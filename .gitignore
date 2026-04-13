@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+.DS_Store?
+*.swp
+*.swo
+*~
+.AppleDouble
+.LSOverride
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.env
+.env.local
+
+# Build
+dist/
+build/
+*.zip
