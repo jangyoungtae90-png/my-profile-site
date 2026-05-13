@@ -163,101 +163,6 @@
         }
         .cta-pill:hover { background: var(--solum-deep); }
 
-        /* ───────────────────────────────────────────────
-           SOLUM Card Shapes (from Retail Media Network)
-           3 variants: purple-cutout / navy-rounded / dark
-           Lower widgets stay balanced (flat white) by default
-           and morph into one of these shapes on hover.
-           ─────────────────────────────────────────────── */
-
-        /* Smooth morph transition on every shape-aware card */
-        .shape-card {
-            transition:
-                background 0.45s ease,
-                color 0.45s ease,
-                border-radius 0.45s ease,
-                clip-path 0.45s ease,
-                transform 0.45s ease,
-                box-shadow 0.45s ease;
-            will-change: clip-path, border-radius, background;
-        }
-
-        /* Variant 1 — Purple with cutout notch at bottom-left
-           Notch sits ~24px inset from the bottom-left corner. */
-        .shape-purple:hover {
-            background: linear-gradient(135deg, var(--solum-deep) 0%, var(--solum-purple) 100%);
-            color: #ffffff;
-            border-radius: 24px;
-            /* Outer rounded rect with an inner square notch cut out of bottom-left.
-               Path traces: TL -> TR -> BR -> BL inset -> up to notch top -> left to corner */
-            clip-path: polygon(
-                0 0,
-                100% 0,
-                100% 100%,
-                70px 100%,
-                70px calc(100% - 56px),
-                0 calc(100% - 56px)
-            );
-            box-shadow: 0 10px 40px rgba(67, 24, 166, 0.35);
-        }
-        .shape-purple:hover .text-gray-400,
-        .shape-purple:hover .text-gray-500,
-        .shape-purple:hover .text-gray-700,
-        .shape-purple:hover .text-gray-300 { color: rgba(255,255,255,0.7) !important; }
-        .shape-purple:hover .v-solum,
-        .shape-purple:hover .v-deep,
-        .shape-purple:hover .v-green,
-        .shape-purple:hover .v-red { color: #ffffff !important; }
-        .shape-purple:hover .mini-card { background: rgba(255,255,255,0.10); }
-        .shape-purple:hover .border-gray-100 { border-color: rgba(255,255,255,0.15) !important; }
-
-        /* Variant 2 — Navy/blue rounded card */
-        .shape-navy:hover {
-            background: linear-gradient(140deg, #1e1b4b 0%, #312e81 60%, #3730a3 100%);
-            color: #ffffff;
-            border-radius: 28px;
-            box-shadow: 0 10px 40px rgba(30, 27, 75, 0.35);
-            transform: translateY(-2px);
-        }
-        .shape-navy:hover .text-gray-400,
-        .shape-navy:hover .text-gray-500,
-        .shape-navy:hover .text-gray-700,
-        .shape-navy:hover .text-gray-300 { color: rgba(255,255,255,0.7) !important; }
-        .shape-navy:hover .v-solum,
-        .shape-navy:hover .v-deep,
-        .shape-navy:hover .v-green,
-        .shape-navy:hover .v-red { color: #ffffff !important; }
-        .shape-navy:hover .mini-card { background: rgba(255,255,255,0.10); }
-        .shape-navy:hover .border-gray-100 { border-color: rgba(255,255,255,0.15) !important; }
-
-        /* Variant 3 — Dark charcoal with asymmetric corner (top-right large radius) */
-        .shape-dark:hover {
-            background: linear-gradient(150deg, #0f172a 0%, #1e293b 100%);
-            color: #ffffff;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 56px;
-            border-bottom-right-radius: 20px;
-            border-bottom-left-radius: 20px;
-            box-shadow: 0 10px 40px rgba(15, 23, 42, 0.35);
-            transform: translateY(-2px);
-        }
-        .shape-dark:hover .text-gray-400,
-        .shape-dark:hover .text-gray-500,
-        .shape-dark:hover .text-gray-700,
-        .shape-dark:hover .text-gray-300 { color: rgba(255,255,255,0.7) !important; }
-        .shape-dark:hover .v-solum,
-        .shape-dark:hover .v-deep,
-        .shape-dark:hover .v-green,
-        .shape-dark:hover .v-red { color: #ffffff !important; }
-        .shape-dark:hover .mini-card { background: rgba(255,255,255,0.10); }
-        .shape-dark:hover .border-gray-100 { border-color: rgba(255,255,255,0.15) !important; }
-
-        /* Mini-card text becomes readable on dark hover */
-        .shape-card:hover .mini-card p { color: rgba(255,255,255,0.85) !important; }
-
-        /* Drag handle stays visible on dark background */
-        .shape-card:hover .drag-handle { color: rgba(255,255,255,0.6); }
-        .shape-card:hover .drag-handle:hover { background: rgba(255,255,255,0.15); color: #ffffff; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -398,19 +303,19 @@
                     </div>
                 </div>
 
-                <div class="widget card shape-card shape-purple p-5" draggable="true">
+                <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 TCO 구성 비교</h3>
                     <div class="h-64"><canvas id="archBarChart"></canvas></div>
                 </div>
 
-                <div class="widget card shape-card shape-navy p-5" draggable="true">
+                <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">연차별 누적 TCO</h3>
                     <div class="h-64"><canvas id="archLineChart"></canvas></div>
                 </div>
 
-                <div class="widget card shape-card shape-dark p-5" draggable="true">
+                <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <details open>
                         <summary class="flex items-center justify-between">
@@ -496,19 +401,19 @@
                     </div>
                 </div>
 
-                <div class="widget card shape-card shape-navy p-5" draggable="true">
+                <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 TCO: CAPEX vs OOS 손실 vs 보충 인력</h3>
                     <div class="h-72"><canvas id="intelBarChart"></canvas></div>
                 </div>
 
-                <div class="widget card shape-card shape-purple p-5" draggable="true">
+                <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">연차별 누적 TCO</h3>
                     <div class="h-64"><canvas id="intelLineChart"></canvas></div>
                 </div>
 
-                <div class="widget card shape-card shape-dark p-5" draggable="true">
+                <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <details open>
                         <summary class="flex items-center justify-between">
@@ -531,7 +436,7 @@
                     </details>
                 </div>
 
-                <div class="widget card shape-card shape-purple p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
+                <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2">로직 요약</p>
                     A안(카메라 단독)은 OOS 감지 지연 30분 + 보충 25분 = <span class="v-solum font-semibold">55분</span> 재고 공백.<br>
@@ -612,19 +517,19 @@
                     </div>
                 </div>
 
-                <div class="widget card shape-card shape-dark p-5" draggable="true">
+                <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 Net Value (누적 매출 − CAPEX)</h3>
                     <div class="h-64"><canvas id="revLineChart"></canvas></div>
                 </div>
 
-                <div class="widget card shape-card shape-purple p-5" draggable="true">
+                <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">SOLUM vs Normal Display — 핵심 지표</h3>
                     <div class="h-64"><canvas id="revBarChart"></canvas></div>
                 </div>
 
-                <div class="widget card shape-card shape-navy p-5" draggable="true">
+                <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div class="mini-card mc-green">
@@ -645,7 +550,7 @@
                     </div>
                 </div>
 
-                <div class="widget card shape-card shape-dark p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
+                <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2">로직 요약</p>
                     배터리 수명 400일(SOLUM) vs 308일(경쟁사) → 광고 갱신 빈도 <span class="v-solum font-semibold">+30%</span> 우위.<br>
@@ -712,9 +617,11 @@ function makeChart(id, cfg) {
 }
 
 const C = {
-    solum:'#4318a6', solumL:'#4318a622', deep:'#1e0a5e', deepL:'#1e0a5e22',
-    red:'#ef4444', redL:'#ef444422', amber:'#f59e0b', amberL:'#f59e0b22',
-    green:'#059669', greenL:'#05966922', blue:'#3b82f6', purple:'#a78bfa',
+    p1:'#c4b5fd', p1L:'#c4b5fd33',  /* lightest lavender */
+    p2:'#8b5cf6', p2L:'#8b5cf633',  /* medium violet */
+    p3:'#5b21b6', p3L:'#5b21b633',  /* deep violet */
+    p4:'#4318a6', p4L:'#4318a633',  /* SOLUM purple */
+    p5:'#1e0a5e', p5L:'#1e0a5e33', /* deepest navy */
     grid:'#f0ecfa', text:'#94a3b8'
 };
 const baseOpts = {
@@ -743,14 +650,14 @@ function renderArch() {
     document.getElementById('archSavingPct').textContent = r.bleTCO>0?Math.round(diff/r.bleTCO*100)+'%':'—';
 
     makeChart('archBarChart',{type:'bar',data:{labels:['HaLow','BLE'],datasets:[
-        {label:'CAPEX',data:[r.halowCapex,r.bleCapex],backgroundColor:C.blue,stack:'s',borderRadius:4},
-        {label:'OPEX (5년)',data:[r.halowOpex*5,r.bleOpex*5],backgroundColor:C.amber,stack:'s',borderRadius:4}
+        {label:'CAPEX',data:[r.halowCapex,r.bleCapex],backgroundColor:C.p1,stack:'s',borderRadius:4},
+        {label:'OPEX (5년)',data:[r.halowOpex*5,r.bleOpex*5],backgroundColor:C.p4,stack:'s',borderRadius:4}
     ]},options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true}}}});
 
     const yrs=[0,1,2,3,4,5];
     makeChart('archLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
-        {label:'HaLow 누적',data:yrs.map(y=>r.halowCapex+r.halowOpex*y),borderColor:C.solum,backgroundColor:C.solumL,tension:0.3,fill:true,pointBackgroundColor:C.solum},
-        {label:'BLE 누적',data:yrs.map(y=>r.bleCapex+r.bleOpex*y),borderColor:C.red,backgroundColor:C.redL,tension:0.3,fill:true,pointBackgroundColor:C.red}
+        {label:'HaLow 누적',data:yrs.map(y=>r.halowCapex+r.halowOpex*y),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5},
+        {label:'BLE 누적',data:yrs.map(y=>r.bleCapex+r.bleOpex*y),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2}
     ]},options:baseOpts});
 
     document.getElementById('archStoreTable').innerHTML = STORE_LIST.map(s=>{
@@ -775,15 +682,15 @@ function renderIntel() {
     document.getElementById('intelSavingPct').textContent = r.aTCO>0?Math.round(diff/r.aTCO*100)+'%':'—';
 
     makeChart('intelBarChart',{type:'bar',data:{labels:['A. Camera 단독','B. UWB+Newton+LoadCell'],datasets:[
-        {label:'CAPEX',data:[r.aCapex,r.bCapex],backgroundColor:C.blue,stack:'s',borderRadius:4},
-        {label:'OOS 손실 (5년)',data:[r.aOOS*5,r.bOOS*5],backgroundColor:C.amber,stack:'s',borderRadius:4},
-        {label:'보충 인력 (5년)',data:[r.aLabor*5,r.bLabor*5],backgroundColor:C.purple,stack:'s',borderRadius:4}
+        {label:'CAPEX',data:[r.aCapex,r.bCapex],backgroundColor:C.p1,stack:'s',borderRadius:4},
+        {label:'OOS 손실 (5년)',data:[r.aOOS*5,r.bOOS*5],backgroundColor:C.p3,stack:'s',borderRadius:4},
+        {label:'보충 인력 (5년)',data:[r.aLabor*5,r.bLabor*5],backgroundColor:C.p5,stack:'s',borderRadius:4}
     ]},options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true}}}});
 
     const yrs=[0,1,2,3,4,5];
     makeChart('intelLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
-        {label:'A. Camera 누적',data:yrs.map(y=>r.aCapex+r.aOpex*y),borderColor:C.red,backgroundColor:C.redL,tension:0.3,fill:true,pointBackgroundColor:C.red},
-        {label:'B. SOLUM 누적',data:yrs.map(y=>r.bCapex+r.bOpex*y),borderColor:C.solum,backgroundColor:C.solumL,tension:0.3,fill:true,pointBackgroundColor:C.solum}
+        {label:'A. Camera 누적',data:yrs.map(y=>r.aCapex+r.aOpex*y),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2},
+        {label:'B. SOLUM 누적',data:yrs.map(y=>r.bCapex+r.bOpex*y),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5}
     ]},options:baseOpts});
 
     document.getElementById('intelStoreTable').innerHTML = STORE_LIST.map(s=>{
@@ -807,12 +714,12 @@ function renderRev() {
 
     const yrs=[0,1,2,3,4,5];
     makeChart('revLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
-        {label:'SOLUM Net Value',data:yrs.map(y=>y===0?-r.capex:r.solAnnual*y-r.capex),borderColor:C.solum,backgroundColor:C.solumL,tension:0.3,fill:true,pointBackgroundColor:C.solum},
-        {label:'Normal Net Value',data:yrs.map(y=>y===0?-r.capex:r.normAnnual*y-r.capex),borderColor:C.red,backgroundColor:C.redL,tension:0.3,fill:true,pointBackgroundColor:C.red}
+        {label:'SOLUM Net Value',data:yrs.map(y=>y===0?-r.capex:r.solAnnual*y-r.capex),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5},
+        {label:'Normal Net Value',data:yrs.map(y=>y===0?-r.capex:r.normAnnual*y-r.capex),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2}
     ]},options:baseOpts});
     makeChart('revBarChart',{type:'bar',data:{labels:['연 매출','5년 누적 매출','5년 Net Value'],datasets:[
-        {label:'SOLUM',data:[r.solAnnual,r.solAnnual*5,r.solNet5],backgroundColor:C.solum,borderRadius:6},
-        {label:'Normal',data:[r.normAnnual,r.normAnnual*5,r.normNet5],backgroundColor:C.red,borderRadius:6}
+        {label:'SOLUM',data:[r.solAnnual,r.solAnnual*5,r.solNet5],backgroundColor:C.p4,borderRadius:6},
+        {label:'Normal',data:[r.normAnnual,r.normAnnual*5,r.normNet5],backgroundColor:C.p1,borderRadius:6}
     ]},options:baseOpts});
 }
 
