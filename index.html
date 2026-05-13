@@ -380,10 +380,21 @@
                     </div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
-                    <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 TCO 구성 비교</h3>
-                    <div class="h-64"><canvas id="archBarChart"></canvas></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" title="드래그하여 이동">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3">HaLow</h3>
+                        <div class="h-48 flex-1"><canvas id="halowBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold" style="color:#1e0a5e" id="halowTcoDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400">5년 TCO</p>
+                    </div>
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" title="드래그하여 이동">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3">BLE</h3>
+                        <div class="h-48 flex-1"><canvas id="bleBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold" style="color:#1e0a5e" id="bleTcoDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400">5년 TCO</p>
+                    </div>
                 </div>
 
                 <div class="widget card p-5" draggable="true">
@@ -478,10 +489,21 @@
                     </div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
-                    <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 TCO: CAPEX vs OOS 손실 vs 보충 인력</h3>
-                    <div class="h-72"><canvas id="intelBarChart"></canvas></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" title="드래그하여 이동">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3">Camera 단독</h3>
+                        <div class="h-52 flex-1"><canvas id="cameraBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold" style="color:#1e0a5e" id="cameraTcoDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400">5년 TCO</p>
+                    </div>
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" title="드래그하여 이동">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3">SOLUM 솔루션</h3>
+                        <div class="h-52 flex-1"><canvas id="solumBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold" style="color:#1e0a5e" id="solumTcoDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400">5년 TCO</p>
+                    </div>
                 </div>
 
                 <div class="widget card p-5" draggable="true">
@@ -600,10 +622,21 @@
                     <div class="h-64"><canvas id="revLineChart"></canvas></div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
-                    <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <h3 class="text-sm font-semibold text-gray-700 mb-4">SOLUM vs Normal Display — 핵심 지표</h3>
-                    <div class="h-64"><canvas id="revBarChart"></canvas></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" title="드래그하여 이동">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3">SOLUM</h3>
+                        <div class="h-48 flex-1"><canvas id="solumRevBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold" style="color:#1e0a5e" id="solumNetDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400">5년 Net Value</p>
+                    </div>
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" title="드래그하여 이동">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3">Normal</h3>
+                        <div class="h-48 flex-1"><canvas id="normRevBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold" style="color:#1e0a5e" id="normNetDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400">5년 Net Value</p>
+                    </div>
                 </div>
 
                 <div class="widget card p-5" draggable="true">
@@ -722,11 +755,11 @@ function makeChart(id, cfg) {
 }
 
 const C = {
-    p1:'#c4b5fd', p1L:'#c4b5fd33',
-    p2:'#8b5cf6', p2L:'#8b5cf633',
-    p3:'#7c3aed', p3L:'#7c3aed33',
-    p4:'#4318a6', p4L:'#4318a633',
-    p5:'#1e0a5e', p5L:'#1e0a5e33',
+    p1:'#c4b5fd', p1L:'#c4b5fd33',  /* lightest lavender */
+    p2:'#8b5cf6', p2L:'#8b5cf633',  /* medium violet */
+    p3:'#7c3aed', p3L:'#7c3aed33',  /* bright mid violet */
+    p4:'#4318a6', p4L:'#4318a633',  /* SOLUM purple */
+    p5:'#1e0a5e', p5L:'#1e0a5e33', /* deepest navy */
     grid:'#f0ecfa', text:'#94a3b8'
 };
 const baseOpts = {
@@ -750,10 +783,17 @@ function renderArch() {
     document.getElementById('archSaving').textContent    = fmtK(diff);
     document.getElementById('archSavingPct').textContent = r.bleTCO>0?Math.round(diff/r.bleTCO*100)+'%':'—';
 
-    makeChart('archBarChart',{type:'bar',data:{labels:['HaLow','BLE'],datasets:[
-        {label:'CAPEX',data:[r.halowCapex,r.bleCapex],backgroundColor:[C.p4,C.p1],stack:'s',borderRadius:4},
-        {label:'OPEX (5년)',data:[r.halowOpex*5,r.bleOpex*5],backgroundColor:[C.p5,C.p2],stack:'s',borderRadius:4}
-    ]},options:{...baseOpts,plugins:{...baseOpts.plugins,barGroupLabels:{labels:['HaLow','BLE']}},scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true,ticks:{display:false},grid:{display:false}}}}});
+    document.getElementById('halowTcoDisplay').textContent = fmt(r.halowTCO);
+    document.getElementById('bleTcoDisplay').textContent   = fmt(r.bleTCO);
+    const slimStackOpts = {scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true,ticks:{display:false},grid:{display:false}}}};
+    makeChart('halowBarChart',{type:'bar',data:{labels:['HaLow'],datasets:[
+        {label:'CAPEX',data:[r.halowCapex],backgroundColor:C.p4,stack:'s',borderRadius:4,maxBarThickness:72},
+        {label:'OPEX (5년)',data:[r.halowOpex*5],backgroundColor:C.p5,stack:'s',borderRadius:0,maxBarThickness:72}
+    ]},options:{...baseOpts,...slimStackOpts}});
+    makeChart('bleBarChart',{type:'bar',data:{labels:['BLE'],datasets:[
+        {label:'CAPEX',data:[r.bleCapex],backgroundColor:C.p1,stack:'s',borderRadius:4,maxBarThickness:72},
+        {label:'OPEX (5년)',data:[r.bleOpex*5],backgroundColor:C.p2,stack:'s',borderRadius:0,maxBarThickness:72}
+    ]},options:{...baseOpts,...slimStackOpts}});
 
     const yrs=[0,1,2,3,4,5];
     makeChart('archLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
@@ -782,11 +822,19 @@ function renderIntel() {
     document.getElementById('intelSaving').textContent    = fmtK(diff);
     document.getElementById('intelSavingPct').textContent = r.aTCO>0?Math.round(diff/r.aTCO*100)+'%':'—';
 
-    makeChart('intelBarChart',{type:'bar',data:{labels:['Camera','SOLUM'],datasets:[
-        {label:'CAPEX',data:[r.aCapex,r.bCapex],backgroundColor:['#ddd6fe',C.p3],stack:'s',borderRadius:4},
-        {label:'OOS 손실 (5년)',data:[r.aOOS*5,r.bOOS*5],backgroundColor:[C.p1,C.p4],stack:'s',borderRadius:4},
-        {label:'보충 인력 (5년)',data:[r.aLabor*5,r.bLabor*5],backgroundColor:[C.p2,C.p5],stack:'s',borderRadius:4}
-    ]},options:{...baseOpts,plugins:{...baseOpts.plugins,barGroupLabels:{labels:['Camera 단독','SOLUM 솔루션']}},scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true,ticks:{display:false},grid:{display:false}}}}});
+    document.getElementById('cameraTcoDisplay').textContent = fmt(r.aTCO);
+    document.getElementById('solumTcoDisplay').textContent  = fmt(r.bTCO);
+    const slimStackI = {scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true,ticks:{display:false},grid:{display:false}}}};
+    makeChart('cameraBarChart',{type:'bar',data:{labels:['Camera'],datasets:[
+        {label:'CAPEX',data:[r.aCapex],backgroundColor:'#ddd6fe',stack:'s',borderRadius:4,maxBarThickness:72},
+        {label:'OOS 손실 (5년)',data:[r.aOOS*5],backgroundColor:C.p1,stack:'s',borderRadius:0,maxBarThickness:72},
+        {label:'보충 인력 (5년)',data:[r.aLabor*5],backgroundColor:C.p2,stack:'s',borderRadius:0,maxBarThickness:72}
+    ]},options:{...baseOpts,...slimStackI}});
+    makeChart('solumBarChart',{type:'bar',data:{labels:['SOLUM'],datasets:[
+        {label:'CAPEX',data:[r.bCapex],backgroundColor:C.p3,stack:'s',borderRadius:4,maxBarThickness:72},
+        {label:'OOS 손실 (5년)',data:[r.bOOS*5],backgroundColor:C.p4,stack:'s',borderRadius:0,maxBarThickness:72},
+        {label:'보충 인력 (5년)',data:[r.bLabor*5],backgroundColor:C.p5,stack:'s',borderRadius:0,maxBarThickness:72}
+    ]},options:{...baseOpts,...slimStackI}});
 
     const yrs=[0,1,2,3,4,5];
     makeChart('intelLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
@@ -818,11 +866,15 @@ function renderRev() {
         {label:'SOLUM Net Value',data:yrs.map(y=>y===0?-r.capex:r.solAnnual*y-r.capex),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5},
         {label:'Normal Net Value',data:yrs.map(y=>y===0?-r.capex:r.normAnnual*y-r.capex),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2}
     ]},options:baseOpts});
-    makeChart('revBarChart',{type:'bar',data:{labels:['SOLUM','Normal'],datasets:[
-        {label:'연 매출',data:[r.solAnnual,r.normAnnual],backgroundColor:[C.p3,C.p1],borderRadius:4},
-        {label:'5년 누적 매출',data:[r.solAnnual*5,r.normAnnual*5],backgroundColor:[C.p4,'#ddd6fe'],borderRadius:4},
-        {label:'5년 Net Value',data:[r.solNet5,r.normNet5],backgroundColor:[C.p5,C.p2],borderRadius:4}
-    ]},options:{...baseOpts,plugins:{...baseOpts.plugins,barGroupLabels:{labels:['SOLUM','Normal']}},scales:{...baseOpts.scales,x:{...baseOpts.scales.x,ticks:{display:false},grid:{display:false}}}}});
+    document.getElementById('solumNetDisplay').textContent = fmt(r.solNet5);
+    document.getElementById('normNetDisplay').textContent  = fmt(r.normNet5);
+    const revBarOpts = {plugins:{...baseOpts.plugins,legend:{display:false}},scales:{...baseOpts.scales,x:{...baseOpts.scales.x,ticks:{color:C.text,font:{size:9}}}}};
+    makeChart('solumRevBarChart',{type:'bar',data:{labels:['연 매출','5년 누적','Net Value'],datasets:[
+        {label:'SOLUM',data:[r.solAnnual,r.solAnnual*5,r.solNet5],backgroundColor:[C.p3,C.p4,C.p5],borderRadius:4,maxBarThickness:60}
+    ]},options:{...baseOpts,...revBarOpts}});
+    makeChart('normRevBarChart',{type:'bar',data:{labels:['연 매출','5년 누적','Net Value'],datasets:[
+        {label:'Normal',data:[r.normAnnual,r.normAnnual*5,r.normNet5],backgroundColor:[C.p1,'#ddd6fe',C.p2],borderRadius:4,maxBarThickness:60}
+    ]},options:{...baseOpts,...revBarOpts}});
 }
 
 function render() { renderShared(); renderArch(); renderIntel(); renderRev(); }
