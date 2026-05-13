@@ -181,6 +181,60 @@
         .hero-select:hover { border-color: rgba(196,181,253,0.9); background-color: rgba(255,255,255,0.18); }
         .hero-select option { background: #1e0a5e; color: white; }
 
+        /* ── Hero right panel (light lavender glass) ── */
+        .hero-right-panel {
+            background: rgba(237, 233, 254, 0.93);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 16px;
+            padding: 20px 22px;
+        }
+        /* Slider for light background */
+        .hero-slider-light {
+            -webkit-appearance: none;
+            width: 100%; height: 6px;
+            border-radius: 99px;
+            outline: none; cursor: pointer;
+            background: linear-gradient(to right, #7c3aed 0%, #7c3aed var(--pct, 50%), #ddd6fe var(--pct, 50%), #ddd6fe 100%);
+        }
+        .hero-slider-light::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px; height: 20px;
+            background: #4318a6;
+            border-radius: 50%; cursor: pointer;
+            box-shadow: 0 0 0 5px rgba(67, 24, 166, 0.22), 0 2px 8px rgba(0,0,0,0.12);
+            transition: box-shadow 0.2s;
+        }
+        .hero-slider-light::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 0 8px rgba(67, 24, 166, 0.28), 0 2px 10px rgba(0,0,0,0.18);
+        }
+        .hero-slider-light::-moz-range-thumb {
+            width: 20px; height: 20px;
+            background: #4318a6;
+            border-radius: 50%; border: 0; cursor: pointer;
+            box-shadow: 0 0 0 5px rgba(67, 24, 166, 0.22);
+        }
+        /* Select for light panel */
+        .hero-select-light {
+            background: rgba(255,255,255,0.85);
+            border: 1.5px solid #c4b5fd;
+            color: #1e0a5e;
+            border-radius: 12px;
+            padding: 8px 36px 8px 14px;
+            font-size: 13px; font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            cursor: pointer; outline: none;
+            appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234318a6' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .hero-select-light:hover { border-color: #7c3aed; background-color: rgba(255,255,255,0.95); }
+        .hero-select-light option { background: white; color: #1e0a5e; }
+
         /* ── CTA pill button (like SOLUM "Contact Us") ── */
         .cta-pill {
             background: var(--solum-purple);
@@ -214,49 +268,51 @@
 <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
     <!-- ── Hero Summary Card (SOLUM hero style: big rounded rect) ── -->
-    <section class="hero-card p-6 sm:p-8 mb-6 grid grid-cols-1 md:grid-cols-4 gap-6 relative z-0">
-        <div class="md:col-span-2">
+    <section class="hero-card p-6 sm:p-8 mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 relative z-0">
+        <div>
             <span class="inline-block bg-white text-gray-800 rounded-full px-4 py-1 text-xs font-semibold mb-4">ESL &amp; IoT · Retail Tech</span>
             <h1 class="text-2xl sm:text-3xl font-bold leading-tight mb-2">SOLUM AIR<br>ROI Simulator</h1>
             <p class="text-sm text-white/70">매장 크기 기반 5년 TCO / Revenue 비교</p>
             <p class="text-xs text-white/50 mt-2">Architecture · Intelligence · Revenue</p>
         </div>
-        <div>
-            <label class="text-xs text-white/60 uppercase tracking-widest">매장 면적 (㎡)</label>
-            <div class="mt-3">
-                <input type="range" id="areaSlider" class="hero-slider" min="500" max="25000" step="100" value="10000">
-            </div>
-            <div class="flex items-center gap-2 mt-2">
-                <input type="number" id="areaInput" min="100" max="50000" step="100" value="10000"
-                    style="background:rgba(255,255,255,0.12);border:1.5px solid rgba(196,181,253,0.5);color:white;border-radius:10px;padding:6px 12px;width:110px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;">
-                <span class="text-white/50 text-xs">㎡</span>
-            </div>
-            <div class="mt-4 grid grid-cols-2 gap-3">
-                <div>
-                    <p class="text-xs text-white/50">선반 수</p>
-                    <p class="text-xl font-bold"><span id="shelfCount">100</span><span class="text-sm font-normal opacity-50"> 개</span></p>
-                </div>
-                <div>
-                    <p class="text-xs text-white/50">E-Paper POP</p>
-                    <p class="text-xl font-bold"><span id="popCount">30</span><span class="text-sm font-normal opacity-50"> 대</span></p>
-                </div>
-            </div>
-        </div>
-        <div class="flex flex-col justify-between">
+        <div class="hero-right-panel grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-                <p class="text-xs text-white/60 uppercase tracking-widest mb-2">매장 프리셋</p>
-                <select id="presetSelect" class="hero-select">
-                    <option value="Standard Hypermarket">Standard Hypermarket — 10,000㎡</option>
-                    <option value="Walmart">Walmart — 20,250㎡</option>
-                    <option value="Carrefour">Carrefour — 7,500㎡</option>
-                    <option value="REWE">REWE — 5,000㎡</option>
-                    <option value="Lidl">Lidl — 1,500㎡</option>
-                    <option value="Aldi">Aldi — 1,500㎡</option>
-                    <option value="custom">직접 입력</option>
-                </select>
-                <p class="text-[10px] text-white/40 mt-2">Air Launching Show ROI 시트 기준 기본값</p>
+                <label class="text-xs text-gray-500 uppercase tracking-widest">매장 면적 (㎡)</label>
+                <div class="mt-3">
+                    <input type="range" id="areaSlider" class="hero-slider-light" min="500" max="25000" step="100" value="10000">
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                    <input type="number" id="areaInput" min="100" max="50000" step="100" value="10000"
+                        style="background:rgba(255,255,255,0.85);border:1.5px solid #c4b5fd;color:#1e0a5e;border-radius:10px;padding:6px 12px;width:110px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;">
+                    <span class="text-gray-400 text-xs">㎡</span>
+                </div>
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="text-xs text-gray-500">선반 수</p>
+                        <p class="text-xl font-bold" style="color:#1e0a5e"><span id="shelfCount">100</span><span class="text-sm font-normal text-gray-400"> 개</span></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">E-Paper POP</p>
+                        <p class="text-xl font-bold" style="color:#1e0a5e"><span id="popCount">30</span><span class="text-sm font-normal text-gray-400"> 대</span></p>
+                    </div>
+                </div>
             </div>
-            <p class="text-[10px] text-white/30 mt-4">5년 누적 TCO / Net Value 분석</p>
+            <div class="flex flex-col justify-between">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-widest mb-2">매장 프리셋</p>
+                    <select id="presetSelect" class="hero-select-light">
+                        <option value="Standard Hypermarket">Standard Hypermarket — 10,000㎡</option>
+                        <option value="Walmart">Walmart — 20,250㎡</option>
+                        <option value="Carrefour">Carrefour — 7,500㎡</option>
+                        <option value="REWE">REWE — 5,000㎡</option>
+                        <option value="Lidl">Lidl — 1,500㎡</option>
+                        <option value="Aldi">Aldi — 1,500㎡</option>
+                        <option value="custom">직접 입력</option>
+                    </select>
+                    <p class="text-[10px] text-gray-400 mt-2">Air Launching Show ROI 시트 기준 기본값</p>
+                </div>
+                <p class="text-[10px] text-gray-400 mt-4">5년 누적 TCO / Net Value 분석</p>
+            </div>
         </div>
     </section>
 
@@ -641,6 +697,34 @@ function calcRev(area) {
     return {pops, solTotalSlots:pops*ss, solAnnual, normAnnual, capex, solNet5:5*solAnnual-capex, normNet5:5*normAnnual-capex};
 }
 
+// Plugin: draw group title labels above each bar cluster
+Chart.register({
+    id: 'barGroupLabels',
+    afterDraw(chart) {
+        const opts = chart.options.plugins?.barGroupLabels;
+        if (!opts?.labels) return;
+        const {ctx, data, scales} = chart;
+        const yScale = scales.y, xScale = scales.x;
+        ctx.save();
+        ctx.font = '700 12px Inter, "Noto Sans KR", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillStyle = opts.color || '#374151';
+        data.labels.forEach((_, i) => {
+            const label = opts.labels[i];
+            if (!label) return;
+            let minY = yScale.bottom;
+            data.datasets.forEach((_, di) => {
+                const meta = chart.getDatasetMeta(di);
+                if (meta.data[i] && !meta.hidden) minY = Math.min(minY, meta.data[i].y);
+            });
+            const xCenter = xScale.getPixelForTick(i);
+            ctx.fillText(label, xCenter, minY - 8);
+        });
+        ctx.restore();
+    }
+});
+
 const charts = {};
 function makeChart(id, cfg) {
     if(charts[id]) charts[id].destroy();
@@ -681,9 +765,9 @@ function renderArch() {
     document.getElementById('archSavingPct').textContent = r.bleTCO>0?Math.round(diff/r.bleTCO*100)+'%':'—';
 
     makeChart('archBarChart',{type:'bar',data:{labels:['HaLow','BLE'],datasets:[
-        {label:'CAPEX',data:[r.halowCapex,r.bleCapex],backgroundColor:C.p1,stack:'s',borderRadius:4},
-        {label:'OPEX (5년)',data:[r.halowOpex*5,r.bleOpex*5],backgroundColor:C.p4,stack:'s',borderRadius:4}
-    ]},options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true}}}});
+        {label:'CAPEX',data:[r.halowCapex,r.bleCapex],backgroundColor:[C.p4,C.p1],stack:'s',borderRadius:4},
+        {label:'OPEX (5년)',data:[r.halowOpex*5,r.bleOpex*5],backgroundColor:[C.p5,C.p2],stack:'s',borderRadius:4}
+    ]},options:{...baseOpts,plugins:{...baseOpts.plugins,barGroupLabels:{labels:['HaLow','BLE']}},scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true,ticks:{display:false},grid:{display:false}}}}});
 
     const yrs=[0,1,2,3,4,5];
     makeChart('archLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
@@ -712,11 +796,11 @@ function renderIntel() {
     document.getElementById('intelSaving').textContent    = fmtK(diff);
     document.getElementById('intelSavingPct').textContent = r.aTCO>0?Math.round(diff/r.aTCO*100)+'%':'—';
 
-    makeChart('intelBarChart',{type:'bar',data:{labels:['A. Camera 단독','B. UWB+Newton+LoadCell'],datasets:[
-        {label:'CAPEX',data:[r.aCapex,r.bCapex],backgroundColor:C.p1,stack:'s',borderRadius:4},
-        {label:'OOS 손실 (5년)',data:[r.aOOS*5,r.bOOS*5],backgroundColor:C.p3,stack:'s',borderRadius:4},
-        {label:'보충 인력 (5년)',data:[r.aLabor*5,r.bLabor*5],backgroundColor:C.p5,stack:'s',borderRadius:4}
-    ]},options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true}}}});
+    makeChart('intelBarChart',{type:'bar',data:{labels:['Camera','SOLUM'],datasets:[
+        {label:'CAPEX',data:[r.aCapex,r.bCapex],backgroundColor:['#ddd6fe',C.p3],stack:'s',borderRadius:4},
+        {label:'OOS 손실 (5년)',data:[r.aOOS*5,r.bOOS*5],backgroundColor:[C.p1,C.p4],stack:'s',borderRadius:4},
+        {label:'보충 인력 (5년)',data:[r.aLabor*5,r.bLabor*5],backgroundColor:[C.p2,C.p5],stack:'s',borderRadius:4}
+    ]},options:{...baseOpts,plugins:{...baseOpts.plugins,barGroupLabels:{labels:['Camera 단독','SOLUM 솔루션']}},scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true,ticks:{display:false},grid:{display:false}}}}});
 
     const yrs=[0,1,2,3,4,5];
     makeChart('intelLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
@@ -748,10 +832,11 @@ function renderRev() {
         {label:'SOLUM Net Value',data:yrs.map(y=>y===0?-r.capex:r.solAnnual*y-r.capex),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5},
         {label:'Normal Net Value',data:yrs.map(y=>y===0?-r.capex:r.normAnnual*y-r.capex),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2}
     ]},options:baseOpts});
-    makeChart('revBarChart',{type:'bar',data:{labels:['연 매출','5년 누적 매출','5년 Net Value'],datasets:[
-        {label:'SOLUM',data:[r.solAnnual,r.solAnnual*5,r.solNet5],backgroundColor:C.p4,borderRadius:6},
-        {label:'Normal',data:[r.normAnnual,r.normAnnual*5,r.normNet5],backgroundColor:C.p1,borderRadius:6}
-    ]},options:baseOpts});
+    makeChart('revBarChart',{type:'bar',data:{labels:['SOLUM','Normal'],datasets:[
+        {label:'연 매출',data:[r.solAnnual,r.normAnnual],backgroundColor:[C.p3,C.p1],borderRadius:4},
+        {label:'5년 누적 매출',data:[r.solAnnual*5,r.normAnnual*5],backgroundColor:[C.p4,'#ddd6fe'],borderRadius:4},
+        {label:'5년 Net Value',data:[r.solNet5,r.normNet5],backgroundColor:[C.p5,C.p2],borderRadius:4}
+    ]},options:{...baseOpts,plugins:{...baseOpts.plugins,barGroupLabels:{labels:['SOLUM','Normal']}},scales:{...baseOpts.scales,x:{...baseOpts.scales.x,ticks:{display:false},grid:{display:false}}}}});
 }
 
 function render() { renderShared(); renderArch(); renderIntel(); renderRev(); }
