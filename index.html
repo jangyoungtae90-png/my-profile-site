@@ -3,354 +3,865 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terry - 전략기획</title>
+    <title>SOLUM AIR — ROI Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .tab-btn.active {
+            background-color: #ffffff;
+            color: #000000;
         }
-
-        .hero-gradient {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+        .tab-btn { transition: all 0.2s ease; }
+        .metric-card {
+            background: linear-gradient(135deg, #0a0a0a 0%, #141414 100%);
+            border: 1px solid #262626;
         }
-
-        .fade-in {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: #1f2937;
+            border-radius: 4px;
+            outline: none;
         }
-
-        .fade-in.visible {
-            opacity: 1;
-            transform: translateY(0);
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
         }
-
-        .nav-blur {
-            backdrop-filter: blur(10px);
-            background-color: rgba(0, 0, 0, 0.7);
+        input[type=range]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 0;
         }
-
-        .skill-card {
+        input[type=number], input[type=text] {
             background: #0a0a0a;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border-color: #333333;
+            border: 1px solid #262626;
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 6px 10px;
+            width: 100%;
         }
-
-        .skill-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 25px rgba(255, 255, 255, 0.05);
-            border-color: #555555;
+        input[type=number]:focus, input[type=text]:focus {
+            outline: none;
+            border-color: #6b7280;
         }
-
-        .project-card {
-            background: #0a0a0a;
-            transition: all 0.3s ease;
-            border: 1px solid #333333;
+        .preset-chip {
+            transition: all 0.15s ease;
         }
-
-        .project-card:hover {
-            transform: translateY(-6px);
-            border-color: #555555;
-            box-shadow: 0 15px 35px rgba(255, 255, 255, 0.05);
+        .preset-chip.active {
+            background-color: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
         }
-
-        .smooth-scroll {
-            scroll-behavior: smooth;
+        .saving-badge {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
         }
-
-        @keyframes shimmer {
-            0% {
-                opacity: 0.5;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0.5;
-            }
+        .deficit-badge {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
         }
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .chevron { transform: rotate(90deg); }
+        .chevron { transition: transform 0.2s ease; }
     </style>
 </head>
-<body class="bg-gradient-to-b from-black via-gray-950 to-black text-white smooth-scroll">
-    <!-- Navigation -->
-    <nav id="navbar" class="fixed w-full top-0 z-50 nav-blur border-b border-gray-700 border-opacity-0 transition-all duration-300">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-5 flex justify-between items-center">
-            <a href="#home" class="text-2xl font-bold text-white tracking-wider hover:text-gray-300 transition">Terry's Portfolio</a>
-            <div class="hidden md:flex space-x-8">
-                <a href="#about" class="nav-link text-sm text-gray-400 hover:text-white font-medium transition uppercase tracking-wider">01/ Professional Experience</a>
-                <a href="#skills" class="nav-link text-sm text-gray-400 hover:text-white font-medium transition uppercase tracking-wider">02/ Projects</a>
-                <a href="#projects" class="nav-link text-sm text-gray-400 hover:text-white font-medium transition uppercase tracking-wider">03/ Blog</a>
-                <a href="#contact" class="nav-link text-sm text-gray-400 hover:text-white font-medium transition uppercase tracking-wider">04/ Contact Me</a>
-            </div>
-            <button id="mobile-menu-btn" class="md:hidden text-white hover:text-gray-300">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
-        </div>
-    </nav>
+<body class="bg-black text-white min-h-screen">
 
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden fixed top-16 left-0 right-0 bg-black border-b border-gray-700 z-40">
-        <div class="flex flex-col space-y-4 p-4">
-            <a href="#about" class="text-gray-400 hover:text-white font-medium transition uppercase tracking-wider">Professional Experience</a>
-            <a href="#skills" class="text-gray-400 hover:text-white font-medium transition uppercase tracking-wider">Projects</a>
-            <a href="#projects" class="text-gray-400 hover:text-white font-medium transition uppercase tracking-wider">Blog</a>
-            <a href="#contact" class="text-gray-400 hover:text-white font-medium transition uppercase tracking-wider">Contact Me</a>
+<!-- Header -->
+<header class="border-b border-gray-800 sticky top-0 z-40 bg-black/90 backdrop-blur">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <a href="portfolio.html" class="text-xs text-gray-500 hover:text-white uppercase tracking-widest">← Portfolio</a>
+            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1">SOLUM AIR · ROI Simulator</h1>
+            <p class="text-xs text-gray-500 mt-1">매장 크기 기반 5년 TCO / Revenue 비교 — Architecture · Intelligence · Revenue</p>
+        </div>
+        <div class="text-right">
+            <p class="text-[11px] text-gray-600 uppercase tracking-widest">Data Source</p>
+            <p class="text-xs text-gray-400">Air Launching Show ROI 시트</p>
         </div>
     </div>
+</header>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero-gradient min-h-screen pt-20 flex items-center justify-center relative overflow-hidden">
-        <div class="absolute inset-0 opacity-30">
-            <div class="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-            <div class="absolute top-40 right-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000"></div>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+    <!-- Store preset bar -->
+    <section class="mb-6">
+        <div class="flex flex-wrap items-center gap-2 mb-3">
+            <span class="text-[11px] text-gray-500 uppercase tracking-widest mr-2">매장 프리셋</span>
+            <button data-preset="Standard Hypermarket" class="preset-chip active px-3 py-1.5 text-xs border border-gray-700 rounded-full hover:border-white">Standard Hypermarket (10,000㎡)</button>
+            <button data-preset="Walmart" class="preset-chip px-3 py-1.5 text-xs border border-gray-700 rounded-full hover:border-white">월마트 (20,250㎡)</button>
+            <button data-preset="Carrefour" class="preset-chip px-3 py-1.5 text-xs border border-gray-700 rounded-full hover:border-white">까르푸 (7,500㎡)</button>
+            <button data-preset="REWE" class="preset-chip px-3 py-1.5 text-xs border border-gray-700 rounded-full hover:border-white">REWE (5,000㎡)</button>
+            <button data-preset="Lidl" class="preset-chip px-3 py-1.5 text-xs border border-gray-700 rounded-full hover:border-white">Lidl (1,500㎡)</button>
+            <button data-preset="Aldi" class="preset-chip px-3 py-1.5 text-xs border border-gray-700 rounded-full hover:border-white">Aldi (1,500㎡)</button>
         </div>
-
-        <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-left">
-            <h1 class="text-6xl sm:text-7xl md:text-8xl font-bold mb-4 fade-in text-white leading-tight">
-                CREATIVE<br>
-                <span class="text-gray-600">DEVELOPER</span>
-            </h1>
-            <p class="text-base text-gray-400 mb-8 fade-in">Terry / Strategy Planner</p>
-            <p class="text-sm text-gray-500 mb-12 max-w-2xl fade-in uppercase tracking-widest">
-                // SCALABLE BUSINESS SOLUTIONS.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-6 fade-in">
-                <a href="#projects" class="px-8 py-3 border border-gray-600 text-gray-400 hover:text-white hover:border-white transition font-medium uppercase tracking-wider text-sm">
-                    EXPLORE MY WORK ↓
-                </a>
+        <div class="metric-card rounded-xl p-5 grid grid-cols-1 md:grid-cols-4 gap-5">
+            <div>
+                <label class="text-[11px] text-gray-500 uppercase tracking-widest">매장 면적 (㎡)</label>
+                <div class="flex items-center gap-3 mt-2">
+                    <input type="range" id="areaSlider" min="500" max="25000" step="100" value="10000">
+                    <input type="number" id="areaInput" min="100" max="50000" step="100" value="10000" class="w-28 text-right">
+                </div>
+            </div>
+            <div>
+                <p class="text-[11px] text-gray-500 uppercase tracking-widest">선반 수 (자동)</p>
+                <p class="text-2xl font-bold mt-1"><span id="shelfCount">100</span> <span class="text-xs text-gray-500 font-normal">개</span></p>
+                <p class="text-[10px] text-gray-600">100 매대 / 10,000㎡ 가정</p>
+            </div>
+            <div>
+                <p class="text-[11px] text-gray-500 uppercase tracking-widest">E-Paper POP 수 (자동)</p>
+                <p class="text-2xl font-bold mt-1"><span id="popCount">30</span> <span class="text-xs text-gray-500 font-normal">대</span></p>
+                <p class="text-[10px] text-gray-600">30 POP / 10,000㎡ 가정</p>
+            </div>
+            <div>
+                <p class="text-[11px] text-gray-500 uppercase tracking-widest">분석 기간</p>
+                <p class="text-2xl font-bold mt-1">5<span class="text-xs text-gray-500 font-normal"> 년</span></p>
+                <p class="text-[10px] text-gray-600">5년 누적 TCO / Net Value 기준</p>
             </div>
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="py-20 px-4 sm:px-6">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-bold mb-12 fade-in uppercase tracking-widest text-white">
-                Professional Experience
-            </h2>
-            <div class="bg-black rounded-lg p-8 sm:p-12 fade-in border border-gray-800">
-                <p class="text-gray-400 leading-relaxed text-base">
-                    증권사 리서치 센터에서 <span class="text-white font-semibold">경제분석</span>을 시작으로,
-                    <span class="text-white font-semibold">이커머스 운영</span>, <span class="text-white font-semibold">플랫폼 영업전략</span>,
-                    그리고 리테일 부문의 <span class="text-white font-semibold">비즈니스 개발 및 오퍼링 전략</span>에 이르기까지
-                    다양한 분야의 경험을 토대로 사업 개발 전략을 어우르고 있습니다.
-                </p>
-                <p class="text-gray-400 leading-relaxed text-base mt-6">
-                    데이터 기반의 의사결정과 전략적 사고를 통해,
-                    복잡한 비즈니스 과제를 분석하고 실행 가능한 솔루션을 제시하는 것을 목표로 합니다.
-                </p>
-            </div>
-        </div>
-    </section>
+    <!-- Tabs -->
+    <nav class="flex gap-2 border-b border-gray-800 mb-6">
+        <button data-tab="arch" class="tab-btn active px-5 py-2.5 text-sm font-medium border-b-2 border-transparent">
+            01 / Architecture
+        </button>
+        <button data-tab="intel" class="tab-btn px-5 py-2.5 text-sm font-medium border-b-2 border-transparent">
+            02 / Intelligence
+        </button>
+        <button data-tab="rev" class="tab-btn px-5 py-2.5 text-sm font-medium border-b-2 border-transparent">
+            03 / Revenue
+        </button>
+    </nav>
 
-    <!-- Skills Section -->
-    <section id="skills" class="py-20 px-4 sm:px-6">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-bold mb-12 fade-in uppercase tracking-widest text-white">
-                Skills & Expertise
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="skill-card rounded-lg p-6 fade-in border">
-                    <div class="text-3xl mb-4">🌐</div>
-                    <h3 class="text-lg font-semibold mb-2 text-white">영어</h3>
-                    <p class="text-gray-500">Professional Level</p>
-                    <p class="text-xs text-gray-600 mt-2">비즈니스 커뮤니케이션</p>
-                </div>
+    <!-- ========== ARCHITECTURE TAB ========== -->
+    <section id="tab-arch" class="tab-panel">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-                <div class="skill-card rounded-lg p-6 fade-in border">
-                    <div class="text-3xl mb-4">📊</div>
-                    <h3 class="text-lg font-semibold mb-2 text-white">금융분석</h3>
-                    <p class="text-gray-500">CFA Level Exam</p>
-                    <p class="text-xs text-gray-600 mt-2">금융 리서치 및 분석</p>
-                </div>
+            <!-- Inputs -->
+            <div class="metric-card rounded-xl p-5 lg:col-span-1">
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
 
-                <div class="skill-card rounded-lg p-6 fade-in border">
-                    <div class="text-3xl mb-4">📈</div>
-                    <h3 class="text-lg font-semibold mb-2 text-white">통계분석</h3>
-                    <p class="text-gray-500">R, Python</p>
-                    <p class="text-xs text-gray-600 mt-2">데이터 분석 및 시각화</p>
-                </div>
-
-                <div class="skill-card rounded-lg p-6 fade-in border">
-                    <div class="text-3xl mb-4">🎯</div>
-                    <h3 class="text-lg font-semibold mb-2 text-white">전략기획</h3>
-                    <p class="text-gray-500">Business Development</p>
-                    <p class="text-xs text-gray-600 mt-2">사업 전략 수립 및 실행</p>
-                </div>
-
-                <div class="skill-card rounded-lg p-6 fade-in border">
-                    <div class="text-3xl mb-4">💼</div>
-                    <h3 class="text-lg font-semibold mb-2 text-white">경제분석</h3>
-                    <p class="text-gray-500">Macroeconomics</p>
-                    <p class="text-xs text-gray-600 mt-2">거시경제 분석</p>
-                </div>
-
-                <div class="skill-card rounded-lg p-6 fade-in border">
-                    <div class="text-3xl mb-4">🛒</div>
-                    <h3 class="text-lg font-semibold mb-2 text-white">이커머스</h3>
-                    <p class="text-gray-500">Operations</p>
-                    <p class="text-xs text-gray-600 mt-2">플랫폼 운영 및 전략</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects" class="py-20 px-4 sm:px-6">
-        <div class="max-w-4xl mx-auto">
-            <h2 class="text-3xl font-bold mb-12 fade-in uppercase tracking-widest text-white">
-                Projects
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <a href="roi-simulator.html" class="project-card rounded-lg overflow-hidden fade-in block">
-                    <div class="h-40 bg-gradient-to-br from-emerald-900 to-gray-900 flex items-center justify-center">
-                        <span class="text-4xl">📈</span>
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-400">BLE AP 밀도 (대 / 1,000㎡)</span>
+                            <span id="bleDensityVal" class="text-white">2.5</span>
+                        </div>
+                        <input type="range" id="bleDensity" min="1" max="5" step="0.1" value="2.5">
                     </div>
-                    <div class="p-6">
-                        <h3 class="text-base font-semibold mb-2 text-white">SOLUM AIR<br>ROI Simulator</h3>
-                        <p class="text-gray-500 text-sm mb-4">
-                            매장 크기별 TCO 시뮬레이터 — Architecture · Intelligence · Revenue
-                        </p>
-                        <div class="flex gap-2 flex-wrap">
-                            <span class="px-3 py-1 bg-gray-900 rounded-full text-xs text-emerald-400 border border-emerald-900">Live Dashboard</span>
-                            <span class="px-3 py-1 bg-gray-900 rounded-full text-xs text-gray-400 border border-gray-700">ROI</span>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-400">HaLow AP 수 (10,000㎡ 기준)</span>
+                            <span id="halowApsVal" class="text-white">2</span>
+                        </div>
+                        <input type="range" id="halowAps" min="1" max="6" step="1" value="2">
+                    </div>
+
+                    <div class="border-t border-gray-800 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-500">BLE 단가 ($)</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">HW</span>
+                                <input type="number" id="bleHw" value="300" step="10">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">설치</span>
+                                <input type="number" id="bleInstall" value="332.5" step="10">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">유지보수/년</span>
+                                <input type="number" id="bleMaint" value="341.5" step="10">
+                            </label>
                         </div>
                     </div>
-                </a>
 
-                <div class="project-card rounded-lg overflow-hidden fade-in">
-                    <div class="h-40 bg-gray-900 flex items-center justify-center">
-                        <span class="text-4xl">📊</span>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-base font-semibold mb-2 text-white">금융리서치 센터<br>경제분석</h3>
-                        <p class="text-gray-500 text-sm mb-4">
-                            국내외 경제 지표 분석 및 시장 전망 리포트 작성
-                        </p>
-                        <div class="flex gap-2 flex-wrap">
-                            <span class="px-3 py-1 bg-gray-900 rounded-full text-xs text-gray-400 border border-gray-700">경제분석</span>
-                            <span class="px-3 py-1 bg-gray-900 rounded-full text-xs text-gray-400 border border-gray-700">리서치</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="project-card rounded-lg overflow-hidden fade-in">
-                    <div class="h-40 bg-gray-900 flex items-center justify-center">
-                        <span class="text-4xl">🛍️</span>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-base font-semibold mb-2 text-white">이커머스 플랫폼<br>운영 전략</h3>
-                        <p class="text-gray-500 text-sm mb-4">
-                            플랫폼 운영 최적화 및 판매자 영업전략 수립
-                        </p>
-                        <div class="flex gap-2 flex-wrap">
-                            <span class="px-3 py-1 bg-gray-900 rounded-full text-xs text-gray-400 border border-gray-700">이커머스</span>
-                            <span class="px-3 py-1 bg-gray-900 rounded-full text-xs text-gray-400 border border-gray-700">전략</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="project-card rounded-lg overflow-hidden fade-in">
-                    <div class="h-40 bg-gray-900 flex items-center justify-center">
-                        <span class="text-4xl">🎯</span>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-base font-semibold mb-2 text-white">리테일 비즈니스<br>개발</h3>
-                        <p class="text-gray-500 text-sm mb-4">
-                            새로운 오퍼링 개발 및 고객 맞춤형 제품 기획
-                        </p>
-                        <div class="flex gap-2 flex-wrap">
-                            <span class="px-3 py-1 bg-gray-900 rounded-full text-xs text-gray-400 border border-gray-700">비즈니스개발</span>
-                            <span class="px-3 py-1 bg-gray-900 rounded-full text-xs text-gray-400 border border-gray-700">상품기획</span>
+                    <div class="border-t border-gray-800 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-500">HaLow 단가 ($)</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">HW</span>
+                                <input type="number" id="halowHw" value="500" step="10">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">설치</span>
+                                <input type="number" id="halowInstall" value="332.5" step="10">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">유지보수/년</span>
+                                <input type="number" id="halowMaint" value="341.5" step="10">
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 px-4 sm:px-6">
-        <div class="max-w-3xl mx-auto">
-            <h2 class="text-3xl font-bold mb-12 fade-in uppercase tracking-widest text-white">
-                Contact Me
-            </h2>
-            <div class="bg-black rounded-lg p-8 sm:p-12 fade-in border border-gray-800 text-center">
-                <p class="text-gray-400 text-base mb-8">
-                    새로운 기회나 협업에 대해 이야기하고 싶으신가요?<br>
-                    언제든지 연락 주세요.
-                </p>
-                <a href="mailto:terrywillmakeit@gmail.com" class="inline-block px-12 py-3 border border-gray-600 text-white hover:bg-white hover:text-black transition font-medium uppercase tracking-wider text-sm">
-                    Send Me An Email
-                </a>
-                <p class="text-gray-600 text-sm mt-6">
-                    terrywillmakeit@gmail.com
-                </p>
+            <!-- Results -->
+            <div class="lg:col-span-2 space-y-5">
+
+                <!-- Key metrics -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">HaLow AP</p>
+                        <p class="text-2xl font-bold mt-1" id="archHalowAps">2</p>
+                        <p class="text-[10px] text-gray-600">대</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">BLE AP</p>
+                        <p class="text-2xl font-bold mt-1" id="archBleAps">25</p>
+                        <p class="text-[10px] text-gray-600">대</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">5년 TCO 차이</p>
+                        <p class="text-2xl font-bold mt-1 text-emerald-400" id="archSaving">$53,420</p>
+                        <p class="text-[10px] text-gray-600">HaLow 절감액</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">절감률</p>
+                        <p class="text-2xl font-bold mt-1 text-emerald-400" id="archSavingPct">91%</p>
+                        <p class="text-[10px] text-gray-600">vs BLE</p>
+                    </div>
+                </div>
+
+                <!-- TCO breakdown bar -->
+                <div class="metric-card rounded-xl p-5">
+                    <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">5년 TCO 구성 비교</h3>
+                    <div class="h-64"><canvas id="archBarChart"></canvas></div>
+                </div>
+
+                <!-- 5-year cumulative line -->
+                <div class="metric-card rounded-xl p-5">
+                    <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">연차별 누적 TCO</h3>
+                    <div class="h-64"><canvas id="archLineChart"></canvas></div>
+                </div>
+
+                <!-- Per-store comparison table -->
+                <details class="metric-card rounded-xl p-5" open>
+                    <summary class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400">매장 크기별 5년 TCO 매트릭스</h3>
+                        <span class="chevron text-gray-500">▶</span>
+                    </summary>
+                    <div class="overflow-x-auto mt-4">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-left text-[11px] uppercase tracking-widest text-gray-500 border-b border-gray-800">
+                                    <th class="py-2 pr-3">매장</th>
+                                    <th class="py-2 px-3 text-right">면적 (㎡)</th>
+                                    <th class="py-2 px-3 text-right">BLE AP</th>
+                                    <th class="py-2 px-3 text-right">HaLow AP</th>
+                                    <th class="py-2 px-3 text-right">BLE 5년 TCO</th>
+                                    <th class="py-2 px-3 text-right">HaLow 5년 TCO</th>
+                                    <th class="py-2 pl-3 text-right">절감액</th>
+                                </tr>
+                            </thead>
+                            <tbody id="archStoreTable" class="text-gray-300"></tbody>
+                        </table>
+                    </div>
+                </details>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="border-t border-gray-800 py-8 px-4 sm:px-6 text-center text-gray-600 text-sm">
-        <div class="max-w-5xl mx-auto">
-            <p>© 2024 Terry. All rights reserved.</p>
+    <!-- ========== INTELLIGENCE TAB ========== -->
+    <section id="tab-intel" class="tab-panel hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+            <!-- Inputs -->
+            <div class="metric-card rounded-xl p-5 lg:col-span-1">
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-400">매대 밀도 (개 / 10,000㎡)</span>
+                            <span id="shelfDensityVal" class="text-white">100</span>
+                        </div>
+                        <input type="range" id="shelfDensity" min="50" max="300" step="10" value="100">
+                    </div>
+
+                    <div class="border-t border-gray-800 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-500">A. Camera 단독 ($/매대)</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">Camera HW</span>
+                                <input type="number" id="camHw" value="1600" step="50">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">OOS 손실/년</span>
+                                <input type="number" id="camOOS" value="1200" step="50">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">보충 인력/년</span>
+                                <input type="number" id="camLabor" value="199.8" step="10">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-800 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-500">B. UWB + Newton EYE + Load Cell ($/매대)</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">UWB Powerrail</span>
+                                <input type="number" id="solUwb" value="100" step="10">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">Newton EYE</span>
+                                <input type="number" id="solEye" value="70" step="5">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">Load Cell</span>
+                                <input type="number" id="solLoad" value="10" step="1">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">OOS 손실/년</span>
+                                <input type="number" id="solOOS" value="370.91" step="10">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">보충 인력/년</span>
+                                <input type="number" id="solLabor" value="55.92" step="5">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="lg:col-span-2 space-y-5">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">A. Camera CAPEX</p>
+                        <p class="text-2xl font-bold mt-1" id="intelACapex">$160K</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">B. SOLUM CAPEX</p>
+                        <p class="text-2xl font-bold mt-1" id="intelBCapex">$18K</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">5년 TCO 차이</p>
+                        <p class="text-2xl font-bold mt-1 text-emerald-400" id="intelSaving">$628K</p>
+                        <p class="text-[10px] text-gray-600">SOLUM 절감</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">절감률</p>
+                        <p class="text-2xl font-bold mt-1 text-emerald-400" id="intelSavingPct">73%</p>
+                    </div>
+                </div>
+
+                <div class="metric-card rounded-xl p-5">
+                    <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">5년 TCO 구성: CAPEX vs OOS 손실 vs 보충 인력</h3>
+                    <div class="h-72"><canvas id="intelBarChart"></canvas></div>
+                </div>
+
+                <div class="metric-card rounded-xl p-5">
+                    <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">연차별 누적 TCO</h3>
+                    <div class="h-64"><canvas id="intelLineChart"></canvas></div>
+                </div>
+
+                <details class="metric-card rounded-xl p-5" open>
+                    <summary class="flex items-center justify-between">
+                        <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400">매장 크기별 5년 TCO 매트릭스</h3>
+                        <span class="chevron text-gray-500">▶</span>
+                    </summary>
+                    <div class="overflow-x-auto mt-4">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-left text-[11px] uppercase tracking-widest text-gray-500 border-b border-gray-800">
+                                    <th class="py-2 pr-3">매장</th>
+                                    <th class="py-2 px-3 text-right">면적 (㎡)</th>
+                                    <th class="py-2 px-3 text-right">매대 수</th>
+                                    <th class="py-2 px-3 text-right">A. Camera TCO</th>
+                                    <th class="py-2 px-3 text-right">B. SOLUM TCO</th>
+                                    <th class="py-2 pl-3 text-right">절감액</th>
+                                </tr>
+                            </thead>
+                            <tbody id="intelStoreTable" class="text-gray-300"></tbody>
+                        </table>
+                    </div>
+                </details>
+
+                <div class="metric-card rounded-xl p-5 text-xs text-gray-400 leading-relaxed">
+                    <p class="text-[11px] uppercase tracking-widest text-gray-500 mb-2">로직 요약</p>
+                    A안(카메라 단독)은 촬영주기 1시간 기준 OOS 감지 지연 30분 + 보충 25분 = <span class="text-white">55분</span> 재고 공백.<br>
+                    B안(UWB+Newton+Load Cell)은 Load Cell 10분 주기로 LS 선제 감지 (5분) + UWB 동선 최적화로 7분 보충 = <span class="text-white">12분</span> 공백.<br>
+                    매대당 OOS 기회비용은 100매대 기준 $120,000 vs $37,091 → 매대 비례 스케일 적용.
+                </div>
+            </div>
         </div>
-    </footer>
+    </section>
 
-    <script>
-        // Smooth scroll for internal links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    document.getElementById('mobile-menu').classList.add('hidden');
-                }
-            });
-        });
+    <!-- ========== REVENUE TAB ========== -->
+    <section id="tab-rev" class="tab-panel hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        });
+            <!-- Inputs -->
+            <div class="metric-card rounded-xl p-5 lg:col-span-1">
+                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-400">E-Paper POP 밀도 (대 / 10,000㎡)</span>
+                            <span id="popDensityVal" class="text-white">30</span>
+                        </div>
+                        <input type="range" id="popDensity" min="10" max="200" step="10" value="30">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-400">광고 구좌 단가 ($/일)</span>
+                            <span id="adRateVal" class="text-white">$1.00</span>
+                        </div>
+                        <input type="range" id="adRate" min="0.5" max="2" step="0.05" value="1">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-400">연간 영업일</span>
+                            <span id="opDaysVal" class="text-white">300</span>
+                        </div>
+                        <input type="range" id="opDays" min="240" max="365" step="5" value="300">
+                    </div>
 
-        // Fade-in animation on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
+                    <div class="border-t border-gray-800 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-500">광고 구좌 / POP (배터리 효율 차)</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">SOLUM</span>
+                                <input type="number" id="solSlots" value="4" step="1">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">Normal</span>
+                                <input type="number" id="normSlots" value="3" step="1">
+                            </label>
+                        </div>
+                    </div>
 
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
+                    <div class="border-t border-gray-800 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-500">CAPEX 단가 ($)</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">E-Paper POP/대</span>
+                                <input type="number" id="popPrice" value="700" step="50">
+                            </label>
+                            <label class="block">
+                                <span class="text-[10px] text-gray-500">AP 인프라 합</span>
+                                <input type="number" id="apInfra" value="1665" step="100">
+                            </label>
+                        </div>
+                        <p class="text-[10px] text-gray-600">AP 인프라: HaLow 2대 × (HW $500 + 설치 $332.5) 기본값</p>
+                    </div>
+                </div>
+            </div>
 
-        document.querySelectorAll('.fade-in').forEach(el => {
-            observer.observe(el);
-        });
+            <!-- Results -->
+            <div class="lg:col-span-2 space-y-5">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">SOLUM 광고 구좌</p>
+                        <p class="text-2xl font-bold mt-1" id="revSolSlots">120</p>
+                        <p class="text-[10px] text-gray-600">총 구좌 / 일</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">SOLUM 연 매출</p>
+                        <p class="text-2xl font-bold mt-1 text-emerald-400" id="revSolAnnual">$36,000</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Normal 연 매출</p>
+                        <p class="text-2xl font-bold mt-1 text-gray-300" id="revNormAnnual">$27,000</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">5년 Net Value 차</p>
+                        <p class="text-2xl font-bold mt-1 text-emerald-400" id="revNetDiff">+$61,678</p>
+                    </div>
+                </div>
 
-        // Navigation highlight on scroll
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            if (window.scrollY > 100) {
-                navbar.classList.add('border-opacity-100');
-            } else {
-                navbar.classList.remove('border-opacity-100');
-            }
-        });
+                <div class="metric-card rounded-xl p-5">
+                    <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">5년 Net Value (누적 매출 − CAPEX)</h3>
+                    <div class="h-64"><canvas id="revLineChart"></canvas></div>
+                </div>
 
-        // Add animation delay for hero fade-in elements
-        document.querySelectorAll('.hero-gradient .fade-in').forEach((el, index) => {
-            el.style.animationDelay = (index * 0.2) + 's';
-        });
-    </script>
+                <div class="metric-card rounded-xl p-5">
+                    <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">SOLUM vs Normal Display — 핵심 지표</h3>
+                    <div class="h-64"><canvas id="revBarChart"></canvas></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">통합 CMS 절감 (연)</p>
+                        <p class="text-xl font-bold mt-1 text-emerald-400">+$20,160</p>
+                        <p class="text-[10px] text-gray-600">3개 CMS 분리 운영 대비</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">Grey Zone CAPEX 회피</p>
+                        <p class="text-xl font-bold mt-1 text-emerald-400">+$2,530</p>
+                        <p class="text-[10px] text-gray-600">HaLow 채택 시</p>
+                    </div>
+                    <div class="metric-card rounded-xl p-4">
+                        <p class="text-[10px] text-gray-500 uppercase tracking-widest">규격 정합 OPEX 회피</p>
+                        <p class="text-xl font-bold mt-1 text-emerald-400">$13K~$91K</p>
+                        <p class="text-[10px] text-gray-600">콘텐츠 리사이징 숨은 비용</p>
+                    </div>
+                </div>
+
+                <div class="metric-card rounded-xl p-5 text-xs text-gray-400 leading-relaxed">
+                    <p class="text-[11px] uppercase tracking-widest text-gray-500 mb-2">로직 요약</p>
+                    배터리 수명 400일(SOLUM) vs 308일(경쟁사) → 광고 갱신 빈도 <span class="text-white">+30%</span> 우위.<br>
+                    POP당 구좌 4 vs 3 × $1/일 × 300일/년 적용. 5년 Net Value = 5 × 연매출 − CAPEX(AP + POP).<br>
+                    추가 가치: 통합 CMS 운영, Grey Zone 회피, 비표준 규격 리사이징 OPEX 회피.
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="border-t border-gray-800 mt-12 py-6 text-center text-xs text-gray-600">
+    SOLUM AIR ROI Simulator · 수치는 Air Launching Show ROI 시트 기준 · 모든 슬라이더/입력값은 실시간 재계산
+</footer>
+
+<script>
+// ============ Constants & Presets ============
+const PRESETS = {
+    'Standard Hypermarket': 10000,
+    'Walmart': 20250,
+    'Carrefour': 7500,
+    'REWE': 5000,
+    'Lidl': 1500,
+    'Aldi': 1500
+};
+
+const STORE_LIST = [
+    { name: '월마트', area: 20250 },
+    { name: '까르푸', area: 7500 },
+    { name: 'REWE', area: 5000 },
+    { name: 'Lidl', area: 1500 },
+    { name: 'Aldi', area: 1500 },
+    { name: 'Standard Hypermarket', area: 10000 }
+];
+
+const fmt = (n) => '$' + Math.round(n).toLocaleString();
+const fmtK = (n) => {
+    const v = Math.round(n);
+    if (Math.abs(v) >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+    if (Math.abs(v) >= 1e3) return '$' + (v/1e3).toFixed(1) + 'K';
+    return '$' + v.toLocaleString();
+};
+
+// ============ State ============
+const state = {
+    area: 10000
+};
+
+// ============ Calc Functions ============
+function calcArch(area) {
+    const bleDensity = +document.getElementById('bleDensity').value;
+    const halowApsBase = +document.getElementById('halowAps').value;
+    const bleHw = +document.getElementById('bleHw').value;
+    const bleInstall = +document.getElementById('bleInstall').value;
+    const bleMaint = +document.getElementById('bleMaint').value;
+    const halowHw = +document.getElementById('halowHw').value;
+    const halowInstall = +document.getElementById('halowInstall').value;
+    const halowMaint = +document.getElementById('halowMaint').value;
+
+    const bleAps = Math.ceil((area / 1000) * bleDensity);
+    const halowAps = Math.max(1, Math.ceil(halowApsBase * (area / 10000)));
+
+    const bleCapex = bleAps * (bleHw + bleInstall);
+    const bleOpex = bleAps * bleMaint;
+    const bleTCO = bleCapex + 5 * bleOpex;
+
+    const halowCapex = halowAps * (halowHw + halowInstall);
+    const halowOpex = halowAps * halowMaint;
+    const halowTCO = halowCapex + 5 * halowOpex;
+
+    return { bleAps, halowAps, bleCapex, bleOpex, bleTCO, halowCapex, halowOpex, halowTCO };
+}
+
+function calcIntel(area) {
+    const shelfDensity = +document.getElementById('shelfDensity').value;
+    const shelves = Math.round((area / 10000) * shelfDensity);
+    const camHw = +document.getElementById('camHw').value;
+    const camOOS = +document.getElementById('camOOS').value;
+    const camLabor = +document.getElementById('camLabor').value;
+    const solUwb = +document.getElementById('solUwb').value;
+    const solEye = +document.getElementById('solEye').value;
+    const solLoad = +document.getElementById('solLoad').value;
+    const solOOS = +document.getElementById('solOOS').value;
+    const solLabor = +document.getElementById('solLabor').value;
+
+    const aCapex = shelves * camHw;
+    const aOOS = shelves * camOOS;
+    const aLabor = shelves * camLabor;
+    const aOpex = aOOS + aLabor;
+    const aTCO = aCapex + 5 * aOpex;
+
+    const bCapex = shelves * (solUwb + solEye + solLoad);
+    const bOOS = shelves * solOOS;
+    const bLabor = shelves * solLabor;
+    const bOpex = bOOS + bLabor;
+    const bTCO = bCapex + 5 * bOpex;
+
+    return { shelves, aCapex, aOOS, aLabor, aOpex, aTCO, bCapex, bOOS, bLabor, bOpex, bTCO };
+}
+
+function calcRev(area) {
+    const popDensity = +document.getElementById('popDensity').value;
+    const adRate = +document.getElementById('adRate').value;
+    const opDays = +document.getElementById('opDays').value;
+    const solSlots = +document.getElementById('solSlots').value;
+    const normSlots = +document.getElementById('normSlots').value;
+    const popPrice = +document.getElementById('popPrice').value;
+    const apInfra = +document.getElementById('apInfra').value;
+
+    const pops = Math.round((area / 10000) * popDensity);
+    const solTotalSlots = pops * solSlots;
+    const normTotalSlots = pops * normSlots;
+    const solAnnual = solTotalSlots * adRate * opDays;
+    const normAnnual = normTotalSlots * adRate * opDays;
+    const capex = apInfra + pops * popPrice;
+    const solNet5 = 5 * solAnnual - capex;
+    const normNet5 = 5 * normAnnual - capex;
+
+    return { pops, solTotalSlots, normTotalSlots, solAnnual, normAnnual, capex, solNet5, normNet5 };
+}
+
+// ============ Chart instances ============
+const charts = {};
+
+function makeChart(id, config) {
+    if (charts[id]) charts[id].destroy();
+    const ctx = document.getElementById(id).getContext('2d');
+    charts[id] = new Chart(ctx, config);
+}
+
+const COLOR = {
+    halow: '#10b981',
+    ble: '#ef4444',
+    solum: '#10b981',
+    normal: '#ef4444',
+    capex: '#60a5fa',
+    oos: '#f59e0b',
+    labor: '#a78bfa',
+    grid: '#1f2937',
+    text: '#9ca3af'
+};
+
+const baseChartOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: { labels: { color: COLOR.text, font: { size: 11 } } },
+        tooltip: {
+            callbacks: { label: (c) => `${c.dataset.label}: ${fmt(c.parsed.y ?? c.parsed)}` }
+        }
+    },
+    scales: {
+        x: { ticks: { color: COLOR.text }, grid: { color: COLOR.grid } },
+        y: { ticks: { color: COLOR.text, callback: (v) => fmtK(v) }, grid: { color: COLOR.grid } }
+    }
+};
+
+// ============ Render ============
+function renderShared() {
+    document.getElementById('shelfCount').textContent = Math.round((state.area / 10000) * +document.getElementById('shelfDensity').value);
+    document.getElementById('popCount').textContent = Math.round((state.area / 10000) * +document.getElementById('popDensity').value);
+}
+
+function renderArch() {
+    const r = calcArch(state.area);
+    document.getElementById('archHalowAps').textContent = r.halowAps;
+    document.getElementById('archBleAps').textContent = r.bleAps;
+    const diff = r.bleTCO - r.halowTCO;
+    document.getElementById('archSaving').textContent = fmt(diff);
+    document.getElementById('archSavingPct').textContent = r.bleTCO > 0 ? Math.round(diff / r.bleTCO * 100) + '%' : '—';
+
+    makeChart('archBarChart', {
+        type: 'bar',
+        data: {
+            labels: ['HaLow', 'BLE'],
+            datasets: [
+                { label: 'CAPEX', data: [r.halowCapex, r.bleCapex], backgroundColor: COLOR.capex, stack: 's' },
+                { label: 'OPEX (5년)', data: [r.halowOpex*5, r.bleOpex*5], backgroundColor: COLOR.oos, stack: 's' }
+            ]
+        },
+        options: { ...baseChartOpts, scales: { ...baseChartOpts.scales, y: { ...baseChartOpts.scales.y, stacked: true }, x: { ...baseChartOpts.scales.x, stacked: true } } }
+    });
+
+    const years = [0,1,2,3,4,5];
+    makeChart('archLineChart', {
+        type: 'line',
+        data: {
+            labels: years.map(y => 'Y' + y),
+            datasets: [
+                { label: 'HaLow 누적', data: years.map(y => r.halowCapex + r.halowOpex * y), borderColor: COLOR.halow, backgroundColor: COLOR.halow+'33', tension: 0.2, fill: true },
+                { label: 'BLE 누적', data: years.map(y => r.bleCapex + r.bleOpex * y), borderColor: COLOR.ble, backgroundColor: COLOR.ble+'33', tension: 0.2, fill: true }
+            ]
+        },
+        options: baseChartOpts
+    });
+
+    const tbody = document.getElementById('archStoreTable');
+    tbody.innerHTML = STORE_LIST.map(s => {
+        const sr = calcArch(s.area);
+        const sd = sr.bleTCO - sr.halowTCO;
+        return `<tr class="border-b border-gray-900">
+            <td class="py-2 pr-3">${s.name}</td>
+            <td class="py-2 px-3 text-right">${s.area.toLocaleString()}</td>
+            <td class="py-2 px-3 text-right">${sr.bleAps}</td>
+            <td class="py-2 px-3 text-right">${sr.halowAps}</td>
+            <td class="py-2 px-3 text-right">${fmt(sr.bleTCO)}</td>
+            <td class="py-2 px-3 text-right text-emerald-400">${fmt(sr.halowTCO)}</td>
+            <td class="py-2 pl-3 text-right text-emerald-400 font-semibold">${fmt(sd)}</td>
+        </tr>`;
+    }).join('');
+}
+
+function renderIntel() {
+    const r = calcIntel(state.area);
+    document.getElementById('intelACapex').textContent = fmtK(r.aCapex);
+    document.getElementById('intelBCapex').textContent = fmtK(r.bCapex);
+    const diff = r.aTCO - r.bTCO;
+    document.getElementById('intelSaving').textContent = fmtK(diff);
+    document.getElementById('intelSavingPct').textContent = r.aTCO > 0 ? Math.round(diff / r.aTCO * 100) + '%' : '—';
+
+    makeChart('intelBarChart', {
+        type: 'bar',
+        data: {
+            labels: ['A. Camera 단독', 'B. UWB+Newton+LoadCell'],
+            datasets: [
+                { label: 'CAPEX', data: [r.aCapex, r.bCapex], backgroundColor: COLOR.capex, stack: 's' },
+                { label: 'OOS 손실 (5년)', data: [r.aOOS*5, r.bOOS*5], backgroundColor: COLOR.oos, stack: 's' },
+                { label: '보충 인력 (5년)', data: [r.aLabor*5, r.bLabor*5], backgroundColor: COLOR.labor, stack: 's' }
+            ]
+        },
+        options: { ...baseChartOpts, scales: { ...baseChartOpts.scales, y: { ...baseChartOpts.scales.y, stacked: true }, x: { ...baseChartOpts.scales.x, stacked: true } } }
+    });
+
+    const years = [0,1,2,3,4,5];
+    makeChart('intelLineChart', {
+        type: 'line',
+        data: {
+            labels: years.map(y => 'Y' + y),
+            datasets: [
+                { label: 'A. Camera 누적', data: years.map(y => r.aCapex + r.aOpex * y), borderColor: COLOR.ble, backgroundColor: COLOR.ble+'33', tension: 0.2, fill: true },
+                { label: 'B. SOLUM 누적', data: years.map(y => r.bCapex + r.bOpex * y), borderColor: COLOR.halow, backgroundColor: COLOR.halow+'33', tension: 0.2, fill: true }
+            ]
+        },
+        options: baseChartOpts
+    });
+
+    const tbody = document.getElementById('intelStoreTable');
+    tbody.innerHTML = STORE_LIST.map(s => {
+        const sr = calcIntel(s.area);
+        const sd = sr.aTCO - sr.bTCO;
+        return `<tr class="border-b border-gray-900">
+            <td class="py-2 pr-3">${s.name}</td>
+            <td class="py-2 px-3 text-right">${s.area.toLocaleString()}</td>
+            <td class="py-2 px-3 text-right">${sr.shelves}</td>
+            <td class="py-2 px-3 text-right">${fmt(sr.aTCO)}</td>
+            <td class="py-2 px-3 text-right text-emerald-400">${fmt(sr.bTCO)}</td>
+            <td class="py-2 pl-3 text-right text-emerald-400 font-semibold">${fmt(sd)}</td>
+        </tr>`;
+    }).join('');
+}
+
+function renderRev() {
+    const r = calcRev(state.area);
+    document.getElementById('revSolSlots').textContent = r.solTotalSlots;
+    document.getElementById('revSolAnnual').textContent = fmt(r.solAnnual);
+    document.getElementById('revNormAnnual').textContent = fmt(r.normAnnual);
+    document.getElementById('revNetDiff').textContent = '+' + fmt(r.solNet5 - r.normNet5);
+
+    const years = [0,1,2,3,4,5];
+    makeChart('revLineChart', {
+        type: 'line',
+        data: {
+            labels: years.map(y => 'Y' + y),
+            datasets: [
+                { label: 'SOLUM Net Value', data: years.map(y => y === 0 ? -r.capex : r.solAnnual * y - r.capex), borderColor: COLOR.solum, backgroundColor: COLOR.solum+'33', tension: 0.2, fill: true },
+                { label: 'Normal Net Value', data: years.map(y => y === 0 ? -r.capex : r.normAnnual * y - r.capex), borderColor: COLOR.normal, backgroundColor: COLOR.normal+'33', tension: 0.2, fill: true }
+            ]
+        },
+        options: baseChartOpts
+    });
+
+    makeChart('revBarChart', {
+        type: 'bar',
+        data: {
+            labels: ['연 매출', '5년 누적 매출', '5년 Net Value'],
+            datasets: [
+                { label: 'SOLUM', data: [r.solAnnual, r.solAnnual*5, r.solNet5], backgroundColor: COLOR.solum },
+                { label: 'Normal', data: [r.normAnnual, r.normAnnual*5, r.normNet5], backgroundColor: COLOR.normal }
+            ]
+        },
+        options: baseChartOpts
+    });
+}
+
+function render() {
+    renderShared();
+    renderArch();
+    renderIntel();
+    renderRev();
+}
+
+// ============ Event Wiring ============
+function syncSliderLabels() {
+    document.getElementById('bleDensityVal').textContent = (+document.getElementById('bleDensity').value).toFixed(1);
+    document.getElementById('halowApsVal').textContent = document.getElementById('halowAps').value;
+    document.getElementById('shelfDensityVal').textContent = document.getElementById('shelfDensity').value;
+    document.getElementById('popDensityVal').textContent = document.getElementById('popDensity').value;
+    document.getElementById('adRateVal').textContent = '$' + (+document.getElementById('adRate').value).toFixed(2);
+    document.getElementById('opDaysVal').textContent = document.getElementById('opDays').value;
+}
+
+document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('input', () => { syncSliderLabels(); render(); });
+});
+
+document.getElementById('areaSlider').addEventListener('input', (e) => {
+    state.area = +e.target.value;
+    document.getElementById('areaInput').value = state.area;
+    document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+    render();
+});
+document.getElementById('areaInput').addEventListener('input', (e) => {
+    const v = Math.max(100, Math.min(50000, +e.target.value || 0));
+    state.area = v;
+    document.getElementById('areaSlider').value = Math.min(25000, v);
+    document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+    render();
+});
+
+document.querySelectorAll('.preset-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const name = btn.dataset.preset;
+        state.area = PRESETS[name];
+        document.getElementById('areaInput').value = state.area;
+        document.getElementById('areaSlider').value = Math.min(25000, state.area);
+        document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        render();
+    });
+});
+
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+        document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+    });
+});
+
+// Initial render
+syncSliderLabels();
+render();
+</script>
 </body>
 </html>
