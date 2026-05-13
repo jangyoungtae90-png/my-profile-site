@@ -6,192 +6,349 @@
     <title>SOLUM AIR — ROI Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Noto Sans KR', sans-serif; background: #f4f7fe; }
+        :root {
+            --solum-deep:   #1e0a5e;
+            --solum-purple: #4318a6;
+            --solum-mid:    #6d28d9;
+            --solum-light:  #ede9fe;
+            --bg:           #f5f6fa;
+        }
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--bg); color: #1a1a2e; }
 
+        /* ── Header ── */
+        .solum-logo {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: 0.05em;
+            color: var(--solum-deep);
+        }
+
+        /* ── Hero card style (rounded rectangle like SOLUM hero) ── */
+        .hero-card {
+            background: linear-gradient(135deg, var(--solum-deep) 0%, var(--solum-purple) 60%, #7c3aed 100%);
+            border-radius: 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-card::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 220px; height: 220px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+        .hero-card::after {
+            content: '';
+            position: absolute;
+            bottom: -40px; left: -40px;
+            width: 160px; height: 160px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+
+        /* ── White cards ── */
         .card {
             background: #ffffff;
             border-radius: 20px;
-            box-shadow: 0 2px 20px rgba(112, 144, 176, 0.14);
+            box-shadow: 0 2px 20px rgba(30, 10, 94, 0.07);
         }
 
-        .tab-btn { transition: all 0.2s ease; color: #718096; border-radius: 10px; }
-        .tab-btn.active {
-            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
-            color: #ffffff;
+        /* ── Pill chips (matching SOLUM "Automotive & Power" pill) ── */
+        .pill-chip {
+            border-radius: 999px;
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1.5px solid #e0dff5;
+            background: white;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.15s ease;
         }
-
-        .preset-chip { transition: all 0.15s ease; }
-        .preset-chip.active {
-            background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
-            color: #ffffff;
-            border-color: transparent;
+        .pill-chip.active {
+            background: var(--solum-deep);
+            color: white;
+            border-color: var(--solum-deep);
         }
+        .pill-chip:hover:not(.active) { border-color: var(--solum-purple); color: var(--solum-purple); }
 
+        /* ── Tab buttons ── */
+        .tab-btn { border-radius: 12px; transition: all 0.2s ease; color: #64748b; font-weight: 500; }
+        .tab-btn.active { background: var(--solum-deep); color: white; }
+
+        /* ── Inputs ── */
         input[type=range] {
             -webkit-appearance: none;
-            width: 100%;
-            height: 5px;
-            background: #e9efff;
-            border-radius: 4px;
-            outline: none;
+            width: 100%; height: 5px;
+            background: #e8e6f5;
+            border-radius: 4px; outline: none;
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #7c3aed, #6366f1);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+            width: 18px; height: 18px;
+            background: var(--solum-purple);
+            border-radius: 50%; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(67, 24, 166, 0.35);
         }
         input[type=range]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
-            background: #7c3aed;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 0;
+            width: 18px; height: 18px;
+            background: var(--solum-purple);
+            border-radius: 50%; cursor: pointer; border: 0;
         }
         input[type=number] {
-            background: #f8faff;
-            border: 1.5px solid #e9efff;
-            color: #2d3748;
+            background: #f8f7ff;
+            border: 1.5px solid #e8e6f5;
+            color: #1a1a2e;
             border-radius: 10px;
             padding: 6px 10px;
             width: 100%;
-            transition: border-color 0.2s, box-shadow 0.2s;
             font-size: 13px;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        input[type=number]:focus {
-            outline: none;
-            border-color: #7c3aed;
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
-        }
+        input[type=number]:focus { outline: none; border-color: var(--solum-purple); box-shadow: 0 0 0 3px rgba(67,24,166,0.1); }
 
-        .val-purple { color: #7c3aed; }
-        .val-green  { color: #059669; }
-        .val-red    { color: #dc2626; }
+        /* ── Value colors ── */
+        .v-solum  { color: var(--solum-purple); }
+        .v-deep   { color: var(--solum-deep); }
+        .v-green  { color: #059669; }
+        .v-red    { color: #dc2626; }
 
-        /* Draggable widgets */
-        .widget { position: relative; transition: box-shadow 0.2s; }
-        .widget[draggable="true"] { cursor: default; }
+        /* ── Metric mini-cards ── */
+        .mini-card { border-radius: 16px; padding: 16px; }
+        .mc-solum  { background: #f0ebff; }
+        .mc-green  { background: #ecfdf5; }
+        .mc-red    { background: #fef2f2; }
+        .mc-deep   { background: #eee8ff; }
+        .mc-blue   { background: #eff6ff; }
+        .mc-gray   { background: #f8fafc; }
+
+        /* ── Drag & Drop ── */
+        .widget { position: relative; }
         .drag-handle {
-            position: absolute;
-            top: 14px; right: 14px;
-            width: 26px; height: 26px;
+            position: absolute; top: 14px; right: 14px;
+            width: 28px; height: 28px;
             display: flex; align-items: center; justify-content: center;
-            cursor: grab;
-            color: #c4c9e2;
-            font-size: 18px;
-            opacity: 0;
-            transition: opacity 0.2s;
-            user-select: none;
-            z-index: 10;
-            border-radius: 6px;
+            cursor: grab; color: #c4bfe8; font-size: 18px;
+            opacity: 0; transition: opacity 0.2s;
+            user-select: none; z-index: 10; border-radius: 8px;
         }
-        .drag-handle:hover { background: #f0f0ff; color: #7c3aed; }
+        .drag-handle:hover { background: #f0ebff; color: var(--solum-purple); }
         .widget:hover .drag-handle { opacity: 1; }
-        .widget.dragging { opacity: 0.35; box-shadow: none; }
-        .widget.drag-over {
-            outline: 2px dashed #7c3aed;
-            outline-offset: 3px;
-            border-radius: 20px;
-        }
+        .widget.dragging { opacity: 0.35; }
+        .widget.drag-over { outline: 2px dashed var(--solum-purple); outline-offset: 3px; border-radius: 20px; }
 
         details > summary { list-style: none; cursor: pointer; }
         details > summary::-webkit-details-marker { display: none; }
         details[open] .chevron { transform: rotate(90deg); }
         .chevron { transition: transform 0.2s ease; display: inline-block; }
 
-        /* Badge pills */
-        .badge-violet { background: #ede9fe; color: #6d28d9; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 600; }
-        .badge-green  { background: #d1fae5; color: #065f46; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 600; }
+        /* ── CTA pill button (like SOLUM "Contact Us") ── */
+        .cta-pill {
+            background: var(--solum-purple);
+            color: white;
+            border-radius: 999px;
+            padding: 8px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .cta-pill:hover { background: var(--solum-deep); }
+
+        /* ───────────────────────────────────────────────
+           SOLUM Card Shapes (from Retail Media Network)
+           3 variants: purple-cutout / navy-rounded / dark
+           Lower widgets stay balanced (flat white) by default
+           and morph into one of these shapes on hover.
+           ─────────────────────────────────────────────── */
+
+        /* Smooth morph transition on every shape-aware card */
+        .shape-card {
+            transition:
+                background 0.45s ease,
+                color 0.45s ease,
+                border-radius 0.45s ease,
+                clip-path 0.45s ease,
+                transform 0.45s ease,
+                box-shadow 0.45s ease;
+            will-change: clip-path, border-radius, background;
+        }
+
+        /* Variant 1 — Purple with cutout notch at bottom-left
+           Notch sits ~24px inset from the bottom-left corner. */
+        .shape-purple:hover {
+            background: linear-gradient(135deg, var(--solum-deep) 0%, var(--solum-purple) 100%);
+            color: #ffffff;
+            border-radius: 24px;
+            /* Outer rounded rect with an inner square notch cut out of bottom-left.
+               Path traces: TL -> TR -> BR -> BL inset -> up to notch top -> left to corner */
+            clip-path: polygon(
+                0 0,
+                100% 0,
+                100% 100%,
+                70px 100%,
+                70px calc(100% - 56px),
+                0 calc(100% - 56px)
+            );
+            box-shadow: 0 10px 40px rgba(67, 24, 166, 0.35);
+        }
+        .shape-purple:hover .text-gray-400,
+        .shape-purple:hover .text-gray-500,
+        .shape-purple:hover .text-gray-700,
+        .shape-purple:hover .text-gray-300 { color: rgba(255,255,255,0.7) !important; }
+        .shape-purple:hover .v-solum,
+        .shape-purple:hover .v-deep,
+        .shape-purple:hover .v-green,
+        .shape-purple:hover .v-red { color: #ffffff !important; }
+        .shape-purple:hover .mini-card { background: rgba(255,255,255,0.10); }
+        .shape-purple:hover .border-gray-100 { border-color: rgba(255,255,255,0.15) !important; }
+
+        /* Variant 2 — Navy/blue rounded card */
+        .shape-navy:hover {
+            background: linear-gradient(140deg, #1e1b4b 0%, #312e81 60%, #3730a3 100%);
+            color: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 10px 40px rgba(30, 27, 75, 0.35);
+            transform: translateY(-2px);
+        }
+        .shape-navy:hover .text-gray-400,
+        .shape-navy:hover .text-gray-500,
+        .shape-navy:hover .text-gray-700,
+        .shape-navy:hover .text-gray-300 { color: rgba(255,255,255,0.7) !important; }
+        .shape-navy:hover .v-solum,
+        .shape-navy:hover .v-deep,
+        .shape-navy:hover .v-green,
+        .shape-navy:hover .v-red { color: #ffffff !important; }
+        .shape-navy:hover .mini-card { background: rgba(255,255,255,0.10); }
+        .shape-navy:hover .border-gray-100 { border-color: rgba(255,255,255,0.15) !important; }
+
+        /* Variant 3 — Dark charcoal with asymmetric corner (top-right large radius) */
+        .shape-dark:hover {
+            background: linear-gradient(150deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 56px;
+            border-bottom-right-radius: 20px;
+            border-bottom-left-radius: 20px;
+            box-shadow: 0 10px 40px rgba(15, 23, 42, 0.35);
+            transform: translateY(-2px);
+        }
+        .shape-dark:hover .text-gray-400,
+        .shape-dark:hover .text-gray-500,
+        .shape-dark:hover .text-gray-700,
+        .shape-dark:hover .text-gray-300 { color: rgba(255,255,255,0.7) !important; }
+        .shape-dark:hover .v-solum,
+        .shape-dark:hover .v-deep,
+        .shape-dark:hover .v-green,
+        .shape-dark:hover .v-red { color: #ffffff !important; }
+        .shape-dark:hover .mini-card { background: rgba(255,255,255,0.10); }
+        .shape-dark:hover .border-gray-100 { border-color: rgba(255,255,255,0.15) !important; }
+
+        /* Mini-card text becomes readable on dark hover */
+        .shape-card:hover .mini-card p { color: rgba(255,255,255,0.85) !important; }
+
+        /* Drag handle stays visible on dark background */
+        .shape-card:hover .drag-handle { color: rgba(255,255,255,0.6); }
+        .shape-card:hover .drag-handle:hover { background: rgba(255,255,255,0.15); color: #ffffff; }
     </style>
 </head>
 <body class="min-h-screen">
 
-<!-- Header -->
-<header class="bg-white shadow-sm sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-            <a href="portfolio.html" class="text-xs text-violet-500 hover:text-violet-700 uppercase tracking-widest font-medium">← Portfolio</a>
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight mt-1 text-gray-800">SOLUM AIR · ROI Simulator</h1>
-            <p class="text-xs text-gray-400 mt-1">매장 크기 기반 5년 TCO / Revenue 비교 — Architecture · Intelligence · Revenue</p>
+<!-- ── SOLUM-style Header ── -->
+<header class="bg-white sticky top-0 z-40" style="border-bottom: 1px solid #ede9fe;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        <a href="portfolio.html" class="text-xs font-medium text-violet-400 hover:text-violet-700 uppercase tracking-widest">← Portfolio</a>
+        <div class="text-center">
+            <div class="solum-logo">SOLUM</div>
+            <div class="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">AIR ROI Simulator</div>
         </div>
-        <div class="text-right">
-            <p class="text-[11px] text-gray-400 uppercase tracking-widest">Data Source</p>
-            <p class="text-xs text-gray-700 font-semibold">Air Launching Show ROI 시트</p>
-            <p class="text-[10px] text-gray-400 mt-0.5">위젯을 드래그해서 순서 변경 가능</p>
+        <div class="flex items-center gap-3">
+            <span class="text-[10px] text-gray-400 uppercase tracking-widest hidden sm:block">위젯 드래그로 순서 변경</span>
+            <a href="portfolio.html" class="cta-pill hidden sm:inline-flex">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                Portfolio
+            </a>
         </div>
     </div>
 </header>
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
-    <!-- Store preset bar -->
-    <section class="mb-6">
-        <div class="flex flex-wrap items-center gap-2 mb-3">
-            <span class="text-[11px] text-gray-400 uppercase tracking-widest mr-2">매장 프리셋</span>
-            <button data-preset="Standard Hypermarket" class="preset-chip active px-3 py-1.5 text-xs border border-gray-200 rounded-full text-gray-600">Standard Hypermarket (10,000㎡)</button>
-            <button data-preset="Walmart" class="preset-chip px-3 py-1.5 text-xs border border-gray-200 rounded-full text-gray-600">월마트 (20,250㎡)</button>
-            <button data-preset="Carrefour" class="preset-chip px-3 py-1.5 text-xs border border-gray-200 rounded-full text-gray-600">까르푸 (7,500㎡)</button>
-            <button data-preset="REWE" class="preset-chip px-3 py-1.5 text-xs border border-gray-200 rounded-full text-gray-600">REWE (5,000㎡)</button>
-            <button data-preset="Lidl" class="preset-chip px-3 py-1.5 text-xs border border-gray-200 rounded-full text-gray-600">Lidl (1,500㎡)</button>
-            <button data-preset="Aldi" class="preset-chip px-3 py-1.5 text-xs border border-gray-200 rounded-full text-gray-600">Aldi (1,500㎡)</button>
+    <!-- ── Hero Summary Card (SOLUM hero style: big rounded rect) ── -->
+    <section class="hero-card p-6 sm:p-8 mb-6 grid grid-cols-1 md:grid-cols-4 gap-6 relative z-0">
+        <div class="md:col-span-2">
+            <span class="inline-block bg-white text-gray-800 rounded-full px-4 py-1 text-xs font-semibold mb-4">ESL &amp; IoT · Retail Tech</span>
+            <h1 class="text-2xl sm:text-3xl font-bold leading-tight mb-2">SOLUM AIR<br>ROI Simulator</h1>
+            <p class="text-sm text-white/70">매장 크기 기반 5년 TCO / Revenue 비교</p>
+            <p class="text-xs text-white/50 mt-2">Architecture · Intelligence · Revenue</p>
         </div>
-        <div class="card p-5 grid grid-cols-1 md:grid-cols-4 gap-5">
-            <div>
-                <label class="text-[11px] text-gray-400 uppercase tracking-widest">매장 면적 (㎡)</label>
-                <div class="flex items-center gap-3 mt-2">
-                    <input type="range" id="areaSlider" min="500" max="25000" step="100" value="10000">
-                    <input type="number" id="areaInput" min="100" max="50000" step="100" value="10000" class="w-28 text-right">
+        <div>
+            <label class="text-xs text-white/60 uppercase tracking-widest">매장 면적 (㎡)</label>
+            <div class="flex items-center gap-3 mt-2">
+                <input type="range" id="areaSlider" min="500" max="25000" step="100" value="10000" style="background:rgba(255,255,255,0.2);">
+                <input type="number" id="areaInput" min="100" max="50000" step="100" value="10000"
+                    style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);color:white;border-radius:10px;padding:6px 10px;width:90px;font-size:13px;">
+            </div>
+            <div class="mt-4 grid grid-cols-2 gap-3">
+                <div>
+                    <p class="text-xs text-white/60">선반 수</p>
+                    <p class="text-xl font-bold"><span id="shelfCount">100</span><span class="text-sm font-normal opacity-60"> 개</span></p>
+                </div>
+                <div>
+                    <p class="text-xs text-white/60">E-Paper POP</p>
+                    <p class="text-xl font-bold"><span id="popCount">30</span><span class="text-sm font-normal opacity-60"> 대</span></p>
                 </div>
             </div>
+        </div>
+        <div class="flex flex-col justify-between">
             <div>
-                <p class="text-[11px] text-gray-400 uppercase tracking-widest">선반 수 (자동)</p>
-                <p class="text-2xl font-bold mt-1 text-gray-800"><span id="shelfCount">100</span> <span class="text-xs text-gray-400 font-normal">개</span></p>
-                <p class="text-[10px] text-gray-400">100 매대 / 10,000㎡ 가정</p>
+                <p class="text-xs text-white/60 uppercase tracking-widest mb-2">매장 프리셋</p>
+                <div class="flex flex-wrap gap-1.5">
+                    <button data-preset="Standard Hypermarket" class="preset-chip active text-[11px] px-2.5 py-1">Hypermarket</button>
+                    <button data-preset="Walmart" class="preset-chip text-[11px] px-2.5 py-1">Walmart</button>
+                    <button data-preset="Carrefour" class="preset-chip text-[11px] px-2.5 py-1">Carrefour</button>
+                    <button data-preset="REWE" class="preset-chip text-[11px] px-2.5 py-1">REWE</button>
+                    <button data-preset="Lidl" class="preset-chip text-[11px] px-2.5 py-1">Lidl</button>
+                    <button data-preset="Aldi" class="preset-chip text-[11px] px-2.5 py-1">Aldi</button>
+                </div>
             </div>
-            <div>
-                <p class="text-[11px] text-gray-400 uppercase tracking-widest">E-Paper POP 수 (자동)</p>
-                <p class="text-2xl font-bold mt-1 text-gray-800"><span id="popCount">30</span> <span class="text-xs text-gray-400 font-normal">대</span></p>
-                <p class="text-[10px] text-gray-400">30 POP / 10,000㎡ 가정</p>
-            </div>
-            <div>
-                <p class="text-[11px] text-gray-400 uppercase tracking-widest">분석 기간</p>
-                <p class="text-2xl font-bold mt-1 text-gray-800">5<span class="text-xs text-gray-400 font-normal"> 년</span></p>
-                <p class="text-[10px] text-gray-400">5년 누적 TCO / Net Value 기준</p>
-            </div>
+            <p class="text-[10px] text-white/40 mt-4">Air Launching Show ROI 시트 기준 · 5년 분석</p>
         </div>
     </section>
 
-    <!-- Tabs -->
-    <nav class="flex gap-1 mb-6 bg-white p-1.5 rounded-2xl shadow-sm w-fit">
-        <button data-tab="arch" class="tab-btn active px-5 py-2 text-sm font-medium">01 / Architecture</button>
-        <button data-tab="intel" class="tab-btn px-5 py-2 text-sm font-medium">02 / Intelligence</button>
-        <button data-tab="rev" class="tab-btn px-5 py-2 text-sm font-medium">03 / Revenue</button>
+    <!-- ── Tabs ── -->
+    <nav class="flex gap-1 mb-6 bg-white p-1.5 rounded-2xl shadow-sm w-fit" style="border:1px solid #ede9fe;">
+        <button data-tab="arch"  class="tab-btn active px-5 py-2 text-sm">01 / Architecture</button>
+        <button data-tab="intel" class="tab-btn px-5 py-2 text-sm">02 / Intelligence</button>
+        <button data-tab="rev"   class="tab-btn px-5 py-2 text-sm">03 / Revenue</button>
     </nav>
 
-    <!-- ========== ARCHITECTURE TAB ========== -->
+    <!-- ═══════════ ARCHITECTURE TAB ═══════════ -->
     <section id="tab-arch" class="tab-panel">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
             <div class="card p-5 lg:col-span-1">
-                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
                 <div class="space-y-5">
                     <div>
                         <div class="flex justify-between text-xs mb-1">
-                            <span class="text-gray-500">BLE AP 밀도 (대 / 1,000㎡)</span>
-                            <span id="bleDensityVal" class="val-purple font-semibold">2.5</span>
+                            <span class="text-gray-500">BLE AP 밀도 (대/1,000㎡)</span>
+                            <span id="bleDensityVal" class="v-solum font-semibold">2.5</span>
                         </div>
                         <input type="range" id="bleDensity" min="1" max="5" step="0.1" value="2.5">
                     </div>
                     <div>
                         <div class="flex justify-between text-xs mb-1">
                             <span class="text-gray-500">HaLow AP 수 (10,000㎡ 기준)</span>
-                            <span id="halowApsVal" class="val-purple font-semibold">2</span>
+                            <span id="halowApsVal" class="v-solum font-semibold">2</span>
                         </div>
                         <input type="range" id="halowAps" min="1" max="6" step="1" value="2">
                     </div>
@@ -215,66 +372,63 @@
             </div>
 
             <div id="arch-widgets" class="lg:col-span-2 space-y-5">
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-violet-50 rounded-2xl p-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="mini-card mc-deep">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">HaLow AP</p>
-                            <p class="text-2xl font-bold mt-1 val-purple" id="archHalowAps">2</p>
+                            <p class="text-2xl font-bold mt-1 v-deep" id="archHalowAps">2</p>
                             <p class="text-[10px] text-gray-400">대</p>
                         </div>
-                        <div class="bg-red-50 rounded-2xl p-4">
+                        <div class="mini-card mc-red">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">BLE AP</p>
-                            <p class="text-2xl font-bold mt-1 val-red" id="archBleAps">25</p>
+                            <p class="text-2xl font-bold mt-1 v-red" id="archBleAps">25</p>
                             <p class="text-[10px] text-gray-400">대</p>
                         </div>
-                        <div class="bg-emerald-50 rounded-2xl p-4">
+                        <div class="mini-card mc-green">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">5년 절감액</p>
-                            <p class="text-2xl font-bold mt-1 val-green" id="archSaving">$53K</p>
+                            <p class="text-2xl font-bold mt-1 v-green" id="archSaving">$53K</p>
                             <p class="text-[10px] text-gray-400">HaLow 우위</p>
                         </div>
-                        <div class="bg-indigo-50 rounded-2xl p-4">
+                        <div class="mini-card mc-solum">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">절감률</p>
-                            <p class="text-2xl font-bold mt-1 val-purple" id="archSavingPct">91%</p>
+                            <p class="text-2xl font-bold mt-1 v-solum" id="archSavingPct">91%</p>
                             <p class="text-[10px] text-gray-400">vs BLE</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
+                <div class="widget card shape-card shape-purple p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <h3 class="text-sm font-semibold text-gray-600 mb-4">5년 TCO 구성 비교</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 TCO 구성 비교</h3>
                     <div class="h-64"><canvas id="archBarChart"></canvas></div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
+                <div class="widget card shape-card shape-navy p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <h3 class="text-sm font-semibold text-gray-600 mb-4">연차별 누적 TCO</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">연차별 누적 TCO</h3>
                     <div class="h-64"><canvas id="archLineChart"></canvas></div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
+                <div class="widget card shape-card shape-dark p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <details open>
                         <summary class="flex items-center justify-between">
-                            <h3 class="text-sm font-semibold text-gray-600">매장 크기별 5년 TCO 매트릭스</h3>
+                            <h3 class="text-sm font-semibold text-gray-700">매장 크기별 5년 TCO 매트릭스</h3>
                             <span class="chevron text-gray-300 text-xs">▶</span>
                         </summary>
                         <div class="overflow-x-auto mt-4">
                             <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="text-left text-[11px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                                        <th class="py-2 pr-3">매장</th>
-                                        <th class="py-2 px-3 text-right">면적 (㎡)</th>
-                                        <th class="py-2 px-3 text-right">BLE AP</th>
-                                        <th class="py-2 px-3 text-right">HaLow AP</th>
-                                        <th class="py-2 px-3 text-right">BLE 5년 TCO</th>
-                                        <th class="py-2 px-3 text-right">HaLow 5년 TCO</th>
-                                        <th class="py-2 pl-3 text-right">절감액</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="archStoreTable" class="text-gray-600"></tbody>
+                                <thead><tr class="text-left text-[11px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                    <th class="py-2 pr-3">매장</th>
+                                    <th class="py-2 px-3 text-right">면적(㎡)</th>
+                                    <th class="py-2 px-3 text-right">BLE AP</th>
+                                    <th class="py-2 px-3 text-right">HaLow AP</th>
+                                    <th class="py-2 px-3 text-right">BLE TCO</th>
+                                    <th class="py-2 px-3 text-right">HaLow TCO</th>
+                                    <th class="py-2 pl-3 text-right">절감액</th>
+                                </tr></thead>
+                                <tbody id="archStoreTable"></tbody>
                             </table>
                         </div>
                     </details>
@@ -283,17 +437,17 @@
         </div>
     </section>
 
-    <!-- ========== INTELLIGENCE TAB ========== -->
+    <!-- ═══════════ INTELLIGENCE TAB ═══════════ -->
     <section id="tab-intel" class="tab-panel hidden">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
             <div class="card p-5 lg:col-span-1">
-                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
                 <div class="space-y-5">
                     <div>
                         <div class="flex justify-between text-xs mb-1">
-                            <span class="text-gray-500">매대 밀도 (개 / 10,000㎡)</span>
-                            <span id="shelfDensityVal" class="val-purple font-semibold">100</span>
+                            <span class="text-gray-500">매대 밀도 (개/10,000㎡)</span>
+                            <span id="shelfDensityVal" class="v-solum font-semibold">100</span>
                         </div>
                         <input type="range" id="shelfDensity" min="50" max="300" step="10" value="100">
                     </div>
@@ -319,103 +473,100 @@
             </div>
 
             <div id="intel-widgets" class="lg:col-span-2 space-y-5">
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-red-50 rounded-2xl p-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="mini-card mc-red">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">A. Camera CAPEX</p>
-                            <p class="text-2xl font-bold mt-1 val-red" id="intelACapex">$160K</p>
+                            <p class="text-2xl font-bold mt-1 v-red" id="intelACapex">$160K</p>
                         </div>
-                        <div class="bg-violet-50 rounded-2xl p-4">
+                        <div class="mini-card mc-solum">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">B. SOLUM CAPEX</p>
-                            <p class="text-2xl font-bold mt-1 val-purple" id="intelBCapex">$18K</p>
+                            <p class="text-2xl font-bold mt-1 v-solum" id="intelBCapex">$18K</p>
                         </div>
-                        <div class="bg-emerald-50 rounded-2xl p-4">
+                        <div class="mini-card mc-green">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">5년 절감액</p>
-                            <p class="text-2xl font-bold mt-1 val-green" id="intelSaving">$628K</p>
+                            <p class="text-2xl font-bold mt-1 v-green" id="intelSaving">$628K</p>
                             <p class="text-[10px] text-gray-400">SOLUM 우위</p>
                         </div>
-                        <div class="bg-indigo-50 rounded-2xl p-4">
+                        <div class="mini-card mc-deep">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">절감률</p>
-                            <p class="text-2xl font-bold mt-1 val-purple" id="intelSavingPct">73%</p>
+                            <p class="text-2xl font-bold mt-1 v-deep" id="intelSavingPct">73%</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
+                <div class="widget card shape-card shape-navy p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <h3 class="text-sm font-semibold text-gray-600 mb-4">5년 TCO 구성: CAPEX vs OOS 손실 vs 보충 인력</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 TCO: CAPEX vs OOS 손실 vs 보충 인력</h3>
                     <div class="h-72"><canvas id="intelBarChart"></canvas></div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
+                <div class="widget card shape-card shape-purple p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <h3 class="text-sm font-semibold text-gray-600 mb-4">연차별 누적 TCO</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">연차별 누적 TCO</h3>
                     <div class="h-64"><canvas id="intelLineChart"></canvas></div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
+                <div class="widget card shape-card shape-dark p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <details open>
                         <summary class="flex items-center justify-between">
-                            <h3 class="text-sm font-semibold text-gray-600">매장 크기별 5년 TCO 매트릭스</h3>
+                            <h3 class="text-sm font-semibold text-gray-700">매장 크기별 5년 TCO 매트릭스</h3>
                             <span class="chevron text-gray-300 text-xs">▶</span>
                         </summary>
                         <div class="overflow-x-auto mt-4">
                             <table class="w-full text-sm">
-                                <thead>
-                                    <tr class="text-left text-[11px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                                        <th class="py-2 pr-3">매장</th>
-                                        <th class="py-2 px-3 text-right">면적 (㎡)</th>
-                                        <th class="py-2 px-3 text-right">매대 수</th>
-                                        <th class="py-2 px-3 text-right">A. Camera TCO</th>
-                                        <th class="py-2 px-3 text-right">B. SOLUM TCO</th>
-                                        <th class="py-2 pl-3 text-right">절감액</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="intelStoreTable" class="text-gray-600"></tbody>
+                                <thead><tr class="text-left text-[11px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                    <th class="py-2 pr-3">매장</th>
+                                    <th class="py-2 px-3 text-right">면적(㎡)</th>
+                                    <th class="py-2 px-3 text-right">매대 수</th>
+                                    <th class="py-2 px-3 text-right">A. Camera</th>
+                                    <th class="py-2 px-3 text-right">B. SOLUM</th>
+                                    <th class="py-2 pl-3 text-right">절감액</th>
+                                </tr></thead>
+                                <tbody id="intelStoreTable"></tbody>
                             </table>
                         </div>
                     </details>
                 </div>
 
-                <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
+                <div class="widget card shape-card shape-purple p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2">로직 요약</p>
-                    A안(카메라 단독)은 촬영주기 1시간 기준 OOS 감지 지연 30분 + 보충 25분 = <span class="val-purple font-semibold">55분</span> 재고 공백.<br>
-                    B안(UWB+Newton+Load Cell)은 Load Cell 10분 주기로 LS 선제 감지 (5분) + UWB 동선 최적화로 7분 보충 = <span class="val-purple font-semibold">12분</span> 공백.<br>
-                    매대당 OOS 기회비용은 100매대 기준 $120,000 vs $37,091 → 매대 비례 스케일 적용.
+                    A안(카메라 단독)은 OOS 감지 지연 30분 + 보충 25분 = <span class="v-solum font-semibold">55분</span> 재고 공백.<br>
+                    B안(UWB+Newton+Load Cell)은 Load Cell 10분 주기 선제 감지 + UWB 동선 최적화 = <span class="v-solum font-semibold">12분</span> 공백.<br>
+                    매대당 OOS 기회비용: $120,000 vs $37,091 → 매대 비례 스케일 적용.
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ========== REVENUE TAB ========== -->
+    <!-- ═══════════ REVENUE TAB ═══════════ -->
     <section id="tab-rev" class="tab-panel hidden">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
             <div class="card p-5 lg:col-span-1">
-                <h3 class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
                 <div class="space-y-5">
                     <div>
                         <div class="flex justify-between text-xs mb-1">
-                            <span class="text-gray-500">E-Paper POP 밀도 (대 / 10,000㎡)</span>
-                            <span id="popDensityVal" class="val-purple font-semibold">30</span>
+                            <span class="text-gray-500">E-Paper POP 밀도 (대/10,000㎡)</span>
+                            <span id="popDensityVal" class="v-solum font-semibold">30</span>
                         </div>
                         <input type="range" id="popDensity" min="10" max="200" step="10" value="30">
                     </div>
                     <div>
                         <div class="flex justify-between text-xs mb-1">
                             <span class="text-gray-500">광고 구좌 단가 ($/일)</span>
-                            <span id="adRateVal" class="val-purple font-semibold">$1.00</span>
+                            <span id="adRateVal" class="v-solum font-semibold">$1.00</span>
                         </div>
                         <input type="range" id="adRate" min="0.5" max="2" step="0.05" value="1">
                     </div>
                     <div>
                         <div class="flex justify-between text-xs mb-1">
                             <span class="text-gray-500">연간 영업일</span>
-                            <span id="opDaysVal" class="val-purple font-semibold">300</span>
+                            <span id="opDaysVal" class="v-solum font-semibold">300</span>
                         </div>
                         <input type="range" id="opDays" min="240" max="365" step="5" value="300">
                     </div>
@@ -432,74 +583,73 @@
                             <label class="block"><span class="text-[10px] text-gray-400">E-Paper POP/대</span><input type="number" id="popPrice" value="700" step="50"></label>
                             <label class="block"><span class="text-[10px] text-gray-400">AP 인프라 합</span><input type="number" id="apInfra" value="1665" step="100"></label>
                         </div>
-                        <p class="text-[10px] text-gray-400">AP 인프라: HaLow 2대 × (HW $500 + 설치 $332.5) 기본값</p>
+                        <p class="text-[10px] text-gray-400">HaLow 2대 × ($500 + $332.5) 기본값</p>
                     </div>
                 </div>
             </div>
 
             <div id="rev-widgets" class="lg:col-span-2 space-y-5">
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-violet-50 rounded-2xl p-4">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="mini-card mc-solum">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">SOLUM 광고 구좌</p>
-                            <p class="text-2xl font-bold mt-1 val-purple" id="revSolSlots">120</p>
-                            <p class="text-[10px] text-gray-400">총 구좌 / 일</p>
+                            <p class="text-2xl font-bold mt-1 v-solum" id="revSolSlots">120</p>
+                            <p class="text-[10px] text-gray-400">구좌 / 일</p>
                         </div>
-                        <div class="bg-emerald-50 rounded-2xl p-4">
+                        <div class="mini-card mc-green">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">SOLUM 연 매출</p>
-                            <p class="text-2xl font-bold mt-1 val-green" id="revSolAnnual">$36K</p>
+                            <p class="text-2xl font-bold mt-1 v-green" id="revSolAnnual">$36K</p>
                         </div>
-                        <div class="bg-gray-50 rounded-2xl p-4">
+                        <div class="mini-card mc-gray">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">Normal 연 매출</p>
-                            <p class="text-2xl font-bold mt-1 text-gray-600" id="revNormAnnual">$27K</p>
+                            <p class="text-2xl font-bold mt-1 text-gray-500" id="revNormAnnual">$27K</p>
                         </div>
-                        <div class="bg-indigo-50 rounded-2xl p-4">
+                        <div class="mini-card mc-deep">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">5년 Net Value 차</p>
-                            <p class="text-2xl font-bold mt-1 val-purple" id="revNetDiff">+$62K</p>
+                            <p class="text-2xl font-bold mt-1 v-deep" id="revNetDiff">+$62K</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
+                <div class="widget card shape-card shape-dark p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <h3 class="text-sm font-semibold text-gray-600 mb-4">5년 Net Value (누적 매출 − CAPEX)</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 Net Value (누적 매출 − CAPEX)</h3>
                     <div class="h-64"><canvas id="revLineChart"></canvas></div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
+                <div class="widget card shape-card shape-purple p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
-                    <h3 class="text-sm font-semibold text-gray-600 mb-4">SOLUM vs Normal Display — 핵심 지표</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">SOLUM vs Normal Display — 핵심 지표</h3>
                     <div class="h-64"><canvas id="revBarChart"></canvas></div>
                 </div>
 
-                <div class="widget card p-5" draggable="true">
+                <div class="widget card shape-card shape-navy p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div class="bg-emerald-50 rounded-2xl p-4">
+                        <div class="mini-card mc-green">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">통합 CMS 절감 (연)</p>
-                            <p class="text-xl font-bold mt-1 val-green">+$20,160</p>
+                            <p class="text-xl font-bold mt-1 v-green">+$20,160</p>
                             <p class="text-[10px] text-gray-400">3개 CMS 분리 운영 대비</p>
                         </div>
-                        <div class="bg-violet-50 rounded-2xl p-4">
+                        <div class="mini-card mc-solum">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest">Grey Zone CAPEX 회피</p>
-                            <p class="text-xl font-bold mt-1 val-purple">+$2,530</p>
+                            <p class="text-xl font-bold mt-1 v-solum">+$2,530</p>
                             <p class="text-[10px] text-gray-400">HaLow 채택 시</p>
                         </div>
-                        <div class="bg-blue-50 rounded-2xl p-4">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">규격 정합 OPEX 회피</p>
+                        <div class="mini-card mc-blue">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">규격 OPEX 회피</p>
                             <p class="text-xl font-bold mt-1 text-blue-600">$13K~$91K</p>
-                            <p class="text-[10px] text-gray-400">콘텐츠 리사이징 숨은 비용</p>
+                            <p class="text-[10px] text-gray-400">콘텐츠 리사이징 비용</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
+                <div class="widget card shape-card shape-dark p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2">로직 요약</p>
-                    배터리 수명 400일(SOLUM) vs 308일(경쟁사) → 광고 갱신 빈도 <span class="val-purple font-semibold">+30%</span> 우위.<br>
-                    POP당 구좌 4 vs 3 × $1/일 × 300일/년 적용. 5년 Net Value = 5 × 연매출 − CAPEX(AP + POP).<br>
+                    배터리 수명 400일(SOLUM) vs 308일(경쟁사) → 광고 갱신 빈도 <span class="v-solum font-semibold">+30%</span> 우위.<br>
+                    POP당 구좌 4 vs 3 × $1/일 × 300일/년. 5년 Net Value = 5 × 연매출 − CAPEX(AP + POP).<br>
                     추가 가치: 통합 CMS 운영, Grey Zone 회피, 비표준 규격 리사이징 OPEX 회피.
                 </div>
             </div>
@@ -508,385 +658,239 @@
 
 </main>
 
-<footer class="border-t border-gray-100 mt-12 py-6 text-center text-xs text-gray-400 bg-white">
-    SOLUM AIR ROI Simulator · 수치는 Air Launching Show ROI 시트 기준 · 모든 슬라이더/입력값은 실시간 재계산
+<footer style="border-top:1px solid #ede9fe;" class="mt-12 py-6 bg-white">
+    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        <div class="solum-logo text-base">SOLUM</div>
+        <p class="text-xs text-gray-400">AIR ROI Simulator · Air Launching Show ROI 시트 기준 · 모든 수치 실시간 재계산</p>
+    </div>
 </footer>
 
 <script>
-// ============ Constants ============
-const PRESETS = {
-    'Standard Hypermarket': 10000,
-    'Walmart': 20250,
-    'Carrefour': 7500,
-    'REWE': 5000,
-    'Lidl': 1500,
-    'Aldi': 1500
-};
-
+const PRESETS = { 'Standard Hypermarket':10000, 'Walmart':20250, 'Carrefour':7500, 'REWE':5000, 'Lidl':1500, 'Aldi':1500 };
 const STORE_LIST = [
-    { name: '월마트', area: 20250 },
-    { name: '까르푸', area: 7500 },
-    { name: 'REWE', area: 5000 },
-    { name: 'Lidl', area: 1500 },
-    { name: 'Aldi', area: 1500 },
-    { name: 'Standard Hypermarket', area: 10000 }
+    {name:'월마트',area:20250},{name:'까르푸',area:7500},{name:'REWE',area:5000},
+    {name:'Lidl',area:1500},{name:'Aldi',area:1500},{name:'Standard Hypermarket',area:10000}
 ];
 
-const fmt = (n) => '$' + Math.round(n).toLocaleString();
-const fmtK = (n) => {
-    const v = Math.round(n);
-    if (Math.abs(v) >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
-    if (Math.abs(v) >= 1e3) return '$' + (v/1e3).toFixed(1) + 'K';
-    return '$' + v.toLocaleString();
-};
-
+const fmt  = n => '$' + Math.round(n).toLocaleString();
+const fmtK = n => { const v=Math.round(n); if(Math.abs(v)>=1e6) return '$'+(v/1e6).toFixed(2)+'M'; if(Math.abs(v)>=1e3) return '$'+(v/1e3).toFixed(1)+'K'; return '$'+v.toLocaleString(); };
 const state = { area: 10000 };
 
-// ============ Calc ============
 function calcArch(area) {
-    const bleDensity = +document.getElementById('bleDensity').value;
-    const halowApsBase = +document.getElementById('halowAps').value;
-    const bleHw = +document.getElementById('bleHw').value;
-    const bleInstall = +document.getElementById('bleInstall').value;
-    const bleMaint = +document.getElementById('bleMaint').value;
-    const halowHw = +document.getElementById('halowHw').value;
-    const halowInstall = +document.getElementById('halowInstall').value;
-    const halowMaint = +document.getElementById('halowMaint').value;
-    const bleAps = Math.ceil((area / 1000) * bleDensity);
-    const halowAps = Math.max(1, Math.ceil(halowApsBase * (area / 10000)));
-    const bleCapex = bleAps * (bleHw + bleInstall);
-    const bleOpex = bleAps * bleMaint;
-    const bleTCO = bleCapex + 5 * bleOpex;
-    const halowCapex = halowAps * (halowHw + halowInstall);
-    const halowOpex = halowAps * halowMaint;
-    const halowTCO = halowCapex + 5 * halowOpex;
-    return { bleAps, halowAps, bleCapex, bleOpex, bleTCO, halowCapex, halowOpex, halowTCO };
+    const bd=+document.getElementById('bleDensity').value, hb=+document.getElementById('halowAps').value;
+    const bh=+document.getElementById('bleHw').value, bi=+document.getElementById('bleInstall').value, bm=+document.getElementById('bleMaint').value;
+    const hh=+document.getElementById('halowHw').value, hi=+document.getElementById('halowInstall').value, hm=+document.getElementById('halowMaint').value;
+    const bleAps=Math.ceil((area/1000)*bd), halowAps=Math.max(1,Math.ceil(hb*(area/10000)));
+    const bleCapex=bleAps*(bh+bi), bleOpex=bleAps*bm, bleTCO=bleCapex+5*bleOpex;
+    const halowCapex=halowAps*(hh+hi), halowOpex=halowAps*hm, halowTCO=halowCapex+5*halowOpex;
+    return {bleAps,halowAps,bleCapex,bleOpex,bleTCO,halowCapex,halowOpex,halowTCO};
 }
-
 function calcIntel(area) {
-    const shelfDensity = +document.getElementById('shelfDensity').value;
-    const shelves = Math.round((area / 10000) * shelfDensity);
-    const camHw = +document.getElementById('camHw').value;
-    const camOOS = +document.getElementById('camOOS').value;
-    const camLabor = +document.getElementById('camLabor').value;
-    const solUwb = +document.getElementById('solUwb').value;
-    const solEye = +document.getElementById('solEye').value;
-    const solLoad = +document.getElementById('solLoad').value;
-    const solOOS = +document.getElementById('solOOS').value;
-    const solLabor = +document.getElementById('solLabor').value;
-    const aCapex = shelves * camHw;
-    const aOOS = shelves * camOOS;
-    const aLabor = shelves * camLabor;
-    const aOpex = aOOS + aLabor;
-    const aTCO = aCapex + 5 * aOpex;
-    const bCapex = shelves * (solUwb + solEye + solLoad);
-    const bOOS = shelves * solOOS;
-    const bLabor = shelves * solLabor;
-    const bOpex = bOOS + bLabor;
-    const bTCO = bCapex + 5 * bOpex;
-    return { shelves, aCapex, aOOS, aLabor, aOpex, aTCO, bCapex, bOOS, bLabor, bOpex, bTCO };
+    const sd=+document.getElementById('shelfDensity').value, shelves=Math.round((area/10000)*sd);
+    const ch=+document.getElementById('camHw').value, co=+document.getElementById('camOOS').value, cl=+document.getElementById('camLabor').value;
+    const su=+document.getElementById('solUwb').value, se=+document.getElementById('solEye').value, sl=+document.getElementById('solLoad').value;
+    const so=+document.getElementById('solOOS').value, sb=+document.getElementById('solLabor').value;
+    const aCapex=shelves*ch, aOOS=shelves*co, aLabor=shelves*cl, aOpex=aOOS+aLabor, aTCO=aCapex+5*aOpex;
+    const bCapex=shelves*(su+se+sl), bOOS=shelves*so, bLabor=shelves*sb, bOpex=bOOS+bLabor, bTCO=bCapex+5*bOpex;
+    return {shelves,aCapex,aOOS,aLabor,aOpex,aTCO,bCapex,bOOS,bLabor,bOpex,bTCO};
 }
-
 function calcRev(area) {
-    const popDensity = +document.getElementById('popDensity').value;
-    const adRate = +document.getElementById('adRate').value;
-    const opDays = +document.getElementById('opDays').value;
-    const solSlots = +document.getElementById('solSlots').value;
-    const normSlots = +document.getElementById('normSlots').value;
-    const popPrice = +document.getElementById('popPrice').value;
-    const apInfra = +document.getElementById('apInfra').value;
-    const pops = Math.round((area / 10000) * popDensity);
-    const solTotalSlots = pops * solSlots;
-    const normTotalSlots = pops * normSlots;
-    const solAnnual = solTotalSlots * adRate * opDays;
-    const normAnnual = normTotalSlots * adRate * opDays;
-    const capex = apInfra + pops * popPrice;
-    const solNet5 = 5 * solAnnual - capex;
-    const normNet5 = 5 * normAnnual - capex;
-    return { pops, solTotalSlots, normTotalSlots, solAnnual, normAnnual, capex, solNet5, normNet5 };
+    const pd=+document.getElementById('popDensity').value, ar=+document.getElementById('adRate').value;
+    const od=+document.getElementById('opDays').value, ss=+document.getElementById('solSlots').value;
+    const ns=+document.getElementById('normSlots').value, pp=+document.getElementById('popPrice').value;
+    const ai=+document.getElementById('apInfra').value;
+    const pops=Math.round((area/10000)*pd);
+    const solAnnual=pops*ss*ar*od, normAnnual=pops*ns*ar*od;
+    const capex=ai+pops*pp;
+    return {pops, solTotalSlots:pops*ss, solAnnual, normAnnual, capex, solNet5:5*solAnnual-capex, normNet5:5*normAnnual-capex};
 }
 
-// ============ Charts ============
 const charts = {};
-function makeChart(id, config) {
-    if (charts[id]) charts[id].destroy();
-    const ctx = document.getElementById(id).getContext('2d');
-    charts[id] = new Chart(ctx, config);
+function makeChart(id, cfg) {
+    if(charts[id]) charts[id].destroy();
+    charts[id] = new Chart(document.getElementById(id).getContext('2d'), cfg);
 }
 
 const C = {
-    violet: '#7c3aed', violetL: '#7c3aed33',
-    indigo: '#6366f1', indigoL: '#6366f133',
-    red: '#ef4444', redL: '#ef444433',
-    amber: '#f59e0b', amberL: '#f59e0b33',
-    emerald: '#059669', emeraldL: '#05966933',
-    blue: '#3b82f6', blueL: '#3b82f633',
-    purple: '#a78bfa', purpleL: '#a78bfa33',
-    grid: '#f1f5f9',
-    text: '#94a3b8'
+    solum:'#4318a6', solumL:'#4318a622', deep:'#1e0a5e', deepL:'#1e0a5e22',
+    red:'#ef4444', redL:'#ef444422', amber:'#f59e0b', amberL:'#f59e0b22',
+    green:'#059669', greenL:'#05966922', blue:'#3b82f6', purple:'#a78bfa',
+    grid:'#f0ecfa', text:'#94a3b8'
 };
-
 const baseOpts = {
-    responsive: true, maintainAspectRatio: false,
-    plugins: {
-        legend: { labels: { color: C.text, font: { size: 11 }, boxWidth: 12 } },
-        tooltip: { callbacks: { label: (c) => `${c.dataset.label}: ${fmt(c.parsed.y ?? c.parsed)}` } }
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+        legend:{labels:{color:C.text,font:{size:11},boxWidth:12}},
+        tooltip:{callbacks:{label:(c)=>`${c.dataset.label}: ${fmt(c.parsed.y??c.parsed)}`}}
     },
-    scales: {
-        x: { ticks: { color: C.text, font: { size: 11 } }, grid: { color: C.grid } },
-        y: { ticks: { color: C.text, callback: (v) => fmtK(v), font: { size: 11 } }, grid: { color: C.grid } }
+    scales:{
+        x:{ticks:{color:C.text,font:{size:11}},grid:{color:C.grid}},
+        y:{ticks:{color:C.text,callback:(v)=>fmtK(v),font:{size:11}},grid:{color:C.grid}}
     }
 };
 
-// ============ Render ============
 function renderShared() {
-    document.getElementById('shelfCount').textContent = Math.round((state.area / 10000) * +document.getElementById('shelfDensity').value);
-    document.getElementById('popCount').textContent = Math.round((state.area / 10000) * +document.getElementById('popDensity').value);
+    const sd=+document.getElementById('shelfDensity').value, pd=+document.getElementById('popDensity').value;
+    document.getElementById('shelfCount').textContent = Math.round((state.area/10000)*sd);
+    document.getElementById('popCount').textContent   = Math.round((state.area/10000)*pd);
 }
-
 function renderArch() {
-    const r = calcArch(state.area);
+    const r=calcArch(state.area);
     document.getElementById('archHalowAps').textContent = r.halowAps;
-    document.getElementById('archBleAps').textContent = r.bleAps;
-    const diff = r.bleTCO - r.halowTCO;
-    document.getElementById('archSaving').textContent = fmtK(diff);
-    document.getElementById('archSavingPct').textContent = r.bleTCO > 0 ? Math.round(diff / r.bleTCO * 100) + '%' : '—';
+    document.getElementById('archBleAps').textContent   = r.bleAps;
+    const diff=r.bleTCO-r.halowTCO;
+    document.getElementById('archSaving').textContent    = fmtK(diff);
+    document.getElementById('archSavingPct').textContent = r.bleTCO>0?Math.round(diff/r.bleTCO*100)+'%':'—';
 
-    makeChart('archBarChart', {
-        type: 'bar',
-        data: {
-            labels: ['HaLow', 'BLE'],
-            datasets: [
-                { label: 'CAPEX', data: [r.halowCapex, r.bleCapex], backgroundColor: C.blue, stack: 's', borderRadius: 4 },
-                { label: 'OPEX (5년)', data: [r.halowOpex*5, r.bleOpex*5], backgroundColor: C.amber, stack: 's', borderRadius: 4 }
-            ]
-        },
-        options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, stacked: true }, x: { ...baseOpts.scales.x, stacked: true } } }
-    });
+    makeChart('archBarChart',{type:'bar',data:{labels:['HaLow','BLE'],datasets:[
+        {label:'CAPEX',data:[r.halowCapex,r.bleCapex],backgroundColor:C.blue,stack:'s',borderRadius:4},
+        {label:'OPEX (5년)',data:[r.halowOpex*5,r.bleOpex*5],backgroundColor:C.amber,stack:'s',borderRadius:4}
+    ]},options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true}}}});
 
-    const years = [0,1,2,3,4,5];
-    makeChart('archLineChart', {
-        type: 'line',
-        data: {
-            labels: years.map(y => 'Y' + y),
-            datasets: [
-                { label: 'HaLow 누적', data: years.map(y => r.halowCapex + r.halowOpex * y), borderColor: C.violet, backgroundColor: C.violetL, tension: 0.3, fill: true, pointBackgroundColor: C.violet },
-                { label: 'BLE 누적', data: years.map(y => r.bleCapex + r.bleOpex * y), borderColor: C.red, backgroundColor: C.redL, tension: 0.3, fill: true, pointBackgroundColor: C.red }
-            ]
-        },
-        options: baseOpts
-    });
+    const yrs=[0,1,2,3,4,5];
+    makeChart('archLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
+        {label:'HaLow 누적',data:yrs.map(y=>r.halowCapex+r.halowOpex*y),borderColor:C.solum,backgroundColor:C.solumL,tension:0.3,fill:true,pointBackgroundColor:C.solum},
+        {label:'BLE 누적',data:yrs.map(y=>r.bleCapex+r.bleOpex*y),borderColor:C.red,backgroundColor:C.redL,tension:0.3,fill:true,pointBackgroundColor:C.red}
+    ]},options:baseOpts});
 
-    const tbody = document.getElementById('archStoreTable');
-    tbody.innerHTML = STORE_LIST.map(s => {
-        const sr = calcArch(s.area);
-        const sd = sr.bleTCO - sr.halowTCO;
-        return `<tr class="border-b border-gray-50 hover:bg-gray-50">
+    document.getElementById('archStoreTable').innerHTML = STORE_LIST.map(s=>{
+        const sr=calcArch(s.area), sd=sr.bleTCO-sr.halowTCO;
+        return `<tr class="border-b border-gray-50 hover:bg-purple-50/30">
             <td class="py-2 pr-3 font-medium text-gray-700">${s.name}</td>
             <td class="py-2 px-3 text-right text-gray-500">${s.area.toLocaleString()}</td>
-            <td class="py-2 px-3 text-right text-red-500">${sr.bleAps}</td>
-            <td class="py-2 px-3 text-right text-violet-600">${sr.halowAps}</td>
+            <td class="py-2 px-3 text-right v-red">${sr.bleAps}</td>
+            <td class="py-2 px-3 text-right v-solum">${sr.halowAps}</td>
             <td class="py-2 px-3 text-right text-gray-500">${fmt(sr.bleTCO)}</td>
-            <td class="py-2 px-3 text-right text-violet-600 font-medium">${fmt(sr.halowTCO)}</td>
-            <td class="py-2 pl-3 text-right text-emerald-600 font-semibold">${fmtK(sd)}</td>
+            <td class="py-2 px-3 text-right v-solum font-medium">${fmt(sr.halowTCO)}</td>
+            <td class="py-2 pl-3 text-right v-green font-semibold">${fmtK(sd)}</td>
         </tr>`;
     }).join('');
 }
-
 function renderIntel() {
-    const r = calcIntel(state.area);
-    document.getElementById('intelACapex').textContent = fmtK(r.aCapex);
-    document.getElementById('intelBCapex').textContent = fmtK(r.bCapex);
-    const diff = r.aTCO - r.bTCO;
-    document.getElementById('intelSaving').textContent = fmtK(diff);
-    document.getElementById('intelSavingPct').textContent = r.aTCO > 0 ? Math.round(diff / r.aTCO * 100) + '%' : '—';
+    const r=calcIntel(state.area);
+    document.getElementById('intelACapex').textContent    = fmtK(r.aCapex);
+    document.getElementById('intelBCapex').textContent    = fmtK(r.bCapex);
+    const diff=r.aTCO-r.bTCO;
+    document.getElementById('intelSaving').textContent    = fmtK(diff);
+    document.getElementById('intelSavingPct').textContent = r.aTCO>0?Math.round(diff/r.aTCO*100)+'%':'—';
 
-    makeChart('intelBarChart', {
-        type: 'bar',
-        data: {
-            labels: ['A. Camera 단독', 'B. UWB+Newton+LoadCell'],
-            datasets: [
-                { label: 'CAPEX', data: [r.aCapex, r.bCapex], backgroundColor: C.blue, stack: 's', borderRadius: 4 },
-                { label: 'OOS 손실 (5년)', data: [r.aOOS*5, r.bOOS*5], backgroundColor: C.amber, stack: 's', borderRadius: 4 },
-                { label: '보충 인력 (5년)', data: [r.aLabor*5, r.bLabor*5], backgroundColor: C.purple, stack: 's', borderRadius: 4 }
-            ]
-        },
-        options: { ...baseOpts, scales: { ...baseOpts.scales, y: { ...baseOpts.scales.y, stacked: true }, x: { ...baseOpts.scales.x, stacked: true } } }
-    });
+    makeChart('intelBarChart',{type:'bar',data:{labels:['A. Camera 단독','B. UWB+Newton+LoadCell'],datasets:[
+        {label:'CAPEX',data:[r.aCapex,r.bCapex],backgroundColor:C.blue,stack:'s',borderRadius:4},
+        {label:'OOS 손실 (5년)',data:[r.aOOS*5,r.bOOS*5],backgroundColor:C.amber,stack:'s',borderRadius:4},
+        {label:'보충 인력 (5년)',data:[r.aLabor*5,r.bLabor*5],backgroundColor:C.purple,stack:'s',borderRadius:4}
+    ]},options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true}}}});
 
-    const years = [0,1,2,3,4,5];
-    makeChart('intelLineChart', {
-        type: 'line',
-        data: {
-            labels: years.map(y => 'Y' + y),
-            datasets: [
-                { label: 'A. Camera 누적', data: years.map(y => r.aCapex + r.aOpex * y), borderColor: C.red, backgroundColor: C.redL, tension: 0.3, fill: true, pointBackgroundColor: C.red },
-                { label: 'B. SOLUM 누적', data: years.map(y => r.bCapex + r.bOpex * y), borderColor: C.violet, backgroundColor: C.violetL, tension: 0.3, fill: true, pointBackgroundColor: C.violet }
-            ]
-        },
-        options: baseOpts
-    });
+    const yrs=[0,1,2,3,4,5];
+    makeChart('intelLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
+        {label:'A. Camera 누적',data:yrs.map(y=>r.aCapex+r.aOpex*y),borderColor:C.red,backgroundColor:C.redL,tension:0.3,fill:true,pointBackgroundColor:C.red},
+        {label:'B. SOLUM 누적',data:yrs.map(y=>r.bCapex+r.bOpex*y),borderColor:C.solum,backgroundColor:C.solumL,tension:0.3,fill:true,pointBackgroundColor:C.solum}
+    ]},options:baseOpts});
 
-    const tbody = document.getElementById('intelStoreTable');
-    tbody.innerHTML = STORE_LIST.map(s => {
-        const sr = calcIntel(s.area);
-        const sd = sr.aTCO - sr.bTCO;
-        return `<tr class="border-b border-gray-50 hover:bg-gray-50">
+    document.getElementById('intelStoreTable').innerHTML = STORE_LIST.map(s=>{
+        const sr=calcIntel(s.area), sd=sr.aTCO-sr.bTCO;
+        return `<tr class="border-b border-gray-50 hover:bg-purple-50/30">
             <td class="py-2 pr-3 font-medium text-gray-700">${s.name}</td>
             <td class="py-2 px-3 text-right text-gray-500">${s.area.toLocaleString()}</td>
             <td class="py-2 px-3 text-right text-gray-500">${sr.shelves}</td>
-            <td class="py-2 px-3 text-right text-red-500">${fmt(sr.aTCO)}</td>
-            <td class="py-2 px-3 text-right text-violet-600 font-medium">${fmt(sr.bTCO)}</td>
-            <td class="py-2 pl-3 text-right text-emerald-600 font-semibold">${fmtK(sd)}</td>
+            <td class="py-2 px-3 text-right v-red">${fmt(sr.aTCO)}</td>
+            <td class="py-2 px-3 text-right v-solum font-medium">${fmt(sr.bTCO)}</td>
+            <td class="py-2 pl-3 text-right v-green font-semibold">${fmtK(sd)}</td>
         </tr>`;
     }).join('');
 }
-
 function renderRev() {
-    const r = calcRev(state.area);
-    document.getElementById('revSolSlots').textContent = r.solTotalSlots;
+    const r=calcRev(state.area);
+    document.getElementById('revSolSlots').textContent  = r.solTotalSlots;
     document.getElementById('revSolAnnual').textContent = fmtK(r.solAnnual);
-    document.getElementById('revNormAnnual').textContent = fmtK(r.normAnnual);
-    document.getElementById('revNetDiff').textContent = '+' + fmtK(r.solNet5 - r.normNet5);
+    document.getElementById('revNormAnnual').textContent= fmtK(r.normAnnual);
+    document.getElementById('revNetDiff').textContent   = '+'+fmtK(r.solNet5-r.normNet5);
 
-    const years = [0,1,2,3,4,5];
-    makeChart('revLineChart', {
-        type: 'line',
-        data: {
-            labels: years.map(y => 'Y' + y),
-            datasets: [
-                { label: 'SOLUM Net Value', data: years.map(y => y===0 ? -r.capex : r.solAnnual*y - r.capex), borderColor: C.violet, backgroundColor: C.violetL, tension: 0.3, fill: true, pointBackgroundColor: C.violet },
-                { label: 'Normal Net Value', data: years.map(y => y===0 ? -r.capex : r.normAnnual*y - r.capex), borderColor: C.red, backgroundColor: C.redL, tension: 0.3, fill: true, pointBackgroundColor: C.red }
-            ]
-        },
-        options: baseOpts
-    });
-
-    makeChart('revBarChart', {
-        type: 'bar',
-        data: {
-            labels: ['연 매출', '5년 누적 매출', '5년 Net Value'],
-            datasets: [
-                { label: 'SOLUM', data: [r.solAnnual, r.solAnnual*5, r.solNet5], backgroundColor: C.violet, borderRadius: 6 },
-                { label: 'Normal', data: [r.normAnnual, r.normAnnual*5, r.normNet5], backgroundColor: C.red, borderRadius: 6 }
-            ]
-        },
-        options: baseOpts
-    });
+    const yrs=[0,1,2,3,4,5];
+    makeChart('revLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
+        {label:'SOLUM Net Value',data:yrs.map(y=>y===0?-r.capex:r.solAnnual*y-r.capex),borderColor:C.solum,backgroundColor:C.solumL,tension:0.3,fill:true,pointBackgroundColor:C.solum},
+        {label:'Normal Net Value',data:yrs.map(y=>y===0?-r.capex:r.normAnnual*y-r.capex),borderColor:C.red,backgroundColor:C.redL,tension:0.3,fill:true,pointBackgroundColor:C.red}
+    ]},options:baseOpts});
+    makeChart('revBarChart',{type:'bar',data:{labels:['연 매출','5년 누적 매출','5년 Net Value'],datasets:[
+        {label:'SOLUM',data:[r.solAnnual,r.solAnnual*5,r.solNet5],backgroundColor:C.solum,borderRadius:6},
+        {label:'Normal',data:[r.normAnnual,r.normAnnual*5,r.normNet5],backgroundColor:C.red,borderRadius:6}
+    ]},options:baseOpts});
 }
 
-function render() {
-    renderShared();
-    renderArch();
-    renderIntel();
-    renderRev();
+function render() { renderShared(); renderArch(); renderIntel(); renderRev(); }
+
+function syncLabels() {
+    document.getElementById('bleDensityVal').textContent  = (+document.getElementById('bleDensity').value).toFixed(1);
+    document.getElementById('halowApsVal').textContent    = document.getElementById('halowAps').value;
+    document.getElementById('shelfDensityVal').textContent= document.getElementById('shelfDensity').value;
+    document.getElementById('popDensityVal').textContent  = document.getElementById('popDensity').value;
+    document.getElementById('adRateVal').textContent      = '$'+(+document.getElementById('adRate').value).toFixed(2);
+    document.getElementById('opDaysVal').textContent      = document.getElementById('opDays').value;
 }
 
-// ============ Slider labels ============
-function syncSliderLabels() {
-    document.getElementById('bleDensityVal').textContent = (+document.getElementById('bleDensity').value).toFixed(1);
-    document.getElementById('halowApsVal').textContent = document.getElementById('halowAps').value;
-    document.getElementById('shelfDensityVal').textContent = document.getElementById('shelfDensity').value;
-    document.getElementById('popDensityVal').textContent = document.getElementById('popDensity').value;
-    document.getElementById('adRateVal').textContent = '$' + (+document.getElementById('adRate').value).toFixed(2);
-    document.getElementById('opDaysVal').textContent = document.getElementById('opDays').value;
-}
+document.querySelectorAll('input').forEach(el => el.addEventListener('input',()=>{syncLabels();render();}));
 
-// ============ Events ============
-document.querySelectorAll('input').forEach(el => {
-    el.addEventListener('input', () => { syncSliderLabels(); render(); });
-});
-
-document.getElementById('areaSlider').addEventListener('input', (e) => {
-    state.area = +e.target.value;
-    document.getElementById('areaInput').value = state.area;
-    document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+document.getElementById('areaSlider').addEventListener('input',e=>{
+    state.area=+e.target.value;
+    document.getElementById('areaInput').value=state.area;
+    document.querySelectorAll('.preset-chip').forEach(c=>c.classList.remove('active'));
     render();
 });
-document.getElementById('areaInput').addEventListener('input', (e) => {
-    const v = Math.max(100, Math.min(50000, +e.target.value || 0));
-    state.area = v;
-    document.getElementById('areaSlider').value = Math.min(25000, v);
-    document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+document.getElementById('areaInput').addEventListener('input',e=>{
+    const v=Math.max(100,Math.min(50000,+e.target.value||0));
+    state.area=v;
+    document.getElementById('areaSlider').value=Math.min(25000,v);
+    document.querySelectorAll('.preset-chip').forEach(c=>c.classList.remove('active'));
     render();
 });
-
-document.querySelectorAll('.preset-chip').forEach(btn => {
-    btn.addEventListener('click', () => {
-        state.area = PRESETS[btn.dataset.preset];
-        document.getElementById('areaInput').value = state.area;
-        document.getElementById('areaSlider').value = Math.min(25000, state.area);
-        document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+document.querySelectorAll('.preset-chip').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        state.area=PRESETS[btn.dataset.preset];
+        document.getElementById('areaInput').value=state.area;
+        document.getElementById('areaSlider').value=Math.min(25000,state.area);
+        document.querySelectorAll('.preset-chip').forEach(c=>c.classList.remove('active'));
         btn.classList.add('active');
         render();
     });
 });
-
-document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-        document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+        document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+        document.getElementById('tab-'+btn.dataset.tab).classList.remove('hidden');
     });
 });
 
-// ============ Drag & Drop ============
-function initDragDrop(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    let dragSrc = null;
-
-    const getWidgets = () => [...container.querySelectorAll(':scope > .widget')];
-
-    container.addEventListener('dragstart', (e) => {
-        const w = e.target.closest('.widget');
-        if (!w) return;
-        dragSrc = w;
-        e.dataTransfer.effectAllowed = 'move';
-        setTimeout(() => w.classList.add('dragging'), 0);
+function initDragDrop(id) {
+    const container=document.getElementById(id); if(!container)return;
+    let src=null;
+    const ws=()=>[...container.querySelectorAll(':scope>.widget')];
+    container.addEventListener('dragstart',e=>{
+        const w=e.target.closest('.widget'); if(!w)return;
+        src=w; e.dataTransfer.effectAllowed='move';
+        setTimeout(()=>w.classList.add('dragging'),0);
     });
-
-    container.addEventListener('dragend', () => {
-        getWidgets().forEach(w => { w.classList.remove('dragging'); w.classList.remove('drag-over'); });
-        dragSrc = null;
-        setTimeout(render, 50);
+    container.addEventListener('dragend',()=>{
+        ws().forEach(w=>{w.classList.remove('dragging');w.classList.remove('drag-over');}); src=null; setTimeout(render,50);
     });
-
-    container.addEventListener('dragover', (e) => {
+    container.addEventListener('dragover',e=>{
         e.preventDefault();
-        const w = e.target.closest('.widget');
-        if (w && w !== dragSrc) {
-            getWidgets().forEach(x => x.classList.remove('drag-over'));
-            w.classList.add('drag-over');
-        }
+        const w=e.target.closest('.widget');
+        if(w&&w!==src){ws().forEach(x=>x.classList.remove('drag-over'));w.classList.add('drag-over');}
     });
-
-    container.addEventListener('dragleave', (e) => {
-        const w = e.target.closest('.widget');
-        if (w && !w.contains(e.relatedTarget)) w.classList.remove('drag-over');
-    });
-
-    container.addEventListener('drop', (e) => {
+    container.addEventListener('dragleave',e=>{const w=e.target.closest('.widget');if(w&&!w.contains(e.relatedTarget))w.classList.remove('drag-over');});
+    container.addEventListener('drop',e=>{
         e.preventDefault();
-        const target = e.target.closest('.widget');
-        if (!target || target === dragSrc || !dragSrc) return;
-        const widgets = getWidgets();
-        const si = widgets.indexOf(dragSrc);
-        const ti = widgets.indexOf(target);
-        if (si < ti) container.insertBefore(dragSrc, target.nextSibling);
-        else container.insertBefore(dragSrc, target);
-        target.classList.remove('drag-over');
+        const t=e.target.closest('.widget');
+        if(!t||t===src||!src)return;
+        const all=ws(), si=all.indexOf(src), ti=all.indexOf(t);
+        if(si<ti) container.insertBefore(src,t.nextSibling); else container.insertBefore(src,t);
+        t.classList.remove('drag-over');
     });
 }
 
-initDragDrop('arch-widgets');
-initDragDrop('intel-widgets');
-initDragDrop('rev-widgets');
-
-// Initial render
-syncSliderLabels();
-render();
+['arch-widgets','intel-widgets','rev-widgets'].forEach(initDragDrop);
+syncLabels(); render();
 </script>
 </body>
 </html>
