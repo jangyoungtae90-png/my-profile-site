@@ -17,7 +17,6 @@
         }
         body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--bg); color: #1a1a2e; }
 
-        /* ── Header ── */
         .solum-logo {
             font-family: 'Inter', sans-serif;
             font-weight: 800;
@@ -26,7 +25,6 @@
             color: var(--solum-deep);
         }
 
-        /* ── Hero card style (rounded rectangle like SOLUM hero) ── */
         .hero-card {
             background: linear-gradient(135deg, var(--solum-deep) 0%, var(--solum-purple) 60%, #7c3aed 100%);
             border-radius: 24px;
@@ -51,37 +49,15 @@
             border-radius: 50%;
         }
 
-        /* ── White cards ── */
         .card {
             background: #ffffff;
             border-radius: 20px;
             box-shadow: 0 2px 20px rgba(30, 10, 94, 0.07);
         }
 
-        /* ── Pill chips (matching SOLUM "Automotive & Power" pill) ── */
-        .pill-chip {
-            border-radius: 999px;
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: 500;
-            border: 1.5px solid #e0dff5;
-            background: white;
-            color: #4b5563;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        .pill-chip.active {
-            background: var(--solum-deep);
-            color: white;
-            border-color: var(--solum-deep);
-        }
-        .pill-chip:hover:not(.active) { border-color: var(--solum-purple); color: var(--solum-purple); }
-
-        /* ── Tab buttons ── */
         .tab-btn { border-radius: 12px; transition: all 0.2s ease; color: #64748b; font-weight: 500; }
         .tab-btn.active { background: var(--solum-deep); color: white; }
 
-        /* ── Inputs ── */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%; height: 5px;
@@ -112,13 +88,11 @@
         }
         input[type=number]:focus { outline: none; border-color: var(--solum-purple); box-shadow: 0 0 0 3px rgba(67,24,166,0.1); }
 
-        /* ── Value colors ── */
         .v-solum  { color: var(--solum-purple); }
         .v-deep   { color: var(--solum-deep); }
         .v-green  { color: #059669; }
         .v-red    { color: #dc2626; }
 
-        /* ── Metric mini-cards ── */
         .mini-card { border-radius: 16px; padding: 16px; }
         .mc-solum  { background: #f0ebff; }
         .mc-green  { background: #ecfdf5; }
@@ -127,7 +101,6 @@
         .mc-blue   { background: #eff6ff; }
         .mc-gray   { background: #f8fafc; }
 
-        /* ── Drag & Drop ── */
         .widget { position: relative; }
         .drag-handle {
             position: absolute; top: 14px; right: 14px;
@@ -147,47 +120,72 @@
         details[open] .chevron { transform: rotate(90deg); }
         .chevron { transition: transform 0.2s ease; display: inline-block; }
 
-        /* ── CTA pill button (like SOLUM "Contact Us") ── */
-        .cta-pill {
-            background: var(--solum-purple);
-            color: white;
-            border-radius: 999px;
-            padding: 8px 20px;
-            font-size: 13px;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            text-decoration: none;
-            transition: background 0.2s;
+        /* ── Hero area slider (custom lavender style) ── */
+        .hero-slider {
+            -webkit-appearance: none;
+            width: 100%; height: 6px;
+            border-radius: 99px;
+            outline: none;
+            cursor: pointer;
+            background: linear-gradient(to right, #c4b5fd 0%, #c4b5fd var(--pct, 50%), rgba(255,255,255,0.2) var(--pct, 50%), rgba(255,255,255,0.2) 100%);
         }
-        .cta-pill:hover { background: var(--solum-deep); }
+        .hero-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px; height: 22px;
+            background: #ffffff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 0 4px rgba(196,181,253,0.5), 0 2px 8px rgba(0,0,0,0.25);
+            transition: box-shadow 0.2s;
+        }
+        .hero-slider::-webkit-slider-thumb:hover {
+            box-shadow: 0 0 0 6px rgba(196,181,253,0.6), 0 2px 12px rgba(0,0,0,0.3);
+        }
+        .hero-slider::-moz-range-thumb {
+            width: 22px; height: 22px;
+            background: #ffffff;
+            border-radius: 50%; border: 0; cursor: pointer;
+            box-shadow: 0 0 0 4px rgba(196,181,253,0.5);
+        }
 
+        /* ── Hero preset dropdown ── */
+        .hero-select {
+            background: rgba(255,255,255,0.12);
+            border: 1.5px solid rgba(196,181,253,0.5);
+            color: white;
+            border-radius: 12px;
+            padding: 8px 36px 8px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            width: 100%;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c4b5fd' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 14px;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+        .hero-select:hover { border-color: rgba(196,181,253,0.9); background-color: rgba(255,255,255,0.18); }
+        .hero-select option { background: #1e0a5e; color: white; }
     </style>
 </head>
 <body class="min-h-screen">
 
-<!-- ── SOLUM-style Header ── -->
 <header class="bg-white sticky top-0 z-40" style="border-bottom: 1px solid #ede9fe;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
-        <a href="portfolio.html" class="text-xs font-medium text-violet-400 hover:text-violet-700 uppercase tracking-widest">← Portfolio</a>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-center">
         <div class="text-center">
             <div class="solum-logo">SOLUM</div>
             <div class="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5">AIR ROI Simulator</div>
-        </div>
-        <div class="flex items-center gap-3">
-            <span class="text-[10px] text-gray-400 uppercase tracking-widest hidden sm:block">위젯 드래그로 순서 변경</span>
-            <a href="portfolio.html" class="cta-pill hidden sm:inline-flex">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                Portfolio
-            </a>
         </div>
     </div>
 </header>
 
 <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
 
-    <!-- ── Hero Summary Card (SOLUM hero style: big rounded rect) ── -->
     <section class="hero-card p-6 sm:p-8 mb-6 grid grid-cols-1 md:grid-cols-4 gap-6 relative z-0">
         <div class="md:col-span-2">
             <span class="inline-block bg-white text-gray-800 rounded-full px-4 py-1 text-xs font-semibold mb-4">ESL &amp; IoT · Retail Tech</span>
@@ -197,39 +195,43 @@
         </div>
         <div>
             <label class="text-xs text-white/60 uppercase tracking-widest">매장 면적 (㎡)</label>
-            <div class="flex items-center gap-3 mt-2">
-                <input type="range" id="areaSlider" min="500" max="25000" step="100" value="10000" style="background:rgba(255,255,255,0.2);">
+            <div class="mt-3">
+                <input type="range" id="areaSlider" class="hero-slider" min="500" max="25000" step="100" value="10000">
+            </div>
+            <div class="flex items-center gap-2 mt-2">
                 <input type="number" id="areaInput" min="100" max="50000" step="100" value="10000"
-                    style="background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25);color:white;border-radius:10px;padding:6px 10px;width:90px;font-size:13px;">
+                    style="background:rgba(255,255,255,0.12);border:1.5px solid rgba(196,181,253,0.5);color:white;border-radius:10px;padding:6px 12px;width:110px;font-size:14px;font-weight:600;font-family:'Inter',sans-serif;">
+                <span class="text-white/50 text-xs">㎡</span>
             </div>
             <div class="mt-4 grid grid-cols-2 gap-3">
                 <div>
-                    <p class="text-xs text-white/60">선반 수</p>
-                    <p class="text-xl font-bold"><span id="shelfCount">100</span><span class="text-sm font-normal opacity-60"> 개</span></p>
+                    <p class="text-xs text-white/50">선반 수</p>
+                    <p class="text-xl font-bold"><span id="shelfCount">100</span><span class="text-sm font-normal opacity-50"> 개</span></p>
                 </div>
                 <div>
-                    <p class="text-xs text-white/60">E-Paper POP</p>
-                    <p class="text-xl font-bold"><span id="popCount">30</span><span class="text-sm font-normal opacity-60"> 대</span></p>
+                    <p class="text-xs text-white/50">E-Paper POP</p>
+                    <p class="text-xl font-bold"><span id="popCount">30</span><span class="text-sm font-normal opacity-50"> 대</span></p>
                 </div>
             </div>
         </div>
         <div class="flex flex-col justify-between">
             <div>
                 <p class="text-xs text-white/60 uppercase tracking-widest mb-2">매장 프리셋</p>
-                <div class="flex flex-wrap gap-1.5">
-                    <button data-preset="Standard Hypermarket" class="preset-chip active text-[11px] px-2.5 py-1">Hypermarket</button>
-                    <button data-preset="Walmart" class="preset-chip text-[11px] px-2.5 py-1">Walmart</button>
-                    <button data-preset="Carrefour" class="preset-chip text-[11px] px-2.5 py-1">Carrefour</button>
-                    <button data-preset="REWE" class="preset-chip text-[11px] px-2.5 py-1">REWE</button>
-                    <button data-preset="Lidl" class="preset-chip text-[11px] px-2.5 py-1">Lidl</button>
-                    <button data-preset="Aldi" class="preset-chip text-[11px] px-2.5 py-1">Aldi</button>
-                </div>
+                <select id="presetSelect" class="hero-select">
+                    <option value="Standard Hypermarket">Standard Hypermarket — 10,000㎡</option>
+                    <option value="Walmart">Walmart — 20,250㎡</option>
+                    <option value="Carrefour">Carrefour — 7,500㎡</option>
+                    <option value="REWE">REWE — 5,000㎡</option>
+                    <option value="Lidl">Lidl — 1,500㎡</option>
+                    <option value="Aldi">Aldi — 1,500㎡</option>
+                    <option value="custom">직접 입력</option>
+                </select>
+                <p class="text-[10px] text-white/40 mt-2">Air Launching Show ROI 시트 기준 기본값</p>
             </div>
-            <p class="text-[10px] text-white/40 mt-4">Air Launching Show ROI 시트 기준 · 5년 분석</p>
+            <p class="text-[10px] text-white/30 mt-4">5년 누적 TCO / Net Value 분석</p>
         </div>
     </section>
 
-    <!-- ── Tabs ── -->
     <nav class="flex gap-1 mb-6 bg-white p-1.5 rounded-2xl shadow-sm w-fit" style="border:1px solid #ede9fe;">
         <button data-tab="arch"  class="tab-btn active px-5 py-2 text-sm">01 / Architecture</button>
         <button data-tab="intel" class="tab-btn px-5 py-2 text-sm">02 / Intelligence</button>
@@ -239,7 +241,6 @@
     <!-- ═══════════ ARCHITECTURE TAB ═══════════ -->
     <section id="tab-arch" class="tab-panel">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
             <div class="card p-5 lg:col-span-1">
                 <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
                 <div class="space-y-5">
@@ -275,46 +276,26 @@
                     </div>
                 </div>
             </div>
-
             <div id="arch-widgets" class="lg:col-span-2 space-y-5">
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div class="mini-card mc-deep">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">HaLow AP</p>
-                            <p class="text-2xl font-bold mt-1 v-deep" id="archHalowAps">2</p>
-                            <p class="text-[10px] text-gray-400">대</p>
-                        </div>
-                        <div class="mini-card mc-red">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">BLE AP</p>
-                            <p class="text-2xl font-bold mt-1 v-red" id="archBleAps">25</p>
-                            <p class="text-[10px] text-gray-400">대</p>
-                        </div>
-                        <div class="mini-card mc-green">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">5년 절감액</p>
-                            <p class="text-2xl font-bold mt-1 v-green" id="archSaving">$53K</p>
-                            <p class="text-[10px] text-gray-400">HaLow 우위</p>
-                        </div>
-                        <div class="mini-card mc-solum">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">절감률</p>
-                            <p class="text-2xl font-bold mt-1 v-solum" id="archSavingPct">91%</p>
-                            <p class="text-[10px] text-gray-400">vs BLE</p>
-                        </div>
+                        <div class="mini-card mc-deep"><p class="text-[10px] text-gray-400 uppercase tracking-widest">HaLow AP</p><p class="text-2xl font-bold mt-1 v-deep" id="archHalowAps">2</p><p class="text-[10px] text-gray-400">대</p></div>
+                        <div class="mini-card mc-red"><p class="text-[10px] text-gray-400 uppercase tracking-widest">BLE AP</p><p class="text-2xl font-bold mt-1 v-red" id="archBleAps">25</p><p class="text-[10px] text-gray-400">대</p></div>
+                        <div class="mini-card mc-green"><p class="text-[10px] text-gray-400 uppercase tracking-widest">5년 절감액</p><p class="text-2xl font-bold mt-1 v-green" id="archSaving">$53K</p><p class="text-[10px] text-gray-400">HaLow 우위</p></div>
+                        <div class="mini-card mc-solum"><p class="text-[10px] text-gray-400 uppercase tracking-widest">절감률</p><p class="text-2xl font-bold mt-1 v-solum" id="archSavingPct">91%</p><p class="text-[10px] text-gray-400">vs BLE</p></div>
                     </div>
                 </div>
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 TCO 구성 비교</h3>
                     <div class="h-64"><canvas id="archBarChart"></canvas></div>
                 </div>
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">연차별 누적 TCO</h3>
                     <div class="h-64"><canvas id="archLineChart"></canvas></div>
                 </div>
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <details open>
@@ -325,13 +306,7 @@
                         <div class="overflow-x-auto mt-4">
                             <table class="w-full text-sm">
                                 <thead><tr class="text-left text-[11px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                                    <th class="py-2 pr-3">매장</th>
-                                    <th class="py-2 px-3 text-right">면적(㎡)</th>
-                                    <th class="py-2 px-3 text-right">BLE AP</th>
-                                    <th class="py-2 px-3 text-right">HaLow AP</th>
-                                    <th class="py-2 px-3 text-right">BLE TCO</th>
-                                    <th class="py-2 px-3 text-right">HaLow TCO</th>
-                                    <th class="py-2 pl-3 text-right">절감액</th>
+                                    <th class="py-2 pr-3">매장</th><th class="py-2 px-3 text-right">면적(㎡)</th><th class="py-2 px-3 text-right">BLE AP</th><th class="py-2 px-3 text-right">HaLow AP</th><th class="py-2 px-3 text-right">BLE TCO</th><th class="py-2 px-3 text-right">HaLow TCO</th><th class="py-2 pl-3 text-right">절감액</th>
                                 </tr></thead>
                                 <tbody id="archStoreTable"></tbody>
                             </table>
@@ -345,7 +320,6 @@
     <!-- ═══════════ INTELLIGENCE TAB ═══════════ -->
     <section id="tab-intel" class="tab-panel hidden">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
             <div class="card p-5 lg:col-span-1">
                 <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
                 <div class="space-y-5">
@@ -376,43 +350,26 @@
                     </div>
                 </div>
             </div>
-
             <div id="intel-widgets" class="lg:col-span-2 space-y-5">
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div class="mini-card mc-red">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">A. Camera CAPEX</p>
-                            <p class="text-2xl font-bold mt-1 v-red" id="intelACapex">$160K</p>
-                        </div>
-                        <div class="mini-card mc-solum">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">B. SOLUM CAPEX</p>
-                            <p class="text-2xl font-bold mt-1 v-solum" id="intelBCapex">$18K</p>
-                        </div>
-                        <div class="mini-card mc-green">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">5년 절감액</p>
-                            <p class="text-2xl font-bold mt-1 v-green" id="intelSaving">$628K</p>
-                            <p class="text-[10px] text-gray-400">SOLUM 우위</p>
-                        </div>
-                        <div class="mini-card mc-deep">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">절감률</p>
-                            <p class="text-2xl font-bold mt-1 v-deep" id="intelSavingPct">73%</p>
-                        </div>
+                        <div class="mini-card mc-red"><p class="text-[10px] text-gray-400 uppercase tracking-widest">A. Camera CAPEX</p><p class="text-2xl font-bold mt-1 v-red" id="intelACapex">$160K</p></div>
+                        <div class="mini-card mc-solum"><p class="text-[10px] text-gray-400 uppercase tracking-widest">B. SOLUM CAPEX</p><p class="text-2xl font-bold mt-1 v-solum" id="intelBCapex">$18K</p></div>
+                        <div class="mini-card mc-green"><p class="text-[10px] text-gray-400 uppercase tracking-widest">5년 절감액</p><p class="text-2xl font-bold mt-1 v-green" id="intelSaving">$628K</p><p class="text-[10px] text-gray-400">SOLUM 우위</p></div>
+                        <div class="mini-card mc-deep"><p class="text-[10px] text-gray-400 uppercase tracking-widest">절감률</p><p class="text-2xl font-bold mt-1 v-deep" id="intelSavingPct">73%</p></div>
                     </div>
                 </div>
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 TCO: CAPEX vs OOS 손실 vs 보충 인력</h3>
                     <div class="h-72"><canvas id="intelBarChart"></canvas></div>
                 </div>
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">연차별 누적 TCO</h3>
                     <div class="h-64"><canvas id="intelLineChart"></canvas></div>
                 </div>
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <details open>
@@ -423,19 +380,13 @@
                         <div class="overflow-x-auto mt-4">
                             <table class="w-full text-sm">
                                 <thead><tr class="text-left text-[11px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
-                                    <th class="py-2 pr-3">매장</th>
-                                    <th class="py-2 px-3 text-right">면적(㎡)</th>
-                                    <th class="py-2 px-3 text-right">매대 수</th>
-                                    <th class="py-2 px-3 text-right">A. Camera</th>
-                                    <th class="py-2 px-3 text-right">B. SOLUM</th>
-                                    <th class="py-2 pl-3 text-right">절감액</th>
+                                    <th class="py-2 pr-3">매장</th><th class="py-2 px-3 text-right">면적(㎡)</th><th class="py-2 px-3 text-right">매대 수</th><th class="py-2 px-3 text-right">A. Camera</th><th class="py-2 px-3 text-right">B. SOLUM</th><th class="py-2 pl-3 text-right">절감액</th>
                                 </tr></thead>
                                 <tbody id="intelStoreTable"></tbody>
                             </table>
                         </div>
                     </details>
                 </div>
-
                 <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2">로직 요약</p>
@@ -450,7 +401,6 @@
     <!-- ═══════════ REVENUE TAB ═══════════ -->
     <section id="tab-rev" class="tab-panel hidden">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-
             <div class="card p-5 lg:col-span-1">
                 <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">파라미터</h3>
                 <div class="space-y-5">
@@ -492,64 +442,34 @@
                     </div>
                 </div>
             </div>
-
             <div id="rev-widgets" class="lg:col-span-2 space-y-5">
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        <div class="mini-card mc-solum">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">SOLUM 광고 구좌</p>
-                            <p class="text-2xl font-bold mt-1 v-solum" id="revSolSlots">120</p>
-                            <p class="text-[10px] text-gray-400">구좌 / 일</p>
-                        </div>
-                        <div class="mini-card mc-green">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">SOLUM 연 매출</p>
-                            <p class="text-2xl font-bold mt-1 v-green" id="revSolAnnual">$36K</p>
-                        </div>
-                        <div class="mini-card mc-gray">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">Normal 연 매출</p>
-                            <p class="text-2xl font-bold mt-1 text-gray-500" id="revNormAnnual">$27K</p>
-                        </div>
-                        <div class="mini-card mc-deep">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">5년 Net Value 차</p>
-                            <p class="text-2xl font-bold mt-1 v-deep" id="revNetDiff">+$62K</p>
-                        </div>
+                        <div class="mini-card mc-solum"><p class="text-[10px] text-gray-400 uppercase tracking-widest">SOLUM 광고 구좌</p><p class="text-2xl font-bold mt-1 v-solum" id="revSolSlots">120</p><p class="text-[10px] text-gray-400">구좌 / 일</p></div>
+                        <div class="mini-card mc-green"><p class="text-[10px] text-gray-400 uppercase tracking-widest">SOLUM 연 매출</p><p class="text-2xl font-bold mt-1 v-green" id="revSolAnnual">$36K</p></div>
+                        <div class="mini-card mc-gray"><p class="text-[10px] text-gray-400 uppercase tracking-widest">Normal 연 매출</p><p class="text-2xl font-bold mt-1 text-gray-500" id="revNormAnnual">$27K</p></div>
+                        <div class="mini-card mc-deep"><p class="text-[10px] text-gray-400 uppercase tracking-widest">5년 Net Value 차</p><p class="text-2xl font-bold mt-1 v-deep" id="revNetDiff">+$62K</p></div>
                     </div>
                 </div>
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">5년 Net Value (누적 매출 − CAPEX)</h3>
                     <div class="h-64"><canvas id="revLineChart"></canvas></div>
                 </div>
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">SOLUM vs Normal Display — 핵심 지표</h3>
                     <div class="h-64"><canvas id="revBarChart"></canvas></div>
                 </div>
-
                 <div class="widget card p-5" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div class="mini-card mc-green">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">통합 CMS 절감 (연)</p>
-                            <p class="text-xl font-bold mt-1 v-green">+$20,160</p>
-                            <p class="text-[10px] text-gray-400">3개 CMS 분리 운영 대비</p>
-                        </div>
-                        <div class="mini-card mc-solum">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">Grey Zone CAPEX 회피</p>
-                            <p class="text-xl font-bold mt-1 v-solum">+$2,530</p>
-                            <p class="text-[10px] text-gray-400">HaLow 채택 시</p>
-                        </div>
-                        <div class="mini-card mc-blue">
-                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">규격 OPEX 회피</p>
-                            <p class="text-xl font-bold mt-1 text-blue-600">$13K~$91K</p>
-                            <p class="text-[10px] text-gray-400">콘텐츠 리사이징 비용</p>
-                        </div>
+                        <div class="mini-card mc-green"><p class="text-[10px] text-gray-400 uppercase tracking-widest">통합 CMS 절감 (연)</p><p class="text-xl font-bold mt-1 v-green">+$20,160</p><p class="text-[10px] text-gray-400">3개 CMS 분리 운영 대비</p></div>
+                        <div class="mini-card mc-solum"><p class="text-[10px] text-gray-400 uppercase tracking-widest">Grey Zone CAPEX 회피</p><p class="text-xl font-bold mt-1 v-solum">+$2,530</p><p class="text-[10px] text-gray-400">HaLow 채택 시</p></div>
+                        <div class="mini-card mc-blue"><p class="text-[10px] text-gray-400 uppercase tracking-widest">규격 OPEX 회피</p><p class="text-xl font-bold mt-1 text-blue-600">$13K~$91K</p><p class="text-[10px] text-gray-400">콘텐츠 리사이징 비용</p></div>
                     </div>
                 </div>
-
                 <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
                     <div class="drag-handle" title="드래그하여 이동">⠿</div>
                     <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2">로직 요약</p>
@@ -617,11 +537,11 @@ function makeChart(id, cfg) {
 }
 
 const C = {
-    p1:'#c4b5fd', p1L:'#c4b5fd33',  /* lightest lavender */
-    p2:'#8b5cf6', p2L:'#8b5cf633',  /* medium violet */
-    p3:'#7c3aed', p3L:'#7c3aed33',  /* bright mid violet */
-    p4:'#4318a6', p4L:'#4318a633',  /* SOLUM purple */
-    p5:'#1e0a5e', p5L:'#1e0a5e33', /* deepest navy */
+    p1:'#c4b5fd', p1L:'#c4b5fd33',
+    p2:'#8b5cf6', p2L:'#8b5cf633',
+    p3:'#7c3aed', p3L:'#7c3aed33',
+    p4:'#4318a6', p4L:'#4318a633',
+    p5:'#1e0a5e', p5L:'#1e0a5e33',
     grid:'#f0ecfa', text:'#94a3b8'
 };
 const baseOpts = {
@@ -648,29 +568,18 @@ function renderArch() {
     const diff=r.bleTCO-r.halowTCO;
     document.getElementById('archSaving').textContent    = fmtK(diff);
     document.getElementById('archSavingPct').textContent = r.bleTCO>0?Math.round(diff/r.bleTCO*100)+'%':'—';
-
     makeChart('archBarChart',{type:'bar',data:{labels:['HaLow','BLE'],datasets:[
         {label:'CAPEX',data:[r.halowCapex,r.bleCapex],backgroundColor:C.p1,stack:'s',borderRadius:4},
         {label:'OPEX (5년)',data:[r.halowOpex*5,r.bleOpex*5],backgroundColor:C.p4,stack:'s',borderRadius:4}
     ]},options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true}}}});
-
     const yrs=[0,1,2,3,4,5];
     makeChart('archLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
         {label:'HaLow 누적',data:yrs.map(y=>r.halowCapex+r.halowOpex*y),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5},
         {label:'BLE 누적',data:yrs.map(y=>r.bleCapex+r.bleOpex*y),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2}
     ]},options:baseOpts});
-
     document.getElementById('archStoreTable').innerHTML = STORE_LIST.map(s=>{
         const sr=calcArch(s.area), sd=sr.bleTCO-sr.halowTCO;
-        return `<tr class="border-b border-gray-50 hover:bg-purple-50/30">
-            <td class="py-2 pr-3 font-medium text-gray-700">${s.name}</td>
-            <td class="py-2 px-3 text-right text-gray-500">${s.area.toLocaleString()}</td>
-            <td class="py-2 px-3 text-right v-red">${sr.bleAps}</td>
-            <td class="py-2 px-3 text-right v-solum">${sr.halowAps}</td>
-            <td class="py-2 px-3 text-right text-gray-500">${fmt(sr.bleTCO)}</td>
-            <td class="py-2 px-3 text-right v-solum font-medium">${fmt(sr.halowTCO)}</td>
-            <td class="py-2 pl-3 text-right v-green font-semibold">${fmtK(sd)}</td>
-        </tr>`;
+        return `<tr class="border-b border-gray-50 hover:bg-purple-50/30"><td class="py-2 pr-3 font-medium text-gray-700">${s.name}</td><td class="py-2 px-3 text-right text-gray-500">${s.area.toLocaleString()}</td><td class="py-2 px-3 text-right v-red">${sr.bleAps}</td><td class="py-2 px-3 text-right v-solum">${sr.halowAps}</td><td class="py-2 px-3 text-right text-gray-500">${fmt(sr.bleTCO)}</td><td class="py-2 px-3 text-right v-solum font-medium">${fmt(sr.halowTCO)}</td><td class="py-2 pl-3 text-right v-green font-semibold">${fmtK(sd)}</td></tr>`;
     }).join('');
 }
 function renderIntel() {
@@ -680,29 +589,19 @@ function renderIntel() {
     const diff=r.aTCO-r.bTCO;
     document.getElementById('intelSaving').textContent    = fmtK(diff);
     document.getElementById('intelSavingPct').textContent = r.aTCO>0?Math.round(diff/r.aTCO*100)+'%':'—';
-
     makeChart('intelBarChart',{type:'bar',data:{labels:['A. Camera 단독','B. UWB+Newton+LoadCell'],datasets:[
         {label:'CAPEX',data:[r.aCapex,r.bCapex],backgroundColor:C.p1,stack:'s',borderRadius:4},
         {label:'OOS 손실 (5년)',data:[r.aOOS*5,r.bOOS*5],backgroundColor:C.p3,stack:'s',borderRadius:4},
         {label:'보충 인력 (5년)',data:[r.aLabor*5,r.bLabor*5],backgroundColor:C.p5,stack:'s',borderRadius:4}
     ]},options:{...baseOpts,scales:{...baseOpts.scales,y:{...baseOpts.scales.y,stacked:true},x:{...baseOpts.scales.x,stacked:true}}}});
-
     const yrs=[0,1,2,3,4,5];
     makeChart('intelLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
         {label:'A. Camera 누적',data:yrs.map(y=>r.aCapex+r.aOpex*y),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2},
         {label:'B. SOLUM 누적',data:yrs.map(y=>r.bCapex+r.bOpex*y),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5}
     ]},options:baseOpts});
-
     document.getElementById('intelStoreTable').innerHTML = STORE_LIST.map(s=>{
         const sr=calcIntel(s.area), sd=sr.aTCO-sr.bTCO;
-        return `<tr class="border-b border-gray-50 hover:bg-purple-50/30">
-            <td class="py-2 pr-3 font-medium text-gray-700">${s.name}</td>
-            <td class="py-2 px-3 text-right text-gray-500">${s.area.toLocaleString()}</td>
-            <td class="py-2 px-3 text-right text-gray-500">${sr.shelves}</td>
-            <td class="py-2 px-3 text-right v-red">${fmt(sr.aTCO)}</td>
-            <td class="py-2 px-3 text-right v-solum font-medium">${fmt(sr.bTCO)}</td>
-            <td class="py-2 pl-3 text-right v-green font-semibold">${fmtK(sd)}</td>
-        </tr>`;
+        return `<tr class="border-b border-gray-50 hover:bg-purple-50/30"><td class="py-2 pr-3 font-medium text-gray-700">${s.name}</td><td class="py-2 px-3 text-right text-gray-500">${s.area.toLocaleString()}</td><td class="py-2 px-3 text-right text-gray-500">${sr.shelves}</td><td class="py-2 px-3 text-right v-red">${fmt(sr.aTCO)}</td><td class="py-2 px-3 text-right v-solum font-medium">${fmt(sr.bTCO)}</td><td class="py-2 pl-3 text-right v-green font-semibold">${fmtK(sd)}</td></tr>`;
     }).join('');
 }
 function renderRev() {
@@ -711,7 +610,6 @@ function renderRev() {
     document.getElementById('revSolAnnual').textContent = fmtK(r.solAnnual);
     document.getElementById('revNormAnnual').textContent= fmtK(r.normAnnual);
     document.getElementById('revNetDiff').textContent   = '+'+fmtK(r.solNet5-r.normNet5);
-
     const yrs=[0,1,2,3,4,5];
     makeChart('revLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
         {label:'SOLUM Net Value',data:yrs.map(y=>y===0?-r.capex:r.solAnnual*y-r.capex),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5},
@@ -736,29 +634,42 @@ function syncLabels() {
 
 document.querySelectorAll('input').forEach(el => el.addEventListener('input',()=>{syncLabels();render();}));
 
-document.getElementById('areaSlider').addEventListener('input',e=>{
-    state.area=+e.target.value;
-    document.getElementById('areaInput').value=state.area;
-    document.querySelectorAll('.preset-chip').forEach(c=>c.classList.remove('active'));
+function updateSliderFill(slider) {
+    const min=+slider.min, max=+slider.max, val=+slider.value;
+    const pct = ((val - min) / (max - min) * 100).toFixed(1) + '%';
+    slider.style.setProperty('--pct', pct);
+}
+
+const areaSlider = document.getElementById('areaSlider');
+const areaInput  = document.getElementById('areaInput');
+const presetSel  = document.getElementById('presetSelect');
+
+areaSlider.addEventListener('input', e => {
+    state.area = +e.target.value;
+    areaInput.value = state.area;
+    updateSliderFill(areaSlider);
+    presetSel.value = 'custom';
     render();
 });
-document.getElementById('areaInput').addEventListener('input',e=>{
-    const v=Math.max(100,Math.min(50000,+e.target.value||0));
-    state.area=v;
-    document.getElementById('areaSlider').value=Math.min(25000,v);
-    document.querySelectorAll('.preset-chip').forEach(c=>c.classList.remove('active'));
+areaInput.addEventListener('input', e => {
+    const v = Math.max(100, Math.min(50000, +e.target.value || 0));
+    state.area = v;
+    areaSlider.value = Math.min(25000, v);
+    updateSliderFill(areaSlider);
+    presetSel.value = 'custom';
     render();
 });
-document.querySelectorAll('.preset-chip').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-        state.area=PRESETS[btn.dataset.preset];
-        document.getElementById('areaInput').value=state.area;
-        document.getElementById('areaSlider').value=Math.min(25000,state.area);
-        document.querySelectorAll('.preset-chip').forEach(c=>c.classList.remove('active'));
-        btn.classList.add('active');
-        render();
-    });
+presetSel.addEventListener('change', e => {
+    const key = e.target.value;
+    if (key === 'custom') return;
+    state.area = PRESETS[key];
+    areaInput.value = state.area;
+    areaSlider.value = Math.min(25000, state.area);
+    updateSliderFill(areaSlider);
+    render();
 });
+updateSliderFill(areaSlider);
+
 document.querySelectorAll('.tab-btn').forEach(btn=>{
     btn.addEventListener('click',()=>{
         document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -772,28 +683,11 @@ function initDragDrop(id) {
     const container=document.getElementById(id); if(!container)return;
     let src=null;
     const ws=()=>[...container.querySelectorAll(':scope>.widget')];
-    container.addEventListener('dragstart',e=>{
-        const w=e.target.closest('.widget'); if(!w)return;
-        src=w; e.dataTransfer.effectAllowed='move';
-        setTimeout(()=>w.classList.add('dragging'),0);
-    });
-    container.addEventListener('dragend',()=>{
-        ws().forEach(w=>{w.classList.remove('dragging');w.classList.remove('drag-over');}); src=null; setTimeout(render,50);
-    });
-    container.addEventListener('dragover',e=>{
-        e.preventDefault();
-        const w=e.target.closest('.widget');
-        if(w&&w!==src){ws().forEach(x=>x.classList.remove('drag-over'));w.classList.add('drag-over');}
-    });
+    container.addEventListener('dragstart',e=>{ const w=e.target.closest('.widget'); if(!w)return; src=w; e.dataTransfer.effectAllowed='move'; setTimeout(()=>w.classList.add('dragging'),0); });
+    container.addEventListener('dragend',()=>{ ws().forEach(w=>{w.classList.remove('dragging');w.classList.remove('drag-over');}); src=null; setTimeout(render,50); });
+    container.addEventListener('dragover',e=>{ e.preventDefault(); const w=e.target.closest('.widget'); if(w&&w!==src){ws().forEach(x=>x.classList.remove('drag-over'));w.classList.add('drag-over');} });
     container.addEventListener('dragleave',e=>{const w=e.target.closest('.widget');if(w&&!w.contains(e.relatedTarget))w.classList.remove('drag-over');});
-    container.addEventListener('drop',e=>{
-        e.preventDefault();
-        const t=e.target.closest('.widget');
-        if(!t||t===src||!src)return;
-        const all=ws(), si=all.indexOf(src), ti=all.indexOf(t);
-        if(si<ti) container.insertBefore(src,t.nextSibling); else container.insertBefore(src,t);
-        t.classList.remove('drag-over');
-    });
+    container.addEventListener('drop',e=>{ e.preventDefault(); const t=e.target.closest('.widget'); if(!t||t===src||!src)return; const all=ws(),si=all.indexOf(src),ti=all.indexOf(t); if(si<ti) container.insertBefore(src,t.nextSibling); else container.insertBefore(src,t); t.classList.remove('drag-over'); });
 }
 
 ['arch-widgets','intel-widgets','rev-widgets'].forEach(initDragDrop);
