@@ -128,20 +128,14 @@
   /* ── YMK Module: centered ── */
   .module-wrap {
     width: 100%;
-    display: flex;
-    justify-content: center;
+    text-align: center;   /* inline-block fallback */
     margin-bottom: 4px;
   }
   #YMK-module {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    text-align: center;
-  }
-  #YMK-module > * {
-    margin-left: auto;
-    margin-right: auto;
+    display: inline-block; /* shrink-wraps SDK content so centering works */
+    width: fit-content;
+    margin: 0 auto;
+    text-align: left;      /* reset inner alignment */
   }
 
   /* ── Single CTA: Skin Analysis ── */
