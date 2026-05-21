@@ -27,7 +27,6 @@
     --grad-gold:     linear-gradient(135deg, #5B21B6 0%, #D4AF6A 100%);
     --grad-soft:     linear-gradient(135deg, #EDE9FE 0%, #FAF8FF 100%);
 
-    /* iPad Mini 5 portrait baseline */
     --app-width: 720px;
     --app-pad:   24px;
   }
@@ -41,7 +40,6 @@
     color: var(--text-primary);
   }
 
-  /* ── Page wrapper: full-height centered column ── */
   .page-wrap {
     min-height: 100vh;
     display: flex;
@@ -113,7 +111,7 @@
     letter-spacing: 0.04em;
   }
 
-  /* ── App Body: centered column, iPad-width ── */
+  /* ── App Body ── */
   .app-body {
     width: 100%;
     max-width: var(--app-width);
@@ -125,20 +123,20 @@
     gap: 0;
   }
 
-  /* ── YMK Module: centered ── */
+  /* ── YMK Module ── */
   .module-wrap {
     width: 100%;
-    text-align: center;   /* inline-block fallback */
+    text-align: center;
     margin-bottom: 4px;
   }
   #YMK-module {
-    display: inline-block; /* shrink-wraps SDK content so centering works */
+    display: inline-block;
     width: fit-content;
     margin: 0 auto;
-    text-align: left;      /* reset inner alignment */
+    text-align: left;
   }
 
-  /* ── Single CTA: Skin Analysis ── */
+  /* ── Single CTA ── */
   .cta-section {
     width: 100%;
     display: flex;
@@ -167,10 +165,7 @@
     transform: translateY(-2px);
     box-shadow: 0 12px 32px rgba(45,27,126,0.42);
   }
-  .cta-btn:active {
-    transform: translateY(0);
-    opacity: 0.9;
-  }
+  .cta-btn:active { transform: translateY(0); opacity: 0.9; }
   .cta-btn-icon {
     width: 20px; height: 20px;
     border-radius: 50%;
@@ -180,7 +175,7 @@
     flex-shrink: 0;
   }
 
-  /* ── Divider between CTA and results ── */
+  /* ── Divider ── */
   .results-divider {
     width: 100%;
     height: 1px;
@@ -193,10 +188,7 @@
     display: none;
     width: 100%;
   }
-
-  .result-section {
-    margin-bottom: 32px;
-  }
+  .result-section { margin-bottom: 32px; }
   .result-section-title {
     font-size: 0.68em;
     font-weight: 700;
@@ -215,16 +207,13 @@
     background: var(--border-soft);
   }
 
-  /* ── Overview: 3-up on iPad Mini portrait ── */
+  /* ── Overview ── */
   .skin-overview {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
   }
-  /* 4-card fallback: 2×2 */
-  .skin-overview.four-cards {
-    grid-template-columns: repeat(4, 1fr);
-  }
+  .skin-overview.four-cards { grid-template-columns: repeat(4, 1fr); }
   .skin-overview-card {
     background: var(--white);
     border: 1px solid var(--border-soft);
@@ -236,10 +225,7 @@
     overflow: hidden;
     transition: transform 0.2s, box-shadow 0.2s;
   }
-  .skin-overview-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
+  .skin-overview-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
   .skin-overview-card::before {
     content: '';
     position: absolute;
@@ -252,34 +238,20 @@
   .skin-overview-card:nth-child(3)::before { background: var(--grad-gold); }
   .skin-overview-card:nth-child(4)::before { background: linear-gradient(135deg,#2D1B7E,#C4B5FD); }
   .skin-overview-card .label {
-    font-size: 0.65em;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 10px;
+    font-size: 0.65em; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 10px;
   }
   .skin-overview-card .value {
-    font-size: 2em;
-    font-weight: 700;
+    font-size: 2em; font-weight: 700;
     background: var(--grad-main);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    margin-bottom: 5px;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; line-height: 1; margin-bottom: 5px;
   }
-  .skin-overview-card:nth-child(3) .value {
-    font-size: 1.3em;
-    letter-spacing: -0.01em;
-  }
-  .skin-overview-card .sub {
-    font-size: 0.7em;
-    color: var(--text-muted);
-    letter-spacing: 0.04em;
-  }
+  .skin-overview-card:nth-child(3) .value { font-size: 1.3em; }
+  .skin-overview-card .sub { font-size: 0.7em; color: var(--text-muted); letter-spacing: 0.04em; }
 
-  /* ── Concern Scores: 3-col on iPad Mini portrait ── */
+  /* ── Concern Scores ── */
   .score-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -293,42 +265,14 @@
     box-shadow: var(--shadow-sm);
     transition: transform 0.2s, box-shadow 0.2s;
   }
-  .score-item:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-  .score-item .score-label {
-    font-size: 0.72em;
-    font-weight: 600;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-    letter-spacing: 0.03em;
-  }
-  .score-item .score-bar-wrap {
-    background: var(--purple-frost);
-    border-radius: 99px;
-    height: 5px;
-    width: 100%;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-  .score-item .score-bar {
-    height: 5px;
-    border-radius: 99px;
-    background: var(--grad-main);
-    transition: width 0.85s cubic-bezier(0.4,0,0.2,1);
-  }
-  .score-item .score-num {
-    font-size: 0.78em;
-    font-weight: 700;
-    color: var(--purple-mid);
-  }
-  .score-item .score-num span {
-    font-weight: 400;
-    color: var(--text-muted);
-  }
+  .score-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .score-item .score-label { font-size: 0.72em; font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; letter-spacing: 0.03em; }
+  .score-item .score-bar-wrap { background: var(--purple-frost); border-radius: 99px; height: 5px; width: 100%; overflow: hidden; margin-bottom: 8px; }
+  .score-item .score-bar { height: 5px; border-radius: 99px; background: var(--grad-main); transition: width 0.85s cubic-bezier(0.4,0,0.2,1); }
+  .score-item .score-num { font-size: 0.78em; font-weight: 700; color: var(--purple-mid); }
+  .score-item .score-num span { font-weight: 400; color: var(--text-muted); }
 
-  /* ── Recommendations: 2-col on iPad Mini portrait ── */
+  /* ── Recommendation Cards ── */
   .rec-section-head {
     font-size: 0.88em;
     font-weight: 700;
@@ -337,68 +281,114 @@
   }
   .rec-products {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
   }
   .rec-card {
     background: var(--white);
     border: 1px solid var(--border-soft);
-    border-radius: 14px;
-    padding: 16px 18px;
-    box-shadow: var(--shadow-sm);
-    position: relative;
+    border-radius: 16px;
     overflow: hidden;
+    box-shadow: var(--shadow-sm);
     transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
   }
-  .rec-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+  .rec-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+
+  /* Product image area */
+  .rec-card-img-wrap {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--grad-soft);
+    overflow: hidden;
+    position: relative;
   }
-  .rec-card::after {
-    content: '';
+  .rec-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+  .rec-card:hover .rec-card-img-wrap img { transform: scale(1.04); }
+  .rec-card-img-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5em;
+    color: var(--purple-pale);
+  }
+
+  /* Concern badge overlaid on image */
+  .rec-card-badge {
     position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
+    top: 10px; left: 10px;
     background: var(--grad-main);
-    opacity: 0;
-    transition: opacity 0.2s;
+    color: #fff;
+    font-size: 0.62em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 20px;
   }
-  .rec-card:hover::after { opacity: 1; }
-  .rec-card .rec-upc {
-    font-size: 0.64em;
-    font-weight: 600;
+
+  /* Card body */
+  .rec-card-body {
+    padding: 14px 15px 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .rec-card-brand {
+    font-size: 0.65em;
+    font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--text-muted);
-    margin-bottom: 4px;
   }
-  .rec-card .rec-id {
-    font-size: 0.9em;
+  .rec-card-name {
+    font-size: 0.82em;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: 10px;
-  }
-  .rec-card .rec-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
+    line-height: 1.35;
     margin-bottom: 6px;
   }
-  .rec-card .rec-tag {
+  .rec-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .rec-card-tag {
     background: var(--purple-frost);
     color: var(--purple-mid);
-    font-size: 0.68em;
+    font-size: 0.65em;
     font-weight: 600;
-    border-radius: 6px;
-    padding: 3px 8px;
+    border-radius: 5px;
+    padding: 2px 7px;
     letter-spacing: 0.04em;
   }
-  .rec-card .rec-weight {
-    font-size: 0.68em;
-    color: var(--text-muted);
-    margin-top: 8px;
-    font-weight: 500;
+  .rec-card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: auto;
+    font-size: 0.72em;
+    font-weight: 700;
+    color: var(--purple-mid);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: color 0.2s;
   }
+  .rec-card-link:hover { color: var(--purple-light); }
+  .rec-card-link-arrow { font-size: 1em; }
 
   /* ── Empty state ── */
   .empty-state {
@@ -411,26 +401,12 @@
     border-radius: 50%;
     background: var(--grad-soft);
     border: 2px solid var(--border-soft);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     margin: 0 auto 20px;
     font-size: 2.2em;
   }
-  .empty-state h3 {
-    font-size: 1.05em;
-    font-weight: 700;
-    color: var(--text-secondary);
-    margin-bottom: 8px;
-    letter-spacing: -0.01em;
-  }
-  .empty-state p {
-    font-size: 0.82em;
-    line-height: 1.7;
-    color: var(--text-muted);
-    max-width: 280px;
-    margin: 0 auto;
-  }
+  .empty-state h3 { font-size: 1.05em; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px; letter-spacing: -0.01em; }
+  .empty-state p { font-size: 0.82em; line-height: 1.7; color: var(--text-muted); max-width: 280px; margin: 0 auto; }
 
   /* ── Raw JSON toggle ── */
   .raw-toggle-wrap {
@@ -440,47 +416,25 @@
     padding-top: 16px;
   }
   #raw-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.7em;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    letter-spacing: 0.07em;
-    transition: color 0.2s;
-    user-select: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.7em; font-weight: 600; color: var(--text-muted);
+    cursor: pointer; letter-spacing: 0.07em; transition: color 0.2s; user-select: none;
   }
   #raw-toggle:hover { color: var(--purple-mid); }
   #raw-json {
     display: none;
-    background: #130D2E;
-    color: #C4B5FD;
+    background: #130D2E; color: #C4B5FD;
     font-size: 0.72em;
     font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-    border-radius: 12px;
-    padding: 16px;
-    margin-top: 10px;
-    overflow: auto;
-    max-height: 280px;
-    white-space: pre;
-    border: 1px solid rgba(196,181,253,0.1);
-    box-shadow: var(--shadow-sm);
+    border-radius: 12px; padding: 16px; margin-top: 10px;
+    overflow: auto; max-height: 280px; white-space: pre;
+    border: 1px solid rgba(196,181,253,0.1); box-shadow: var(--shadow-sm);
   }
 
   /* ── No-rec placeholder ── */
-  .no-rec-box {
-    background: var(--purple-frost);
-    border-radius: 14px;
-    padding: 18px 22px;
-  }
-  .no-rec-box p {
-    font-size: 0.82em;
-    line-height: 1.7;
-    color: var(--text-secondary);
-  }
+  .no-rec-box { background: var(--purple-frost); border-radius: 14px; padding: 18px 22px; }
+  .no-rec-box p { font-size: 0.82em; line-height: 1.7; color: var(--text-secondary); }
 
-  /* ── Hidden dev controls (preserved for JS) ── */
   .dev-hidden { display: none !important; }
 </style>
 </head>
@@ -500,15 +454,13 @@
     </div>
   </div>
 
-  <!-- ── App Body: max-width 720px, centered ── -->
+  <!-- ── App Body ── -->
   <div class="app-body">
 
-    <!-- YMK AR Module (centered) -->
     <div class="module-wrap">
       <div id="YMK-module"></div>
     </div>
 
-    <!-- Single CTA: Skin Analysis only -->
     <div class="cta-section">
       <button class="cta-btn" onclick="clearResult(); YMK.openSkincare()">
         <span class="cta-btn-icon">✦</span>
@@ -516,10 +468,8 @@
       </button>
     </div>
 
-    <!-- Divider (visible only after result) -->
     <div class="results-divider" id="results-divider" style="display:none;"></div>
 
-    <!-- Empty state (before analysis) -->
     <div id="empty-state" class="empty-state">
       <div class="empty-state-ring">✦</div>
       <h3>Ready for Skin Analysis</h3>
@@ -529,25 +479,21 @@
     <!-- ── Result Panel ── -->
     <div id="skincare-result">
 
-      <!-- 1. Overview -->
       <div class="result-section">
         <div class="result-section-title">Overview</div>
         <div class="skin-overview" id="sc-overview"></div>
       </div>
 
-      <!-- 2. Concern Scores -->
       <div class="result-section">
         <div class="result-section-title">Concern Scores</div>
         <div id="sc-scores" class="score-grid"></div>
       </div>
 
-      <!-- 3. Recommendations -->
       <div class="result-section">
         <div class="result-section-title">Recommendations</div>
         <div id="sc-recommendation"></div>
       </div>
 
-      <!-- Raw JSON debug -->
       <div class="raw-toggle-wrap">
         <span id="raw-toggle" onclick="
           var el = document.getElementById('raw-json');
@@ -557,13 +503,12 @@
         <pre id="raw-json"></pre>
       </div>
 
-    </div><!-- /#skincare-result -->
+    </div>
 
-  </div><!-- /.app-body -->
+  </div>
 
-</div><!-- /.page-wrap -->
+</div>
 
-<!-- Hidden dev inputs (SDK callbacks need these) -->
 <div class="dev-hidden">
   <input type="text" id="itemGuid" value=""/>
 </div>
@@ -581,6 +526,20 @@
 </script>
 
 <script>
+/* ── Product database (keyed by Product UID, matched from Excel) ── */
+var PRODUCT_DB = {
+  3085502: { name: 'HYAL REYOUTH TONER 120ml',                   brand: 'Dr.Ceuracle', pid: 'Moisture',    image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/9/38d6b46a-1278-4f80-8530-3f03df7117ce.png',   url: 'http://en.leegeehaam.com/2021/10/27/hyal-reyouth-toner/' },
+  3085503: { name: 'LIFAR Calming Creamy Bubble Pack Cleanser 45g', brand: 'LIFAR',       pid: 'Redness',    image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/204/c9880778-3db9-4ae3-bc88-d077246a8116.png', url: 'http://www.pland-pure.com/en/bbs/board.php?bo_table=product&wr_id=4' },
+  3085556: { name: 'UIQ Biome Barrier™ Cream Mist 100ml',         brand: 'UIQ',         pid: 'Radiance',   image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/817/5349af22-fdd5-49d9-8b10-548053a65de6.png', url: 'https://theuiq.com/product/%EB%B0%94%EC%9D%B4%EC%98%B4-%EB%B2%A0%EB%A6%AC%EC%96%B4-%ED%81%AC%EB%A6%BC-%EB%AF%B8%EC%8A%A4%ED%8A%B8-100ml/64/category/46/display/1/' },
+  3085560: { name: 'Dark Circle Eye Serum 30g',                    brand: 'OOTD',        pid: 'Dark Circle', image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/511/bea39b31-04c1-4bc3-9cfa-11d802eaa594.png', url: 'https://ootdbeauty.com/collections/dark-spots-dullness/products/dark-circle-eye-serum' },
+  3085564: { name: 'ALLCHADA Botanical Exosome cream 50ml',        brand: 'ALLCHADA',    pid: 'Firmness',   image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/422/3a01203e-b9c7-4915-a7a8-9a0ef81e1d36.png', url: 'https://allchada.net/product/allchada%C2%AE-botanical-exosome-cream-50ml/28/category/44/display/1/' },
+  3085501: { name: 'HYAL REYOUTH MOIST SUN 50ml',                  brand: 'Dr.Ceuracle', pid: 'Texture',    image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/130/0435b3f7-4757-441d-a992-e8ec7e5b2e02.png', url: 'http://en.leegeehaam.com/2022/02/07/hyal-reyouth-moist-sun/' },
+  3085500: { name: 'JEJU MATCHA TEA ESSENCE 150ml',                brand: 'Dr.Ceuracle', pid: 'Oiliness',   image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/71/be51f47c-bb61-45c5-ac58-517d46810202.png',  url: 'http://en.leegeehaam.com/2025/11/06/jeju-matcha-tea-essence/' },
+  3085504: { name: 'UIQ Biome Remedy Pore Care PDRN Serum',        brand: 'UIQ',         pid: 'Pore',       image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/555/7becec47-2766-44ca-bd15-985d7be9e8d6.png', url: 'https://theuiq.com/product/%EB%B0%94%EC%9D%B4%EC%98%B4-%EB%A0%88%EB%AF%B8%EB%94%94-%ED%8F%AC%EC%96%B4-%EB%A6%AC%EC%85%8B-pdrn-%EC%84%B8%EB%9F%BC-30ml/668/category/24/display/1/' },
+  3085563: { name: 'CAFFEINE SHOT Vita C Bubble Serum 110ml',      brand: 'shaishaishai',pid: 'Spot',       image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/335/9996c8bc-767e-42e7-9e22-b2805c5f061f.png', url: 'https://shaishaishai.kr/product/detail.html?product_no=322' },
+  3085499: { name: 'VEGAN KOMBUCHA TEA ESSENCE 150ml',             brand: 'Dr.Ceuracle', pid: 'Wrinkle',    image: 'https://app-cdn-01.perfectcorp.com/console/customer/536/56536/SkuImage/23/cb2d35d2-8048-427b-ad77-58c2bc918806.png',  url: 'http://en.leegeehaam.com/2021/10/27/vegan-kombuchatea-essence/' },
+};
+
 /* ── Score labels ── */
 var SCORE_LABELS = {
   acne:              'Acne',
@@ -602,7 +561,7 @@ var SCORE_LABELS = {
   teartrough:        'Tear Trough',
 };
 
-/* ── Render result panel ── */
+/* ── Render ── */
 function renderSkincareResult(report) {
   document.getElementById('empty-state').style.display = 'none';
   document.getElementById('results-divider').style.display = 'block';
@@ -616,8 +575,6 @@ function renderSkincareResult(report) {
   if (report.skinType)                  overviewHtml += overviewCard('Skin Type',   report.skinType,   '');
   if (report.fitzpatrickScale)          overviewHtml += overviewCard('Fitzpatrick', 'Type ' + report.fitzpatrickScale, '');
   overviewEl.innerHTML = overviewHtml;
-
-  /* 4-card: switch to 4-col */
   var cardCount = overviewEl.querySelectorAll('.skin-overview-card').length;
   if (cardCount === 4) overviewEl.classList.add('four-cards');
   else overviewEl.classList.remove('four-cards');
@@ -637,16 +594,40 @@ function renderSkincareResult(report) {
   if (report.recommendation && report.recommendation.products && report.recommendation.products.length > 0) {
     var recHtml = '';
     report.recommendation.products.forEach(function(p) {
-      var tags = (p.sources || []).map(function(s) {
-        return '<span class="rec-tag">' + s + '</span>';
+      var db   = PRODUCT_DB[p.productId] || null;
+      var name  = db ? db.name  : ('Product #' + p.productId);
+      var brand = db ? db.brand : '';
+      var img   = db ? db.image : '';
+      var url   = db ? db.url   : null;
+      var pid   = db ? db.pid   : (p.upc || '');
+
+      /* image or placeholder */
+      var imgContent = img
+        ? '<img src="' + img + '" alt="' + name + '" onerror="this.parentNode.innerHTML=\'<div class=rec-card-img-placeholder>✦</div>\'">'
+        : '<div class="rec-card-img-placeholder">✦</div>';
+
+      /* source tags from SDK */
+      var tagHtml = (p.sources || []).map(function(s) {
+        return '<span class="rec-card-tag">' + s + '</span>';
       }).join('');
-      var weight = p.weight !== undefined ? '<div class="rec-weight">Weight: ' + p.weight + '</div>' : '';
+
+      /* link button */
+      var linkHtml = url
+        ? '<a class="rec-card-link" href="' + url + '" target="_blank" rel="noopener">View Product <span class="rec-card-link-arrow">→</span></a>'
+        : '';
+
       recHtml +=
         '<div class="rec-card">' +
-          '<div class="rec-upc">UPC: ' + (p.upc || '—') + '</div>' +
-          '<div class="rec-id">Product #' + p.productId + '</div>' +
-          '<div class="rec-tags">' + tags + '</div>' +
-          weight +
+          '<div class="rec-card-img-wrap">' +
+            imgContent +
+            (pid ? '<span class="rec-card-badge">' + pid + '</span>' : '') +
+          '</div>' +
+          '<div class="rec-card-body">' +
+            (brand ? '<div class="rec-card-brand">' + brand + '</div>' : '') +
+            '<div class="rec-card-name">' + name + '</div>' +
+            (tagHtml ? '<div class="rec-card-tags">' + tagHtml + '</div>' : '') +
+            linkHtml +
+          '</div>' +
         '</div>';
     });
     recSection.innerHTML =
@@ -656,13 +637,10 @@ function renderSkincareResult(report) {
       '<div class="rec-products">' + recHtml + '</div>';
   } else {
     recSection.innerHTML =
-      '<div class="no-rec-box"><p>' +
-        'No product recommendations returned.<br>' +
-        '<span style="color:var(--text-muted);">Configure recommendation rules on Perfect Console to enable this.</span>' +
-      '</p></div>';
+      '<div class="no-rec-box"><p>No product recommendations returned.<br>' +
+      '<span style="color:var(--text-muted);">Configure recommendation rules on Perfect Console to enable this.</span></p></div>';
   }
 
-  /* Raw JSON */
   document.getElementById('raw-json').textContent = JSON.stringify(report, null, 2);
 }
 
@@ -685,7 +663,14 @@ function scoreItem(label, val) {
 
 /* ── SDK init ── */
 window.ymkAsyncInit = function() {
-  window.YMK.init({ autoOpen: false });
+  window.YMK.init({
+    autoOpen: false,
+    skincareFeatures: [
+      'darkCircles', 'skinType', 'darkCirclesV2', 'moisture', 'oiliness', 'redness',
+      'eyeBags', 'acne', 'ageSpots', 'texture', 'wrinkles', 'wrinklesV2',
+      'firmness', 'radiance', 'pore'
+    ],
+  });
 
   window.YMK.addEventListener('videoLoaded',         function()  { console.log('videoLoaded'); });
   window.YMK.addEventListener('photoLoaded',         function()  { console.log('photoLoaded'); });
