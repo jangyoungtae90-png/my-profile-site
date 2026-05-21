@@ -99,16 +99,11 @@
     color: rgba(255,255,255,0.65);
   }
   .app-title {
-    font-size: 1.85em;
-    font-weight: 700;
+    font-size: clamp(1.1em, 3.8vw, 1.5em);
+    font-weight: 800;
     color: #fff;
     letter-spacing: -0.02em;
-    margin-bottom: 5px;
-  }
-  .app-subtitle {
-    font-size: 0.8em;
-    color: rgba(255,255,255,0.55);
-    letter-spacing: 0.04em;
+    white-space: nowrap;
   }
 
   /* ── App Body ── */
@@ -487,8 +482,7 @@
         <div class="app-brand-dot"></div>
         <span class="app-brand-name">Beauty Device · AI Analysis</span>
       </div>
-      <div class="app-title">Skin Diagnostic</div>
-      <div class="app-subtitle">Powered by YMK Skin Analysis Engine</div>
+      <div class="app-title">AI Skin Analysis &amp; Smart Recommendations</div>
     </div>
   </div>
 
