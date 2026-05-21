@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8"/>
+<head>
+<style>
+  /* ── Base Reset & Variables ── */
+  :root {
+    --purple-deep:   #2D1B7E;
+    --purple-mid:    #5B21B6;
+    --purple-light:  #8B5CF6;
+    --purple-pale:   #C4B5FD;
+    --purple-frost:  #EDE9FE;
+    --rose-gold:     #E8B4C0;
+    --rose-deep:     #C47A8A;
+    --gold:          #D4AF6A;
+    --cream:         #FAF8FF;
+    --white:         #FFFFFF;
+    --text-primary:  #1A1035;
+    --text-secondary:#6B5E8C;
+    --text-muted:    #A89DC0;
+    --border-soft:   rgba(91, 33, 182, 0.12);
+    --shadow-sm:     0 2px 12px rgba(45, 27, 126, 0.08);
+    --shadow-md:     0 6px 28px rgba(45, 27, 126, 0.14);
+    --shadow-lg:     0 16px 48px rgba(45, 27, 126, 0.18);
+    --grad-main:     linear-gradient(135deg, #2D1B7E 0%, #5B21B6 50%, #8B5CF6 100%);
+    --grad-rose:     linear-gradient(135deg, #5B21B6 0%, #C47A8A 100%);
+    --grad-gold:     linear-gradient(135deg, #5B21B6 0%, #D4AF6A 100%);
+    --grad-soft:     linear-gradient(135deg, #EDE9FE 0%, #FAF8FF 100%);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, 'SF Pro Display', 'Segoe UI', Arial, sans-serif;
+    background: var(--cream);
+    color: var(--text-primary);
+    min-height: 100vh;
+  }
+
+  /* ── App Header ── */
+  .app-header {
+    background: var(--grad-main);
+    padding: 24px 28px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .app-header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .app-header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .app-header-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .app-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .app-brand-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--rose-gold);
+    box-shadow: 0 0 8px var(--rose-gold);
+  }
+  .app-brand-name {
+    font-size: 0.72em;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.7);
+  }
+  .app-title {
+    font-size: 1.7em;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+  .app-subtitle {
+    font-size: 0.82em;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.03em;
+  }
+
+  /* ── Dev Controls Bar ── */
+  .dev-controls {
+    background: var(--white);
+    border-bottom: 1px solid var(--border-soft);
+    padding: 10px 28px;
+  }
+  .dev-controls-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .dev-label {
+    font-size: 0.65em;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-right: 4px;
+  }
+  .dev-btn {
+    display: inline-block;
+    padding: 4px 10px;
+    background: var(--purple-frost);
+    color: var(--purple-mid);
+    font-size: 0.68em;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid rgba(91,33,182,0.15);
+    transition: background 0.2s, color 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+  .dev-btn:hover {
+    background: var(--purple-mid);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .dev-btn.primary {
+    background: var(--grad-main);
+    color: #fff;
+    border: none;
+  }
+  .dev-btn.primary:hover { opacity: 0.9; }
+  .dev-sep { color: var(--border-soft); font-size: 0.8em; padding: 0 2px; }
+
+  .sku-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 28px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border-soft);
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .sku-label {
+    font-size: 0.7em;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .sku-input {
+    flex: 1;
+    max-width: 260px;
+    padding: 6px 12px;
+    border: 1px solid var(--border-soft);
+    border-radius: 8px;
+    font-size: 0.78em;
+    color: var(--text-primary);
+    background: var(--cream);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .sku-input:focus { border-color: var(--purple-light); }
+  .sku-btn {
+    padding: 6px 16px;
+    background: var(--grad-main);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.75em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .sku-btn:hover { opacity: 0.88; }
+
+  /* ── Main Content ── */
+  .main-content {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px;
+  }
+
+  /* ── Result Panel ── */
+  #skincare-result {
+    display: none;
+  }
+
+  .result-section-title {
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .result-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-soft);
+  }
+
+  /* ── Overview Cards ── */
+  .skin-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+  .skin-overview-card {
+    background: var(--white);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    padding: 18px 16px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .skin-overview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .skin-overview-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--grad-main);
+    border-radius: 16px 16px 0 0;
+  }
+  .skin-overview-card:nth-child(2)::before { background: var(--grad-rose); }
+  .skin-overview-card:nth-child(3)::before { background: var(--grad-gold); }
+  .skin-overview-card:nth-child(4)::before { background: linear-gradient(135deg, #2D1B7E, #C4B5FD); }
+  .skin-overview-card .label {
+    font-size: 0.68em;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .skin-overview-card .value {
+    font-size: 1.9em;
+    font-weight: 700;
+    background: var(--grad-main);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .skin-overview-card .sub {
+    font-size: 0.72em;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Score Grid ── */
+  .score-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .score-item {
+    background: var(--white);
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .score-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .score-item .score-label {
+    font-size: 0.72em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+  }
+  .score-item .score-bar-wrap {
+    background: var(--purple-frost);
+    border-radius: 99px;
+    height: 5px;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .score-item .score-bar {
+    height: 5px;
+    border-radius: 99px;
+    background: var(--grad-main);
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+  }
+  .score-item .score-num {
+    font-size: 0.8em;
+    font-weight: 700;
+    color: var(--purple-mid);
+  }
+  .score-item .score-num span {
+    font-weight: 400;
+    color: var(--text-muted);
+    font-size: 0.9em;
+  }
+
+  /* ── Recommendation Section ── */
+  .rec-section h3 {
+    font-size: 0.92em;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+  }
+  .rec-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 14px;
+  }
+  .rec-card {
+    background: var(--white);
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .rec-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  .rec-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--grad-main);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .rec-card:hover::after { opacity: 1; }
+  .rec-card .rec-upc {
+    font-size: 0.65em;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .rec-card .rec-id {
+    font-size: 0.88em;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 10px;
+  }
+  .rec-card .rec-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 6px;
+  }
+  .rec-card .rec-tag {
+    background: var(--purple-frost);
+    color: var(--purple-mid);
+    font-size: 0.68em;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 3px 8px;
+    letter-spacing: 0.04em;
+  }
+  .rec-card .rec-weight {
+    font-size: 0.68em;
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  /* ── Raw JSON Toggle ── */
+  .raw-toggle-wrap {
+    margin-top: 24px;
+    border-top: 1px solid var(--border-soft);
+    padding-top: 16px;
+  }
+  #raw-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72em;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: color 0.2s;
+    user-select: none;
+  }
+  #raw-toggle:hover { color: var(--purple-mid); }
+  #raw-json {
+    display: none;
+    background: #130D2E;
+    color: #C4B5FD;
+    font-size: 0.72em;
+    font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 10px;
+    overflow: auto;
+    max-height: 280px;
+    white-space: pre;
+    border: 1px solid rgba(196,181,253,0.1);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ── Empty State ── */
+  .empty-state {
+    text-align: center;
+    padding: 64px 28px;
+    color: var(--text-muted);
+  }
+  .empty-state-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: var(--grad-soft);
+    border: 2px solid var(--border-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 2em;
+  }
+  .empty-state h3 {
+    font-size: 1em;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+  .empty-state p {
+    font-size: 0.82em;
+    line-height: 1.6;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  /* ── Divider ── */
+  .section-gap { margin-bottom: 32px; }
+
+  /* ── Responsive ── */
+  @media (max-width: 520px) {
+    .app-header { padding: 20px 18px 26px; }
+    .main-content { padding: 20px 18px; }
+    .dev-controls { padding: 10px 18px; }
+    .sku-row { padding: 8px 18px; flex-wrap: wrap; }
+    .skin-overview { grid-template-columns: repeat(2, 1fr); }
+    .score-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── App Header ── -->
+<div class="app-header">
+  <div class="app-header-inner">
+    <div class="app-brand">
+      <div class="app-brand-dot"></div>
+      <span class="app-brand-name">Beauty Device · AI Analysis</span>
+    </div>
+    <div class="app-title">Skin Diagnostic</div>
+    <div class="app-subtitle">Powered by YMK Skin Analysis Engine</div>
+  </div>
+</div>
+
+<!-- ── Dev Controls ── -->
+<div class="dev-controls">
+  <div class="dev-controls-inner">
+    <span class="dev-label">Controls</span>
+    <a href="javascript:;" class="dev-btn primary" onClick="YMK.open()">Open AR</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.openHandAR()">Hand AR</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.openMakeupTutorial()">Tutorial</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.openSkincareEmulation()">Skincare Sim</a>
+    <a href="javascript:;" class="dev-btn primary" onClick="clearResult(); YMK.openSkincare()">Skin Analysis</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.applyEmulation('eyeBags:90')">Eye Bags ×90</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.open(true,'blob', true)">Shade Finder</a>
+    <span class="dev-sep">|</span>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.applyMakeupBySku('EYEWEAR_01_01')">Eyewear</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.applyMakeupByLook('BCC-35659_20210807_LK_02')">Look 2</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.applyMakeupByTutorial('BCC-38295_20230331_LK_01')">Look Tutorial</a>
+    <span class="dev-sep">|</span>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.enableCompare()">Compare On</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.disableCompare()">Compare Off</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.reset()">Reset</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.reset('BLUSH')">Reset Blush</a>
+    <a href="javascript:;" class="dev-btn" onClick="YMK.close()">Close</a>
+  </div>
+</div>
+
+<!-- ── SKU Row ── -->
+<div style="background:#fff; border-bottom:1px solid var(--border-soft); padding:8px 28px;">
+  <div style="max-width:860px; margin:0 auto; display:flex; align-items:center; gap:8px;">
+    <span class="sku-label">SKU</span>
+    <input type="text" id="itemGuid" placeholder="Enter Item GUID" class="sku-input"/>
+    <button type="button" onclick="applyMakeupManual()" class="sku-btn">Apply</button>
+  </div>
+</div>
+
+<!-- ── SDK Module Mount ── -->
+<div style="max-width:860px; margin:0 auto; padding:0 28px;">
+  <div id="YMK-module"></div>
+</div>
+
+<!-- ── Main Content ── -->
+<div class="main-content">
+
+  <!-- Empty state (shown before analysis) -->
+  <div id="empty-state" class="empty-state">
+    <div class="empty-state-icon">✦</div>
+    <h3>Ready for Skin Analysis</h3>
+    <p>Tap <strong>Skin Analysis</strong> above to begin your AI-powered diagnostic session.</p>
+  </div>
+
+  <!-- ── Skincare Result Panel ── -->
+  <div id="skincare-result">
+    <div class="section-gap">
+      <div class="result-section-title">Overview</div>
+      <div class="skin-overview" id="sc-overview"></div>
+    </div>
+
+    <div class="section-gap">
+      <div class="result-section-title">Concern Scores</div>
+      <div id="sc-scores" class="score-grid"></div>
+    </div>
+
+    <div class="section-gap">
+      <div class="result-section-title">Recommendations</div>
+      <div id="sc-recommendation"></div>
+    </div>
+
+    <div class="raw-toggle-wrap">
+      <span id="raw-toggle" onclick="
+        var el = document.getElementById('raw-json');
+        el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        this.textContent = el.style.display === 'none' ? '▶  Show raw JSON' : '▼  Hide raw JSON';
+      ">▶  Show raw JSON</span>
+      <pre id="raw-json"></pre>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── SDK Loader ── -->
+<script>
+  (function (d,k) {
+    var s = d.createElement('script');
+    s.type = 'text/javascript';
+    s.async = true;
+    s.src = 'https://plugins-media.makeupar.com/c56536-dev/sdk.js?apiKey=' + k;
+    var x = d.getElementsByTagName('script')[0];
+    x.parentNode.insertBefore(s, x);
+  })(document, '079ovYZ0iE7UhO574L9zvA');
+</script>
+
+<script>
+/* ── Score labels ── */
+var SCORE_LABELS = {
+  acne:              'Acne',
+  darkCircles:       'Dark Circles',
+  darkCirclesV2:     'Dark Circles V2',
+  moisture:          'Moisture',
+  oiliness:          'Oiliness',
+  redness:           'Redness',
+  ageSpots:          'Age Spots',
+  texture:           'Texture',
+  wrinkles:          'Wrinkles',
+  wrinklesV2:        'Wrinkles V2',
+  eyeBags:           'Eye Bags',
+  droopyUpperEyelid: 'Droopy Upper Eyelid',
+  droopyLowerEyelid: 'Droopy Lower Eyelid',
+  firmness:          'Firmness',
+  radiance:          'Radiance',
+  pore:              'Pore',
+  teartrough:        'Tear Trough',
+};
+
+/* ── Render result panel ── */
+function renderSkincareResult(report) {
+  document.getElementById('empty-state').style.display = 'none';
+  var panel = document.getElementById('skincare-result');
+  panel.style.display = 'block';
+
+  // Overview
+  var overviewHtml = '';
+  if (report.skinHealth !== undefined) {
+    overviewHtml += overviewCard('Skin Health', report.skinHealth, '/ 100');
+  }
+  if (report.skinAge !== undefined) {
+    overviewHtml += overviewCard('Skin Age', report.skinAge, 'years');
+  }
+  if (report.skinType) {
+    overviewHtml += overviewCard('Skin Type', report.skinType, '');
+  }
+  if (report.fitzpatrickScale) {
+    overviewHtml += overviewCard('Fitzpatrick', 'Type ' + report.fitzpatrickScale, '');
+  }
+  document.getElementById('sc-overview').innerHTML = overviewHtml;
+
+  // Score grid
+  var gridHtml = '';
+  Object.keys(SCORE_LABELS).forEach(function(key) {
+    var val = report[key];
+    if (val === undefined || val === null) return;
+    var numVal = parseFloat(val);
+    gridHtml += scoreItem(SCORE_LABELS[key], numVal);
+  });
+  document.getElementById('sc-scores').innerHTML = gridHtml ||
+    '<p style="color:var(--text-muted);font-size:0.82em;padding:12px 0;">No concern scores returned.</p>';
+
+  // Recommendation
+  var recSection = document.getElementById('sc-recommendation');
+  var recHtml = '';
+  if (report.recommendation && report.recommendation.products && report.recommendation.products.length > 0) {
+    report.recommendation.products.forEach(function(p) {
+      var tags = (p.sources || []).map(function(s) {
+        return '<span class="rec-tag">' + s + '</span>';
+      }).join('');
+      var weight = p.weight !== undefined
+        ? '<div class="rec-weight">Weight: ' + p.weight + '</div>'
+        : '';
+      recHtml +=
+        '<div class="rec-card">' +
+          '<div class="rec-upc">UPC: ' + (p.upc || '—') + '</div>' +
+          '<div class="rec-id">Product #' + p.productId + '</div>' +
+          '<div class="rec-tags">' + tags + '</div>' +
+          weight +
+        '</div>';
+    });
+    recSection.innerHTML =
+      '<div class="rec-section">' +
+        '<h3>Recommended Products <span style="color:var(--purple-light);font-size:0.85em;">(' + report.recommendation.products.length + ')</span></h3>' +
+        '<div class="rec-products">' + recHtml + '</div>' +
+      '</div>';
+  } else {
+    recSection.innerHTML =
+      '<div style="background:var(--purple-frost);border-radius:12px;padding:16px 20px;">' +
+        '<p style="color:var(--text-secondary);font-size:0.82em;line-height:1.6;">' +
+          'No product recommendations returned.<br>' +
+          '<span style="color:var(--text-muted);">Configure recommendation rules on Perfect Console to enable this.</span>' +
+        '</p>' +
+      '</div>';
+  }
+
+  // Raw JSON
+  document.getElementById('raw-json').textContent = JSON.stringify(report, null, 2);
+}
+
+function overviewCard(label, value, sub) {
+  return '<div class="skin-overview-card">' +
+    '<div class="label">' + label + '</div>' +
+    '<div class="value">' + value + '</div>' +
+    (sub ? '<div class="sub">' + sub + '</div>' : '') +
+    '</div>';
+}
+
+function scoreItem(label, val) {
+  var pct = Math.min(100, Math.max(0, val));
+  return '<div class="score-item">' +
+    '<div class="score-label">' + label + '</div>' +
+    '<div class="score-bar-wrap"><div class="score-bar" style="width:' + pct + '%"></div></div>' +
+    '<div class="score-num">' + val + ' <span>/ 100</span></div>' +
+    '</div>';
+}
+
+/* ── SDK init ── */
+window.ymkAsyncInit = function() {
+  window.YMK.init({
+    autoOpen: false,
+  });
+
+  window.YMK.addEventListener('videoLoaded', function () {
+    console.log('videoLoaded');
+  });
+  window.YMK.addEventListener('photoLoaded', function () {
+    console.log('photoLoaded');
+  });
+  window.YMK.addEventListener('shadeFinderComplete', function (r) {
+    console.log('shadeFinderComplete', r);
+  });
+
+  window.YMK.addEventListener('skinAnalysisCompleted', function (report) {
+    console.log('skinAnalysisCompleted', report);
+    renderSkincareResult(report);
+  });
+
+  window.YMK.addEventListener('skinAnalysisUpdated', function (report) {
+    console.log('skinAnalysisUpdated (fallback)', report);
+    if (document.getElementById('skincare-result').style.display === 'none') {
+      renderSkincareResult(report);
+    }
+  });
+};
+
+function loadImage() {
+  var file = document.getElementById('imageData').files[0];
+  if (file) { window.YMK.open(file); }
+}
+
+function applyMakeupManual() {
+  var itemGuid = document.getElementById('itemGuid');
+  YMK.applyMakeupBySku(itemGuid.value);
+}
+
+function clearResult() {
+  document.getElementById('skincare-result').style.display = 'none';
+  document.getElementById('empty-state').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
