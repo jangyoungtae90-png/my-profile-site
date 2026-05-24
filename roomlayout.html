@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>31B-2 가구 배치 평면도 (31.43㎡)</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#e8e8e0; font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; overflow:hidden; }
+
+    #canvas { position:absolute; top:0; left:0; }
+
+    /* ── 가구 div ── */
+    .furn {
+      position:absolute;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      border:2px solid;
+      border-radius:3px;
+      cursor:grab;
+      user-select:none;
+      text-align:center;
+      line-height:1.3;
+      transform-origin:center center;
+      transition:box-shadow .15s;
+    }
+    .furn:hover  { box-shadow:0 0 0 2px rgba(0,160,255,.5); }
+    .furn.sel    { box-shadow:0 0 0 3px #0090ff, 0 2px 12px rgba(0,120,255,.35); cursor:grabbing; }
+    .furn .fname { font-weight:bold; pointer-events:none; }
+    .furn .fdim  { opacity:.75; pointer-events:none; }
+
+    /* 회전 버튼 (선택된 가구 위에 표시) */
+    .rot-btn {
+      position:absolute;
+      top:-26px; left:50%; transform:translateX(-50%);
+      background:#0090ff; color:#fff;
+      border:none; border-radius:12px;
+      padding:2px 10px; font-size:12px;
+      cursor:pointer; white-space:nowrap;
+      pointer-events:all;
+      box-shadow:0 1px 4px rgba(0,0,0,.3);
+    }
+    .rot-btn:hover { background:#0070cc; }
+
+    /* ── UI 패널 ── */
+    #top-hint {
+      position:absolute; top:12px; left:50%; transform:translateX(-50%);
+      background:rgba(20,20,40,.82); color:#fff;
+      border-radius:20px; padding:6px 18px;
+      font-size:12px; display:flex; gap:16px; align-items:center;
+      pointer-events:none; white-space:nowrap;
+    }
+    .hk {
+      background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3);
+      border-radius:4px; padding:1px 7px; font-family:monospace; font-size:11px;
+    }
+
+    #info-panel {
+      position:absolute; top:12px; right:12px;
+      background:rgba(255,255,255,.93); border:1px solid #ccc;
+      border-radius:10px; padding:12px 16px;
+      font-size:11.5px; line-height:1.9;
+      box-shadow:0 2px 8px rgba(0,0,0,.12);
+      pointer-events:none;
+    }
+    #info-panel h3 { font-size:12px; margin-bottom:6px;
+      border-bottom:1px solid #ddd; padding-bottom:4px; color:#333; }
+    .il { color:#666; } .iv { font-weight:bold; color:#111; }
+
+    #sel-bar {
+      position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+      background:rgba(0,120,255,.88); color:#fff;
+      border-radius:20px; padding:7px 20px; font-size:12px;
+      display:none; white-space:nowrap;
+      box-shadow:0 2px 8px rgba(0,0,0,.2);
+    }
+
+    #reset-btn {
+      position:absolute; bottom:14px; left:14px;
+      background:#fff; border:1px solid #bbb; border-radius:8px;
+      padding:7px 14px; font-size:12px; cursor:pointer;
+      box-shadow:0 1px 4px rgba(0,0,0,.1);
+    }
+    #reset-btn:hover { background:#f0f0f0; }
+
+    #scale-bar {
+      position:absolute; bottom:14px; right:14px;
+      background:rgba(255,255,255,.85); border:1px solid #bbb;
+      border-radius:8px; padding:6px 12px; font-size:11px; color:#333;
+      pointer-events:none;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+<div id="furniture-layer"></div>
+
+<div id="top-hint">
+  <span><span class="hk">드래그</span> 가구 이동</span>
+  <span><span class="hk">R</span> 또는 <span class="hk">⟳버튼</span> 90° 회전</span>
+  <span><span class="hk">빈 공간 클릭</span> 선택 해제</span>
+</div>
+
+<div id="info-panel">
+  <h3>🏠 31B-2 타입 · 전용 31.43㎡</h3>
+  <div><span class="il">실내 폭 (E-W) </span><span class="iv">6,100 mm</span></div>
+  <div><span class="il">실내 깊이 (N-S) </span><span class="iv">3,100 mm</span></div>
+  <div><span class="il">주방 </span><span class="iv">2,160 × 1,500</span></div>
+  <div><span class="il">욕실 </span><span class="iv">1,600 × 1,800</span></div>
+  <div><span class="il">발코니 </span><span class="iv">6,100 × 1,500</span></div>
+  <hr style="margin:6px 0;border-color:#eee;">
+  <div><span class="il">🛏 퀸침대 </span><span class="iv">1,600 × 2,000</span></div>
+  <div><span class="il">🛋 소파 </span><span class="iv">2,000 × 900</span></div>
+  <div><span class="il">☕ 커피테이블 </span><span class="iv">1,100 × 550</span></div>
+  <div><span class="il">💻 책상 </span><span class="iv">1,200 × 600</span></div>
+</div>
+
+<div id="sel-bar"></div>
+<button id="reset-btn" onclick="resetAll()">↺ 가구 초기화</button>
+<div id="scale-bar" id="scale-bar">축척 1 : <span id="scale-num">—</span></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  방 치수 (mm)
+// ═══════════════════════════════════════════════════════════
+const R = {
+  mainW: 6100,  // 거실 폭 (E-W)
+  mainD: 3100,  // 거실 깊이 (N-S)
+  kitW:  2160,  // 주방 폭
+  kitD:  1500,  // 주방 깊이 (북쪽 연장)
+  bathW: 1600,  // 욕실 폭
+  bathD: 1800,  // 욕실 깊이
+  balD:  1500,  // 발코니 깊이
+  wallT: 150,   // 벽 두께
+};
+
+// Y 좌표계: 0 = 주방 북쪽 끝, Y 증가 = 남쪽
+// 주요 Y 경계 (mm)
+const Y = {
+  kitTop:  0,
+  kitBot:  R.kitD,                   // 1200
+  mainTop: R.kitD,                   // 1200
+  mainBot: R.kitD + R.mainD,         // 4600
+  balBot:  R.kitD + R.mainD + R.balD // 6100
+};
+// 욕실 X 경계 (mm, 거실 우측 상단)
+const BX = R.mainW - R.bathW; // 4100
+
+// 전체 도면 영역 (mm)
+const DRAW_W = R.mainW;
+const DRAW_H = Y.balBot;  // 6100
+
+// ═══════════════════════════════════════════════════════════
+//  캔버스 & 스케일
+// ═══════════════════════════════════════════════════════════
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+const layer  = document.getElementById('furniture-layer');
+
+// 여백 (dimension 라인 공간)
+const PAD = { l:100, r:80, t:70, b:50 };
+
+let SC = 1;  // px / mm
+let OX = 0, OY = 0;  // 도면 원점 (px)
+
+function toX(mm) { return OX + mm * SC; }
+function toY(mm) { return OY + mm * SC; }
+function toPx(mm) { return mm * SC; }
+function toMmX(px) { return (px - OX) / SC; }
+function toMmY(px) { return (px - OY) / SC; }
+
+// ═══════════════════════════════════════════════════════════
+//  바닥 평면도 그리기
+// ═══════════════════════════════════════════════════════════
+function drawRoom() {
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // 배경
+  ctx.fillStyle = '#d8d8ce';
+  ctx.fillRect(0, 0, W, H);
+
+  // ── 바닥 채우기 ──────────────────────────────────────────
+  // 발코니
+  ctx.fillStyle = '#cdd0c0';
+  ctx.fillRect(toX(0), toY(Y.mainBot), toPx(R.mainW), toPx(R.balD));
+
+  // 거실 (욕실 제외)
+  ctx.fillStyle = '#faf6ed';
+  ctx.fillRect(toX(0), toY(Y.mainTop), toPx(R.mainW), toPx(R.mainD));
+
+  // 마루결 (가로선)
+  ctx.strokeStyle = 'rgba(180,145,90,.13)';
+  ctx.lineWidth = 0.8;
+  for (let my = Y.mainTop + 300; my < Y.mainBot; my += 300) {
+    ctx.beginPath(); ctx.moveTo(toX(0), toY(my)); ctx.lineTo(toX(R.mainW), toY(my)); ctx.stroke();
+  }
+
+  // 욕실
+  ctx.fillStyle = '#dbe8ee';
+  ctx.fillRect(toX(BX), toY(Y.mainTop), toPx(R.bathW), toPx(R.bathD));
+  // 욕실 타일 그리드
+  ctx.strokeStyle = 'rgba(100,140,170,.18)';
+  ctx.lineWidth = 0.5;
+  const TL = 300;
+  for (let mx = BX; mx <= R.mainW; mx += TL) {
+    ctx.beginPath(); ctx.moveTo(toX(mx), toY(Y.mainTop)); ctx.lineTo(toX(mx), toY(Y.mainTop+R.bathD)); ctx.stroke();
+  }
+  for (let my = Y.mainTop; my <= Y.mainTop+R.bathD; my += TL) {
+    ctx.beginPath(); ctx.moveTo(toX(BX), toY(my)); ctx.lineTo(toX(R.mainW), toY(my)); ctx.stroke();
+  }
+
+  // 주방
+  ctx.fillStyle = '#f0ead6';
+  ctx.fillRect(toX(0), toY(Y.kitTop), toPx(R.kitW), toPx(R.kitD));
+
+  // ── 벽 그리기 ────────────────────────────────────────────
+  const WT = toPx(R.wallT);
+  ctx.lineJoin = 'miter';
+  ctx.lineCap  = 'square';
+
+  // 외벽 (굵은 검정)
+  ctx.strokeStyle = '#111';
+  ctx.lineWidth   = WT;
+
+  // 거실 서벽
+  strokeLine(0, Y.mainTop, 0, Y.mainBot);
+  // 거실 북벽 (주방~욕실 사이)
+  strokeLine(R.kitW, Y.mainTop, BX, Y.mainTop);
+  // 거실 동벽 (욕실 하단~거실 하단)
+  strokeLine(R.mainW, Y.mainTop + R.bathD, R.mainW, Y.mainBot);
+  // 거실 남벽 (창문 양 끝 기둥만)
+  strokeLine(0, Y.mainBot, 900, Y.mainBot);
+  strokeLine(5200, Y.mainBot, R.mainW, Y.mainBot);
+
+  // 주방 외벽
+  strokeLine(0, Y.kitTop, R.kitW, Y.kitTop);    // 북벽
+  strokeLine(0, Y.kitTop, 0, Y.mainTop);         // 서벽 연장
+  strokeLine(R.kitW, Y.kitTop, R.kitW, Y.mainTop); // 주방 동벽
+
+  // 욕실 외벽 (북+동)
+  strokeLine(BX, Y.mainTop, R.mainW, Y.mainTop);  // 욕실 북벽
+  strokeLine(R.mainW, Y.mainTop, R.mainW, Y.mainTop + R.bathD); // 욕실 동벽
+
+  // 욕실 내벽 (얇게)
+  ctx.strokeStyle = '#333';
+  ctx.lineWidth = toPx(120);
+  strokeLine(BX, Y.mainTop, BX, Y.mainTop + R.bathD);   // 욕실 서쪽 파티션
+  strokeLine(BX, Y.mainTop + R.bathD, R.mainW, Y.mainTop + R.bathD); // 욕실 남쪽
+
+  // ── 창문 (남벽, 900~5200) ────────────────────────────────
+  const W1 = 900, W2 = 5200;
+  const paneW = (W2 - W1) / 3;
+
+  // 창문 파란색 라인 (남벽)
+  ctx.strokeStyle = '#5599cc';
+  ctx.lineWidth = toPx(100);
+  strokeLine(W1, Y.mainBot, W2, Y.mainBot);
+
+  // 창문 이중선 (안쪽)
+  ctx.strokeStyle = '#88bbdd';
+  ctx.lineWidth = toPx(40);
+  strokeLine(W1, Y.mainBot - 80, W2, Y.mainBot - 80);
+
+  // 창 분할선
+  ctx.strokeStyle = '#5599cc';
+  ctx.lineWidth = toPx(50);
+  for (let i = 1; i < 3; i++) {
+    const wx = W1 + i * paneW;
+    strokeLine(wx, Y.mainBot - 80, wx, Y.mainBot);
+  }
+
+  // 발코니 난간 (점선)
+  ctx.strokeStyle = '#888';
+  ctx.lineWidth = toPx(80);
+  ctx.setLineDash([toPx(400), toPx(200)]);
+  strokeLine(0, Y.balBot - 150, R.mainW, Y.balBot - 150);
+  ctx.setLineDash([]);
+
+  // 발코니 외곽선
+  ctx.strokeStyle = '#666';
+  ctx.lineWidth = toPx(100);
+  strokeLine(0, Y.mainBot, 0, Y.balBot);
+  strokeLine(R.mainW, Y.mainBot, R.mainW, Y.balBot);
+  strokeLine(0, Y.balBot, R.mainW, Y.balBot);
+
+  // ── 주방 싱크/가스레인지 심볼 ────────────────────────────
+  ctx.fillStyle = '#c8b890';
+  ctx.fillRect(toX(0), toY(Y.kitTop), toPx(600), toPx(R.kitD));
+  ctx.strokeStyle = '#888'; ctx.lineWidth = 1;
+  // 가스레인지
+  ctx.strokeRect(toX(50), toY(Y.kitTop+100), toPx(500), toPx(500));
+  [[150,350],[250,200],[350,500],[450,350]].forEach(([bx,by])=>{
+    ctx.beginPath(); ctx.arc(toX(bx), toY(Y.kitTop+by), toPx(70), 0, Math.PI*2); ctx.stroke();
+  });
+  // 싱크
+  ctx.strokeStyle = '#aaa';
+  ctx.strokeRect(toX(60), toY(Y.kitTop+720), toPx(480), toPx(380));
+  ctx.beginPath(); ctx.arc(toX(300), toY(Y.kitTop+910), toPx(150), 0, Math.PI*2); ctx.stroke();
+
+  // ── 욕실 기구 ────────────────────────────────────────────
+  // 변기
+  ctx.fillStyle = '#dbe8ee';
+  ctx.strokeStyle = '#5588aa'; ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.ellipse(toX(BX+300), toY(Y.mainTop+1650), toPx(220), toPx(300), 0, 0, Math.PI*2);
+  ctx.stroke(); ctx.fill();
+  ctx.strokeRect(toX(BX+130), toY(Y.mainTop+1200), toPx(340), toPx(300));
+  // 세면대
+  ctx.beginPath();
+  ctx.ellipse(toX(R.mainW-350), toY(Y.mainTop+300), toPx(260), toPx(200), 0, 0, Math.PI*2);
+  ctx.stroke(); ctx.fill();
+  // 샤워부스
+  ctx.strokeRect(toX(BX+80), toY(Y.mainTop+100), toPx(700), toPx(800));
+  ctx.beginPath();
+  ctx.moveTo(toX(BX+80), toY(Y.mainTop+900)); ctx.lineTo(toX(BX+780), toY(Y.mainTop+100));
+  ctx.stroke();
+
+  // ── 방 라벨 ──────────────────────────────────────────────
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+
+  const LABEL_ROOM = Math.max(10, toPx(260));
+  ctx.font = `bold ${LABEL_ROOM}px Arial`;
+  ctx.fillStyle = 'rgba(60,40,10,.25)';
+  ctx.fillText('거  실', toX(2800), toY(Y.mainTop + 2800));
+
+  const LABEL_SMALL = Math.max(9, toPx(200));
+  ctx.font = `bold ${LABEL_SMALL}px Arial`;
+  ctx.fillStyle = 'rgba(0,0,0,.3)';
+  ctx.fillText('주방', toX(R.kitW/2), toY((Y.kitTop+Y.kitBot)/2));
+  ctx.fillText('욕실', toX(BX + R.bathW/2), toY(Y.mainTop + R.bathD/2));
+  ctx.font = `bold ${Math.max(9, toPx(170))}px Arial`;
+  ctx.fillText('발코니', toX(R.mainW/2), toY(Y.mainBot + R.balD/2));
+
+  // ── 치수선 그리기 ─────────────────────────────────────────
+  drawDimensions();
+}
+
+function strokeLine(x1mm, y1mm, x2mm, y2mm) {
+  ctx.beginPath();
+  ctx.moveTo(toX(x1mm), toY(y1mm));
+  ctx.lineTo(toX(x2mm), toY(y2mm));
+  ctx.stroke();
+}
+
+// ── 치수 보조 함수 ────────────────────────────────────────────
+function dimH(x1mm, x2mm, yMm, offsetMm, label) {
+  // 수평 치수선 (위 또는 아래)
+  const px1 = toX(x1mm), px2 = toX(x2mm);
+  const py  = toY(yMm) + toPx(offsetMm);
+  const pRef = toY(yMm);
+
+  ctx.strokeStyle = '#cc2200'; ctx.fillStyle = '#cc2200';
+  ctx.lineWidth = 0.8;
+
+  // 연장선 (점선)
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(px1, pRef); ctx.lineTo(px1, py);
+  ctx.moveTo(px2, pRef); ctx.lineTo(px2, py);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 치수선
+  ctx.beginPath(); ctx.moveTo(px1, py); ctx.lineTo(px2, py); ctx.stroke();
+
+  // 화살표
+  arrowH(px1, py, 1); arrowH(px2, py, -1);
+
+  // 라벨
+  const FS = Math.max(9, toPx(130));
+  ctx.font = `bold ${FS}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = offsetMm < 0 ? 'bottom' : 'top';
+  ctx.fillText(label, (px1+px2)/2, py + (offsetMm < 0 ? -3 : 3));
+}
+
+function dimV(xMm, y1mm, y2mm, offsetMm, label) {
+  // 수직 치수선 (좌 또는 우)
+  const py1 = toY(y1mm), py2 = toY(y2mm);
+  const px  = toX(xMm) + toPx(offsetMm);
+  const pRef = toX(xMm);
+
+  ctx.strokeStyle = '#cc2200'; ctx.fillStyle = '#cc2200';
+  ctx.lineWidth = 0.8;
+
+  ctx.setLineDash([3, 3]);
+  ctx.beginPath();
+  ctx.moveTo(pRef, py1); ctx.lineTo(px, py1);
+  ctx.moveTo(pRef, py2); ctx.lineTo(px, py2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.beginPath(); ctx.moveTo(px, py1); ctx.lineTo(px, py2); ctx.stroke();
+
+  arrowV(px, py1, 1); arrowV(px, py2, -1);
+
+  const FS = Math.max(9, toPx(130));
+  ctx.save();
+  ctx.translate(px + (offsetMm < 0 ? -5 : 5), (py1+py2)/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.font = `bold ${FS}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = offsetMm < 0 ? 'top' : 'bottom';
+  ctx.fillText(label, 0, 0);
+  ctx.restore();
+}
+
+function arrowH(px, py, dir) { // dir: +1=right tip, -1=left tip
+  const A = 6;
+  ctx.beginPath();
+  ctx.moveTo(px, py);
+  ctx.lineTo(px + dir*A, py - 3);
+  ctx.lineTo(px + dir*A, py + 3);
+  ctx.closePath(); ctx.fill();
+}
+function arrowV(px, py, dir) { // dir: +1=down tip, -1=up tip
+  const A = 6;
+  ctx.beginPath();
+  ctx.moveTo(px, py);
+  ctx.lineTo(px - 3, py + dir*A);
+  ctx.lineTo(px + 3, py + dir*A);
+  ctx.closePath(); ctx.fill();
+}
+
+function drawDimensions() {
+  const G = 220; // offset gap (mm)
+
+  // 거실 전체 폭 (6100) — 위
+  dimH(0, R.mainW, Y.mainTop, -G*2, '6,100mm');
+  // 거실 깊이 (3100) — 왼쪽
+  dimV(0, Y.mainTop, Y.mainBot, -G*2, '3,100mm');
+
+  // 주방 폭 (2160)
+  dimH(0, R.kitW, Y.kitTop, -G, '2,160');
+  // 주방 깊이 (1500)
+  dimV(0, Y.kitTop, Y.kitBot, -G, '1,500');
+
+  // 욕실 폭 (1600) — 오른쪽
+  dimH(BX, R.mainW, Y.mainTop, -G, '1,600');
+  // 욕실 깊이 (1800) — 오른쪽
+  dimV(R.mainW, Y.mainTop, Y.mainTop + R.bathD, G, '1,800');
+
+  // 발코니 깊이 (1500) — 오른쪽
+  dimV(R.mainW, Y.mainBot, Y.balBot, G, '1,500');
+
+  // 창문 폭 (4300) — 남벽 아래
+  dimH(900, 5200, Y.mainBot, G*0.8, '창문 4,300mm');
+
+  // 북쪽 방위 표시
+  drawNorth();
+}
+
+function drawNorth() {
+  const nx = toX(R.mainW) + toPx(G*0.5 + 200);
+  const ny = toY(Y.mainBot - 600);
+  const r  = toPx(300);
+  ctx.strokeStyle = '#444'; ctx.fillStyle = '#444';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.moveTo(nx, ny - r);
+  ctx.lineTo(nx, ny + r);
+  ctx.moveTo(nx, ny - r);
+  ctx.lineTo(nx - r*0.4, ny - r*0.4);
+  ctx.moveTo(nx, ny - r);
+  ctx.lineTo(nx + r*0.4, ny - r*0.4);
+  ctx.stroke();
+  ctx.font = `bold ${Math.max(10, toPx(200))}px Arial`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+  ctx.fillText('N', nx, ny - r - 4);
+}
+
+const G = 220; // expose for drawNorth reference
+
+// ═══════════════════════════════════════════════════════════
+//  가구 정의
+// ═══════════════════════════════════════════════════════════
+// cx, cy: 가구 중심 좌표 (mm, 도면 좌표계)
+const FURNITURE = [
+  {
+    id:'bed', name:'🛏 퀸침대', dims:'1,600 × 2,000mm',
+    wMM:1600, hMM:2000,
+    cx: BX - 800,          // 욕실 서쪽 벽 바로 옆
+    cy: Y.mainTop + 1000,  // 거실 북쪽 벽 근처
+    rot: 0,
+    bg:'rgba(210,165,110,.85)', border:'#9e6a28',
+  },
+  {
+    id:'sofa', name:'🛋 소파', dims:'2,000 × 900mm',
+    wMM:2000, hMM:900,
+    cx: 2200,
+    cy: Y.mainTop + 450,
+    rot: 0,
+    bg:'rgba(90,150,90,.85)', border:'#2e6e2e',
+  },
+  {
+    id:'ct', name:'☕ 커피테이블', dims:'1,100 × 550mm',
+    wMM:1100, hMM:550,
+    cx: 2200,
+    cy: Y.mainTop + 1600,
+    rot: 0,
+    bg:'rgba(180,145,85,.85)', border:'#7a5520',
+  },
+  {
+    id:'desk', name:'💻 책상', dims:'1,200 × 600mm',
+    wMM:1200, hMM:600,
+    cx: 400,
+    cy: Y.mainTop + 2700,
+    rot: 0,
+    bg:'rgba(200,175,80,.85)', border:'#7a6010',
+  },
+];
+
+// 초기 위치 저장
+const INIT = FURNITURE.map(f => ({ ...f }));
+
+// ═══════════════════════════════════════════════════════════
+//  가구 div 생성 & 업데이트
+// ═══════════════════════════════════════════════════════════
+function furnPxW(f) { return toPx(f.rot % 180 === 0 ? f.wMM : f.hMM); }
+function furnPxH(f) { return toPx(f.rot % 180 === 0 ? f.hMM : f.wMM); }
+
+function createDiv(f) {
+  const div = document.createElement('div');
+  div.id = 'f_' + f.id;
+  div.className = 'furn';
+  div.style.background  = f.bg;
+  div.style.borderColor = f.border;
+  div.style.color       = f.border;
+  div.innerHTML = `
+    <span class="fname">${f.name}</span>
+    <span class="fdim">${f.dims}</span>
+  `;
+  layer.appendChild(div);
+  positionDiv(div, f);
+
+  div.addEventListener('mousedown',  e => startDrag(e, f.id));
+  div.addEventListener('touchstart', e => { startDrag(e.touches[0], f.id); e.preventDefault(); }, { passive:false });
+  return div;
+}
+
+function positionDiv(div, f) {
+  const pw = furnPxW(f), ph = furnPxH(f);
+  // CSS left/top = top-left corner of unrotated box
+  // transform-origin: center → rotation around center
+  div.style.width    = toPx(f.wMM) + 'px';
+  div.style.height   = toPx(f.hMM) + 'px';
+  div.style.left     = (toX(f.cx) - toPx(f.wMM)/2) + 'px';
+  div.style.top      = (toY(f.cy) - toPx(f.hMM)/2) + 'px';
+  div.style.transform = `rotate(${f.rot}deg)`;
+  const fs = Math.max(9, Math.min(toPx(f.wMM)/8, toPx(f.hMM)/4, 13));
+  div.style.fontSize = fs + 'px';
+}
+
+function refreshAll() {
+  FURNITURE.forEach(f => {
+    const div = document.getElementById('f_' + f.id);
+    if (div) positionDiv(div, f);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  선택 & 회전 UI
+// ═══════════════════════════════════════════════════════════
+let selId = null;
+let rotBtn = null;
+
+function selectFurn(id) {
+  selId = id;
+  // 모든 가구 sel 해제
+  document.querySelectorAll('.furn').forEach(d => d.classList.remove('sel'));
+  // 기존 rotBtn 제거
+  if (rotBtn) { rotBtn.remove(); rotBtn = null; }
+
+  if (!id) {
+    document.getElementById('sel-bar').style.display = 'none';
+    return;
+  }
+
+  const f = FURNITURE.find(f => f.id === id);
+  const div = document.getElementById('f_' + id);
+  div.classList.add('sel');
+
+  // 회전 버튼 (div 안에 absolute)
+  rotBtn = document.createElement('button');
+  rotBtn.className = 'rot-btn';
+  rotBtn.textContent = '⟳ 90° 회전';
+  rotBtn.addEventListener('click', e => { e.stopPropagation(); rotateFurn(id); });
+  rotBtn.addEventListener('mousedown', e => e.stopPropagation());
+  div.appendChild(rotBtn);
+
+  const bar = document.getElementById('sel-bar');
+  bar.textContent = f.name + ' 선택됨 — 드래그로 이동, R 또는 버튼으로 회전';
+  bar.style.display = 'block';
+}
+
+function rotateFurn(id) {
+  const f = FURNITURE.find(f => f.id === id);
+  if (!f) return;
+  f.rot = (f.rot + 90) % 360;
+  const div = document.getElementById('f_' + id);
+  positionDiv(div, f);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  드래그
+// ═══════════════════════════════════════════════════════════
+let dragging  = null;
+let dragOffMmX = 0, dragOffMmY = 0;
+
+function startDrag(e, id) {
+  dragging = id;
+  selectFurn(id);
+  const f = FURNITURE.find(f => f.id === id);
+  // 마우스 위치와 가구 중심의 mm 오프셋
+  const clientX = e.clientX !== undefined ? e.clientX : e.pageX;
+  const clientY = e.clientY !== undefined ? e.clientY : e.pageY;
+  dragOffMmX = f.cx - toMmX(clientX);
+  dragOffMmY = f.cy - toMmY(clientY);
+  e.preventDefault();
+}
+
+function onMove(clientX, clientY) {
+  if (!dragging) return;
+  const f = FURNITURE.find(f => f.id === dragging);
+  f.cx = toMmX(clientX) + dragOffMmX;
+  f.cy = toMmY(clientY) + dragOffMmY;
+  const div = document.getElementById('f_' + f.id);
+  positionDiv(div, f);
+}
+
+document.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+document.addEventListener('touchmove', e => {
+  onMove(e.touches[0].clientX, e.touches[0].clientY);
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('mouseup', () => { dragging = null; });
+document.addEventListener('touchend', () => { dragging = null; });
+
+// 빈 공간 클릭 → 선택 해제
+canvas.addEventListener('click', () => selectFurn(null));
+
+// R 키 → 회전
+document.addEventListener('keydown', e => {
+  if ((e.key === 'r' || e.key === 'R') && selId) rotateFurn(selId);
+});
+
+// ═══════════════════════════════════════════════════════════
+//  초기화 & 리사이즈
+// ═══════════════════════════════════════════════════════════
+function resetAll() {
+  INIT.forEach(init => {
+    const f = FURNITURE.find(f => f.id === init.id);
+    f.cx = init.cx; f.cy = init.cy; f.rot = init.rot;
+    const div = document.getElementById('f_' + f.id);
+    positionDiv(div, f);
+  });
+  selectFurn(null);
+}
+
+function resize() {
+  canvas.width  = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  SC = Math.min(
+    (canvas.width  - PAD.l - PAD.r) / DRAW_W,
+    (canvas.height - PAD.t - PAD.b) / DRAW_H
+  );
+  OX = PAD.l + (canvas.width  - PAD.l - PAD.r - DRAW_W * SC) / 2;
+  OY = PAD.t + (canvas.height - PAD.t - PAD.b - DRAW_H * SC) / 2;
+
+  drawRoom();
+  refreshAll();
+
+  // 축척 표시
+  const scaleNum = Math.round(1 / SC * 1000) / 10;
+  document.getElementById('scale-num').textContent =
+    Math.round(1000 / SC).toLocaleString();
+}
+
+// 초기 실행
+layer.innerHTML = '';
+FURNITURE.forEach(f => createDiv(f));
+window.addEventListener('resize', resize);
+resize();
+</script>
+</body>
+</html>
