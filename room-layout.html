@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>31B-2 가구 배치 시뮬레이션 (31.43㎡)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0d0d1a; font-family: 'Malgun Gothic', sans-serif; overflow: hidden; }
+    canvas { display: block; }
+
+    #ui-overlay {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    #info-panel {
+      position: absolute;
+      top: 16px; left: 16px;
+      background: rgba(10, 15, 30, 0.88);
+      border: 1px solid rgba(100, 180, 255, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #e8f0ff;
+      font-size: 13px;
+      line-height: 2;
+      min-width: 220px;
+      backdrop-filter: blur(8px);
+    }
+    #info-panel h2 {
+      font-size: 15px;
+      color: #7ec8f8;
+      margin-bottom: 8px;
+      border-bottom: 1px solid rgba(100,180,255,0.3);
+      padding-bottom: 6px;
+    }
+    .dim-row { display: flex; justify-content: space-between; gap: 12px; }
+    .dim-label { color: #aac0e0; }
+    .dim-val { color: #fff; font-weight: bold; }
+
+    #legend-panel {
+      position: absolute;
+      top: 16px; right: 16px;
+      background: rgba(10, 15, 30, 0.88);
+      border: 1px solid rgba(100, 180, 255, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #e8f0ff;
+      font-size: 12px;
+      line-height: 1.8;
+      backdrop-filter: blur(8px);
+    }
+    #legend-panel h2 { font-size: 13px; color: #7ec8f8; margin-bottom: 8px; }
+    .legend-row { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
+    .legend-dot {
+      width: 16px; height: 10px; border-radius: 3px; flex-shrink: 0;
+    }
+
+    #sun-indicator {
+      position: absolute;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 200, 0, 0.15);
+      border: 1px solid rgba(255, 200, 0, 0.5);
+      border-radius: 24px;
+      padding: 8px 20px;
+      color: #ffd700;
+      font-size: 13px;
+      backdrop-filter: blur(6px);
+    }
+
+    #controls-hint {
+      position: absolute;
+      bottom: 24px; right: 16px;
+      color: rgba(160, 180, 220, 0.7);
+      font-size: 11px;
+      line-height: 1.8;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+<div id="ui-overlay">
+  <div id="info-panel">
+    <h2>🏠 31B-2 타입 · 전용 31.43㎡</h2>
+    <div class="dim-row"><span class="dim-label">실내 폭</span><span class="dim-val">6,100 mm</span></div>
+    <div class="dim-row"><span class="dim-label">실내 깊이</span><span class="dim-val">3,400 mm</span></div>
+    <div class="dim-row"><span class="dim-label">층고</span><span class="dim-val">2,400 mm</span></div>
+    <div style="margin-top:10px; border-top:1px solid rgba(100,180,255,0.2); padding-top:10px;">
+      <div class="dim-row"><span class="dim-label">🛏 퀸침대</span><span class="dim-val">1,600 × 2,000</span></div>
+      <div class="dim-row"><span class="dim-label">🛋 소파</span><span class="dim-val">2,000 × 900</span></div>
+      <div class="dim-row"><span class="dim-label">💻 책상</span><span class="dim-val">1,200 × 600</span></div>
+    </div>
+    <div style="margin-top:10px; color:#ffd700; font-size:12px;">
+      ☀️ 소파 → 발코니 창 향 배치<br>
+      <span style="color:#aaa;">빛이 정면으로 들어오는 위치</span>
+    </div>
+  </div>
+
+  <div id="legend-panel">
+    <h2>범례</h2>
+    <div class="legend-row"><div class="legend-dot" style="background:#9e7a4a;"></div>원목 마루</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#7ab3d4; opacity:0.7;"></div>창문 / 유리</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#c8a07a;"></div>퀸사이즈 침대</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#5e8c6a;"></div>소파 (2m)</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#7a5c20;"></div>책상</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#a0b8c8;"></div>욕실</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#c8b890;"></div>주방</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#ffd700; opacity:0.5;"></div>자연광 패턴</div>
+  </div>
+
+  <div id="sun-indicator">☀️ 발코니 창문에서 자연광 유입 → 소파에서 정면으로 빛을 즐길 수 있습니다</div>
+  <div id="controls-hint">마우스 드래그: 회전<br>휠: 확대/축소<br>우클릭 드래그: 이동</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// ─── Scene ───────────────────────────────────────────────────────────────────
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a2035);
+scene.fog = new THREE.FogExp2(0x1a2035, 0.04);
+
+const W = window.innerWidth, H = window.innerHeight;
+const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
+camera.position.set(10, 9, 11);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(W, H);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputEncoding = THREE.sRGBEncoding;
+document.body.appendChild(renderer.domElement);
+
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.target.set(3.5, 1.0, 2.5);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 3;
+controls.maxDistance = 22;
+controls.maxPolarAngle = Math.PI / 2 + 0.1;
+camera.lookAt(controls.target);
+
+// ─── Lighting ────────────────────────────────────────────────────────────────
+// Ambient
+scene.add(new THREE.AmbientLight(0xc8d8ff, 0.45));
+
+// Sun — coming in from the south window wall (Z = 0 side)
+const sun = new THREE.DirectionalLight(0xfff4cc, 1.4);
+sun.position.set(3.5, 8, -6);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.near = 0.5;
+sun.shadow.camera.far = 30;
+sun.shadow.camera.left = -8;
+sun.shadow.camera.right = 8;
+sun.shadow.camera.top = 8;
+sun.shadow.camera.bottom = -8;
+sun.shadow.bias = -0.001;
+scene.add(sun);
+
+// Fill from north
+const fill = new THREE.DirectionalLight(0x9aaeff, 0.3);
+fill.position.set(-3, 4, 8);
+scene.add(fill);
+
+// Point light inside room
+const roomLight = new THREE.PointLight(0xffeedd, 0.6, 12);
+roomLight.position.set(3.5, 2.1, 2.0);
+scene.add(roomLight);
+
+// ─── Materials ───────────────────────────────────────────────────────────────
+const M = {
+  floor:    new THREE.MeshStandardMaterial({ color: 0x9e7a4a, roughness: 0.55, metalness: 0.05 }),
+  floorBal: new THREE.MeshStandardMaterial({ color: 0x888070, roughness: 0.8 }),
+  wall:     new THREE.MeshStandardMaterial({ color: 0xf2ede4, roughness: 0.9 }),
+  wallDark: new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.7 }),
+  glass:    new THREE.MeshStandardMaterial({ color: 0x87c8e8, transparent: true, opacity: 0.35, roughness: 0.05, metalness: 0.1 }),
+  glassRail:new THREE.MeshStandardMaterial({ color: 0xaaccdd, transparent: true, opacity: 0.25, roughness: 0.05 }),
+  bath:     new THREE.MeshStandardMaterial({ color: 0xa0b8c8, roughness: 0.4 }),
+  kit:      new THREE.MeshStandardMaterial({ color: 0xc8b890, roughness: 0.6 }),
+  kitCab:   new THREE.MeshStandardMaterial({ color: 0xe8d8b0, roughness: 0.5 }),
+  bed:      new THREE.MeshStandardMaterial({ color: 0xc8a07a, roughness: 0.7 }),
+  sheet:    new THREE.MeshStandardMaterial({ color: 0xf5f0e8, roughness: 0.9 }),
+  pillow:   new THREE.MeshStandardMaterial({ color: 0xfefefe, roughness: 0.95 }),
+  sofa:     new THREE.MeshStandardMaterial({ color: 0x5e8c6a, roughness: 0.8 }),
+  sofaDark: new THREE.MeshStandardMaterial({ color: 0x4a7055, roughness: 0.8 }),
+  desk:     new THREE.MeshStandardMaterial({ color: 0x7a5c20, roughness: 0.5 }),
+  deskLeg:  new THREE.MeshStandardMaterial({ color: 0x3a2c10, roughness: 0.4 }),
+  metal:    new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.3, metalness: 0.7 }),
+  black:    new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.4 }),
+  sunRay:   new THREE.MeshBasicMaterial({ color: 0xffd700, transparent: true, opacity: 0.06, side: THREE.DoubleSide }),
+};
+
+// ─── Helper ──────────────────────────────────────────────────────────────────
+function box(w, h, d, x, y, z, mat, shadow = true) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+  m.position.set(x, y, z);
+  if (shadow) { m.castShadow = true; m.receiveShadow = true; }
+  scene.add(m);
+  return m;
+}
+
+// ─── Room Geometry (mm → m) ──────────────────────────────────────────────────
+// Coordinate system: X = east (+), Z = north (+), Y = up (+)
+// South wall (windows/balcony) at Z = 0
+// North wall at Z = 3.4
+// West wall at X = 0
+// East wall at X = 6.1
+
+const RW = 6.1, RD = 3.4, RH = 2.4;  // main room
+const WT = 0.15;                        // wall thickness
+const KW = 1.5, KD = 2.0;              // kitchen nook (NW corner, extends north)
+const BW = 2.1, BD = 2.0;              // bathroom (NE area)
+const BAL = 1.3;                        // balcony depth (south)
+
+// ── Floor ──
+box(RW,    0.05, RD,   RW/2,      0.025,  RD/2,        M.floor,    false);
+box(KW,    0.05, KD,   KW/2,      0.025,  RD + KD/2,   M.kit,      false);
+box(RW,    0.05, BAL,  RW/2,      0.025,  -BAL/2,      M.floorBal, false);
+box(BW,    0.05, BD,   RW-BW/2,   0.028,  BD/2,        M.bath,     false);
+
+// ── Ceiling (back-side, dim) ──
+const ceilMat = new THREE.MeshStandardMaterial({ color: 0xf8f5f0, roughness: 1, side: THREE.BackSide });
+box(RW, 0.06, RD, RW/2, RH, RD/2, ceilMat, false);
+
+// ── Walls ──
+// West wall
+box(WT, RH, RD + KD, 0,       RH/2, (RD+KD)/2,       M.wall);
+// North wall (behind kitchen)
+box(KW, RH, WT,      KW/2,    RH/2, RD + KD,          M.wall);
+// North wall (right of kitchen)
+box(RW - KW, RH, WT, KW + (RW-KW)/2, RH/2, RD,        M.wall);
+// East wall – upper portion (above bath zone)
+box(WT, RH, RD - BD,  RW,     RH/2, BD + (RD-BD)/2,   M.wall);
+// East wall – bathroom portion
+box(WT, RH, BD,       RW,     RH/2, BD/2,              M.bath);
+// Bathroom north partition
+box(BW, RH, WT,       RW-BW/2, RH/2, BD,              M.wall);
+// Bathroom west partition (upper 60%)
+box(WT, RH, BD * 0.65, RW-BW, RH/2, BD - BD*0.65/2,   M.wall);
+
+// South wall — window sections (windows from X=0.8 to X=5.3, leaving piers)
+// Piers
+box(0.9, RH, WT,  0.45,    RH/2, 0,  M.wall);
+box(0.9, RH, WT,  RW-0.45, RH/2, 0,  M.wall);
+// Window header
+box(RW-1.8, 0.45, WT, RW/2, RH-0.225, 0, M.wall);
+// Window sill
+box(RW-1.8, 0.35, WT, RW/2, 0.175,    0, M.wall);
+
+// Windows — 3 panes
+const winW = (RW - 1.8 - 0.12) / 3;
+for (let i = 0; i < 3; i++) {
+  const wx = 0.9 + winW/2 + i * (winW + 0.04);
+  // Frame
+  box(winW, 1.6, 0.06,  wx, 0.35+0.8, 0.03, M.wall);
+  // Glass
+  const g = new THREE.Mesh(new THREE.BoxGeometry(winW-0.1, 1.4, 0.03), M.glass);
+  g.position.set(wx, 0.4+0.7, 0.02);
+  g.receiveShadow = true;
+  scene.add(g);
+}
+
+// Structural pillar at kitchen/main room junction
+box(0.18, RH, 0.18, KW, RH/2, RD, M.wallDark);
+
+// Balcony railing (glass)
+box(RW, 0.9, 0.06,   RW/2, 0.45, -BAL,  M.glassRail);
+box(RW, 0.04, 0.06,  RW/2, 0.9,  -BAL,  M.metal);
+// Railing posts
+for (let i = 0; i <= 4; i++) {
+  box(0.04, 0.9, 0.04, 0.6 + i*(RW-1.2)/4, 0.45, -BAL, M.metal);
+}
+
+// ── Kitchen ──
+// Base counter (L-shape along north + west walls)
+box(0.65, 0.9, KD,    0.325,    0.45, RD+KD/2,       M.kit);   // west-facing counter
+box(KW,   0.9, 0.65,  KW/2,     0.45, RD+KD-0.325,   M.kit);   // north counter
+// Counter top
+box(0.62, 0.04, KD,   0.32,     0.92, RD+KD/2,       M.metal);
+// Overhead cabinets
+box(0.55, 0.65, KD*0.9, 0.28,   2.0,  RD+KD*0.55,    M.kitCab);
+// Cooktop
+box(0.55, 0.03, 0.5,   0.3,     0.935,RD+0.9,        M.metal);
+// Sink
+box(0.35, 0.06, 0.35,  0.3,     0.93, RD+1.8,        new THREE.MeshStandardMaterial({color:0x7a9aaa,roughness:0.3,metalness:0.5}));
+
+// ── Bathroom fixtures (simple) ──
+// Toilet
+box(0.4, 0.75, 0.6,  RW-0.25, 0.375, 1.6,  M.bath);
+// Sink
+box(0.5, 0.85, 0.4,  RW-0.3,  0.425, BD-0.25, new THREE.MeshStandardMaterial({color:0xd0e0e8,roughness:0.3}));
+
+// ─── Furniture ───────────────────────────────────────────────────────────────
+
+// ── QUEEN BED  (1.6m × 2.0m) ─────────────────────────────────────────────────
+// East side of main room, against north wall — creates a sleeping zone
+const bedX = RW - BW - 0.85;   // west of bathroom partition
+const bedZ = RD - 0.05;         // headboard against north wall
+
+// Frame
+box(1.6, 0.2, 2.0,  bedX, 0.1,  bedZ-1.0, M.bed);
+// Mattress
+box(1.5, 0.22,1.85, bedX, 0.31, bedZ-1.0, M.sheet);
+// Headboard
+box(1.65,0.65,0.1,  bedX, 0.52, bedZ+0.05, M.bed);
+// Pillows
+box(0.65,0.1, 0.42, bedX-0.37, 0.44, bedZ-0.23, M.pillow);
+box(0.65,0.1, 0.42, bedX+0.37, 0.44, bedZ-0.23, M.pillow);
+// Duvet fold
+box(1.5, 0.06, 0.8, bedX, 0.44, bedZ-1.4, M.sheet);
+// Bedside table (small)
+box(0.4, 0.6, 0.4,  bedX+0.9, 0.3, bedZ-0.3, M.deskLeg);
+box(0.38,0.03,0.38, bedX+0.9, 0.615,bedZ-0.3,M.desk);
+
+// ── SOFA (2.0m wide × 0.9m deep) ─────────────────────────────────────────────
+// Against north wall, CENTER of room, facing SOUTH toward balcony windows
+// People sitting on sofa look directly at windows → optimal natural light
+const sofaX = KW + (RW - BW - KW) / 2;  // horizontally centered in main room area
+const sofaZ = RD - 0.5;                   // back against north wall
+
+// Sofa body
+box(2.0, 0.45, 0.88, sofaX, 0.25, sofaZ,       M.sofa);
+// Sofa back
+box(2.0, 0.45, 0.14, sofaX, 0.65, sofaZ+0.42,  M.sofa);
+// Armrests
+box(0.14,0.42, 0.88, sofaX-1.0, 0.46, sofaZ,   M.sofa);
+box(0.14,0.42, 0.88, sofaX+1.0, 0.46, sofaZ,   M.sofa);
+// Cushions (3 seat)
+for (let i = -1; i <= 1; i++) {
+  box(0.6, 0.12, 0.52, sofaX + i*0.63, 0.52, sofaZ-0.13, M.sofaDark);
+}
+// Back cushions (3)
+for (let i = -1; i <= 1; i++) {
+  box(0.58, 0.38, 0.1, sofaX + i*0.63, 0.63, sofaZ+0.35, M.sofaDark);
+}
+// Sofa legs (4)
+const slegM = new THREE.MeshStandardMaterial({color:0x333322,roughness:0.4,metalness:0.2});
+[[-0.9,-0.38],[-0.9,0.38],[0.9,-0.38],[0.9,0.38]].forEach(([dx,dz]) => {
+  box(0.06,0.1,0.06, sofaX+dx, 0.05, sofaZ+dz, slegM);
+});
+
+// Coffee table in front of sofa (between sofa and windows)
+const ctX = sofaX, ctZ = sofaZ - 1.0;
+box(1.1, 0.04, 0.55, ctX, 0.38, ctZ, M.desk);
+// Table legs
+[[0.48,-0.22],[0.48,0.22],[-0.48,-0.22],[-0.48,0.22]].forEach(([dx,dz]) => {
+  box(0.05, 0.38, 0.05, ctX+dx, 0.19, ctZ+dz, M.deskLeg);
+});
+
+// ── DESK (1.2m × 0.6m) ───────────────────────────────────────────────────────
+// Near west window section — good side light while working
+// Against west wall, south portion → bright work zone
+const deskX = 0.65;
+const deskZ = 1.1;
+
+// Desk surface
+box(0.6, 0.04, 1.2, deskX, 0.76, deskZ, M.desk);
+// Desk legs
+[[0.24,-0.52],[0.24,0.52],[-0.24,-0.52],[-0.24,0.52]].forEach(([dx,dz]) => {
+  box(0.05,0.76,0.05, deskX+dx, 0.38, deskZ+dz, M.deskLeg);
+});
+// Monitor
+box(0.02, 0.34, 0.54, deskX+0.32, 0.97, deskZ, M.black);
+box(0.02, 0.06, 0.18, deskX+0.32, 0.81, deskZ, M.black);
+// Keyboard
+box(0.02, 0.02, 0.35, deskX+0.2,  0.79, deskZ, M.metal);
+// Chair
+const chairZ = deskZ + 0.7;
+box(0.48,0.04,0.48, deskX, 0.46, chairZ, M.sofaDark);
+box(0.48,0.48,0.04, deskX, 0.72, chairZ-0.22, M.sofaDark);
+[[0.2,-0.2],[-0.2,-0.2],[0.2,0.2],[-0.2,0.2]].forEach(([dx,dz]) => {
+  box(0.04,0.46,0.04, deskX+dx, 0.23, chairZ+dz, M.black);
+});
+
+// ─── Natural Light Rays (visual) ─────────────────────────────────────────────
+// Volumetric-like light shafts coming through south windows
+const rayMat = new THREE.MeshBasicMaterial({
+  color: 0xfff0b0, transparent: true, opacity: 0.055, side: THREE.DoubleSide
+});
+// Three shafts — one per window pane
+for (let i = 0; i < 3; i++) {
+  const rx = 0.9 + winW/2 + i*(winW+0.04);
+  // shaft geometry: tapers inward (simulate cone with box)
+  const geo = new THREE.BoxGeometry(winW*0.7, 0.01, 3.8);
+  const ray = new THREE.Mesh(geo, rayMat);
+  ray.rotation.x = 0;
+  ray.position.set(rx, 0.02, RD/2 - 0.5);
+  scene.add(ray);
+
+  // Light pool on floor
+  const poolGeo = new THREE.PlaneGeometry(winW*0.7, 0.7);
+  const poolMat = new THREE.MeshBasicMaterial({ color: 0xfff4aa, transparent: true, opacity: 0.07 });
+  const pool = new THREE.Mesh(poolGeo, poolMat);
+  pool.rotation.x = -Math.PI / 2;
+  pool.position.set(rx, 0.03, 1.2);
+  scene.add(pool);
+}
+
+// ─── Dimension annotation arrows (simple lines) ──────────────────────────────
+function dimLine(x1,y1,z1, x2,y2,z2, color=0xffd700) {
+  const mat = new THREE.LineBasicMaterial({ color });
+  const geo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(x1,y1,z1), new THREE.Vector3(x2,y2,z2)
+  ]);
+  scene.add(new THREE.Line(geo, mat));
+}
+// Room width
+dimLine(0, 0.05, RD+0.3, RW, 0.05, RD+0.3, 0xffdd44);
+// Room depth
+dimLine(-0.3, 0.05, 0, -0.3, 0.05, RD, 0xffdd44);
+// Bed label
+dimLine(bedX-0.8, 0.06, bedZ-2.0, bedX+0.8, 0.06, bedZ-2.0, 0xffaaaa);
+dimLine(bedX-0.8, 0.06, bedZ,     bedX-0.8, 0.06, bedZ-2.0, 0xffaaaa);
+// Sofa width
+dimLine(sofaX-1.0, 0.06, sofaZ+0.7, sofaX+1.0, 0.06, sofaZ+0.7, 0xaaffaa);
+
+// ─── Text Sprites ─────────────────────────────────────────────────────────────
+function makeLabel(text, color='#ffdd44', bg='rgba(0,0,20,0.75)') {
+  const c = document.createElement('canvas');
+  c.width = 320; c.height = 72;
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, 320, 72);
+  ctx.fillStyle = bg;
+  ctx.beginPath();
+  ctx.roundRect(0, 0, 320, 72, 10);
+  ctx.fill();
+  ctx.fillStyle = color;
+  ctx.font = 'bold 26px Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 160, 36);
+  const tex = new THREE.CanvasTexture(c);
+  const sp  = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true }));
+  sp.scale.set(1.8, 0.4, 1);
+  return sp;
+}
+
+function addLabel(text, x, y, z, color) {
+  const sp = makeLabel(text, color);
+  sp.position.set(x, y, z);
+  scene.add(sp);
+}
+
+// Room dimension labels
+addLabel('← 6,100mm →',       RW/2, 0.5, RD+0.6,  '#ffdd44');
+addLabel('↕ 3,400mm',         -0.9, 0.5, RD/2,    '#ffdd44');
+addLabel('퀸침대 1,600×2,000',  bedX, 1.05, bedZ-1.0, '#ffc09f');
+addLabel('소파 2,000mm',        sofaX, 1.15, sofaZ,    '#9fdfb0');
+addLabel('책상 1,200×600',      deskX-0.5, 1.15, deskZ,  '#9fcfff');
+addLabel('☀ 자연광',            RW/2, 1.8, 0.4,      '#fff3a0');
+
+// ─── Animate ─────────────────────────────────────────────────────────────────
+let t = 0;
+function animate() {
+  requestAnimationFrame(animate);
+  t += 0.005;
+  // Subtle pulsing on light rays to simulate natural variation
+  rayMat.opacity = 0.04 + Math.sin(t) * 0.015;
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+  const w = window.innerWidth, h = window.innerHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+});
+
+animate();
+</script>
+</body>
+</html>
