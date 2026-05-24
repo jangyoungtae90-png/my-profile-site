@@ -4,71 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>31B-2 가구 배치 시뮬레이션 (31.43㎡)</title>
+
+  <!-- ES module importmap — 단일 CDN, 버전 고정으로 안정적 로드 -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three":          "https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js",
+      "three/addons/":  "https://cdn.jsdelivr.net/npm/three@0.158.0/examples/jsm/"
+    }
+  }
+  </script>
+
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0d0d1a; font-family: 'Malgun Gothic', sans-serif; overflow: hidden; }
-    canvas { display: block; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { background:#111; font-family:'Malgun Gothic',sans-serif; overflow:hidden; }
+    canvas { display:block; }
 
     #info-panel {
-      position: absolute; top: 16px; left: 16px;
-      background: rgba(10,15,30,0.88);
-      border: 1px solid rgba(100,180,255,0.3);
-      border-radius: 12px; padding: 14px 18px;
-      color: #e8f0ff; font-size: 12px; line-height: 1.9;
-      min-width: 200px; backdrop-filter: blur(8px);
-      pointer-events: none;
+      position:absolute; top:14px; left:14px;
+      background:rgba(10,15,30,0.9); border:1px solid rgba(100,180,255,0.3);
+      border-radius:12px; padding:13px 17px; color:#e8f0ff;
+      font-size:12px; line-height:1.9; min-width:195px;
+      backdrop-filter:blur(8px); pointer-events:none;
     }
-    #info-panel h2 { font-size: 14px; color: #7ec8f8; margin-bottom: 8px;
-      border-bottom: 1px solid rgba(100,180,255,0.3); padding-bottom: 6px; }
+    #info-panel h2 { font-size:13px; color:#7ec8f8; margin-bottom:7px;
+      border-bottom:1px solid rgba(100,180,255,0.3); padding-bottom:5px; }
     .dr { display:flex; justify-content:space-between; gap:10px; }
     .dl { color:#aac0e0; } .dv { color:#fff; font-weight:bold; }
 
-    #controls-panel {
-      position: absolute; top: 16px; right: 16px;
-      background: rgba(10,15,30,0.88);
-      border: 1px solid rgba(100,180,255,0.3);
-      border-radius: 12px; padding: 14px 18px;
-      color: #e8f0ff; font-size: 12px; line-height: 2;
-      backdrop-filter: blur(8px); pointer-events: none;
+    #ctrl-panel {
+      position:absolute; top:14px; right:14px;
+      background:rgba(10,15,30,0.9); border:1px solid rgba(100,180,255,0.3);
+      border-radius:12px; padding:13px 17px; color:#e8f0ff;
+      font-size:12px; line-height:2; backdrop-filter:blur(8px); pointer-events:none;
     }
-    #controls-panel h2 { font-size: 13px; color: #7ec8f8; margin-bottom: 6px; }
-    .ctrl-row { display:flex; gap:8px; align-items:center; }
+    #ctrl-panel h2 { font-size:13px; color:#7ec8f8; margin-bottom:5px; }
+    .cr { display:flex; align-items:center; gap:7px; }
     .key {
-      background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 5px; padding: 1px 7px; font-size: 11px;
-      font-family: monospace; color: #fff;
+      background:rgba(255,255,255,0.13); border:1px solid rgba(255,255,255,0.3);
+      border-radius:4px; padding:1px 6px; font-size:11px; font-family:monospace; color:#fff;
     }
 
-    #selected-bar {
-      position: absolute; bottom: 20px; left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,200,255,0.12);
-      border: 1px solid rgba(0,200,255,0.5);
-      border-radius: 24px; padding: 8px 22px;
-      color: #00e5ff; font-size: 13px;
-      backdrop-filter: blur(6px);
-      display: none; pointer-events: none;
-      white-space: nowrap;
+    #sel-bar {
+      position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
+      background:rgba(0,200,255,0.13); border:1px solid rgba(0,200,255,0.5);
+      border-radius:24px; padding:7px 20px; color:#00e5ff; font-size:13px;
+      display:none; pointer-events:none; white-space:nowrap;
+      backdrop-filter:blur(6px);
     }
-
     #sun-bar {
-      position: absolute; bottom: 20px; right: 16px;
-      background: rgba(255,200,0,0.12);
-      border: 1px solid rgba(255,200,0,0.4);
-      border-radius: 12px; padding: 8px 14px;
-      color: #ffd700; font-size: 11px; line-height: 1.7;
-      backdrop-filter: blur(6px); pointer-events: none;
+      position:absolute; bottom:18px; right:14px;
+      background:rgba(255,200,0,0.12); border:1px solid rgba(255,200,0,0.4);
+      border-radius:10px; padding:7px 12px; color:#ffd700;
+      font-size:11px; line-height:1.7; pointer-events:none; backdrop-filter:blur(6px);
     }
-
     #reset-btn {
-      position: absolute; bottom: 20px; left: 16px;
-      background: rgba(255,100,100,0.15);
-      border: 1px solid rgba(255,100,100,0.4);
-      border-radius: 10px; padding: 8px 16px;
-      color: #ff9090; font-size: 12px; cursor: pointer;
-      backdrop-filter: blur(6px);
+      position:absolute; bottom:18px; left:14px;
+      background:rgba(255,100,100,0.15); border:1px solid rgba(255,100,100,0.4);
+      border-radius:9px; padding:7px 14px; color:#ff9090;
+      font-size:12px; cursor:pointer; backdrop-filter:blur(6px);
     }
-    #reset-btn:hover { background: rgba(255,100,100,0.28); }
+    #reset-btn:hover { background:rgba(255,100,100,0.3); }
+    #err { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+      color:#ff8888; font-size:14px; text-align:center; display:none; }
   </style>
 </head>
 <body>
@@ -86,495 +84,476 @@
   </div>
 </div>
 
-<div id="controls-panel">
+<div id="ctrl-panel">
   <h2>조작법</h2>
-  <div class="ctrl-row"><span class="key">드래그</span> 가구 이동</div>
-  <div class="ctrl-row"><span class="key">R</span> 가구 90° 회전</div>
-  <div style="height:4px;"></div>
-  <div class="ctrl-row"><span class="key">우클릭 드래그</span> 뷰 이동</div>
-  <div class="ctrl-row"><span class="key">좌클릭 드래그</span> 뷰 회전</div>
-  <div class="ctrl-row"><span class="key">휠</span> 확대/축소</div>
+  <div class="cr"><span class="key">가구 드래그</span>이동</div>
+  <div class="cr"><span class="key">R</span>90° 회전</div>
+  <div style="height:3px;"></div>
+  <div class="cr"><span class="key">좌클릭 드래그</span>뷰 회전</div>
+  <div class="cr"><span class="key">우클릭 드래그</span>뷰 이동</div>
+  <div class="cr"><span class="key">휠</span>확대/축소</div>
 </div>
 
-<div id="selected-bar"></div>
+<div id="sel-bar"></div>
 <div id="sun-bar">☀️ 남향 발코니 창<br>소파 정면 자연광 유입</div>
-<button id="reset-btn" onclick="resetFurniture()">↺ 초기화</button>
+<button id="reset-btn" onclick="window._resetFurniture && window._resetFurniture()">↺ 초기화</button>
+<div id="err">Three.js 로드 실패.<br>인터넷 연결을 확인하고 새로고침 하세요.</div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
-<script>
-// ─── Scene ───────────────────────────────────────────────────────────────────
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ── Scene ─────────────────────────────────────────────────────────────────────
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x1a2035);
-scene.fog = new THREE.FogExp2(0x1a2035, 0.035);
+scene.fog = new THREE.FogExp2(0x1a2035, 0.028);
 
 const W = window.innerWidth, H = window.innerHeight;
-const camera = new THREE.PerspectiveCamera(42, W / H, 0.1, 100);
-camera.position.set(10, 9, 11);
+const camera = new THREE.PerspectiveCamera(45, W/H, 0.1, 80);
+// 위에서 내려다보는 각도 — 남동쪽 사선 뷰
+camera.position.set(11, 12, 10);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(W, H);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-renderer.outputEncoding = THREE.sRGBEncoding;
 document.body.appendChild(renderer.domElement);
 
-const controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.target.set(3.5, 1.0, 2.5);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(3.5, 0.5, 2.5);
 controls.enableDamping = true;
-controls.dampingFactor = 0.06;
-controls.minDistance = 3;
-controls.maxDistance = 22;
-controls.maxPolarAngle = Math.PI * 0.85;
-camera.lookAt(controls.target);
+controls.dampingFactor = 0.07;
+controls.minDistance = 2;
+controls.maxDistance = 24;
+controls.maxPolarAngle = Math.PI * 0.82; // 완전 평면보다 조금 위까지만
+controls.update();
 
-// ─── Lighting ────────────────────────────────────────────────────────────────
-scene.add(new THREE.AmbientLight(0xc8d8ff, 0.55));
+// ── Lighting ──────────────────────────────────────────────────────────────────
+scene.add(new THREE.AmbientLight(0xd0deff, 0.7));
 
-const sun = new THREE.DirectionalLight(0xfff4cc, 1.3);
-sun.position.set(3.5, 8, -6);
+const sun = new THREE.DirectionalLight(0xfff4cc, 1.2);
+sun.position.set(4, 10, -7);  // 남쪽 창문 방향에서
 sun.castShadow = true;
 sun.shadow.mapSize.set(2048, 2048);
-sun.shadow.camera.left = -9; sun.shadow.camera.right = 9;
-sun.shadow.camera.top = 9;  sun.shadow.camera.bottom = -9;
-sun.shadow.camera.far = 30; sun.shadow.bias = -0.001;
+sun.shadow.camera.left = -10; sun.shadow.camera.right = 10;
+sun.shadow.camera.top  =  10; sun.shadow.camera.bottom = -10;
+sun.shadow.camera.far  = 30;
+sun.shadow.bias = -0.001;
 scene.add(sun);
 
-scene.add(Object.assign(new THREE.DirectionalLight(0x9aaeff, 0.3), {
-  position: new THREE.Vector3(-3, 4, 8)
-}));
-const roomPt = new THREE.PointLight(0xffeedd, 0.5, 12);
-roomPt.position.set(3.5, 2.1, 2.0);
+const fill = new THREE.DirectionalLight(0x8899ff, 0.4);
+fill.position.set(-4, 6, 8);
+scene.add(fill);
+
+const roomPt = new THREE.PointLight(0xfff0dd, 0.5, 14);
+roomPt.position.set(3.5, 2.2, 2.0);
 scene.add(roomPt);
 
-// ─── Materials ───────────────────────────────────────────────────────────────
+// ── Materials ─────────────────────────────────────────────────────────────────
 const M = {
-  floor:     new THREE.MeshStandardMaterial({ color: 0x9e7a4a, roughness: 0.55 }),
-  floorBal:  new THREE.MeshStandardMaterial({ color: 0x888070, roughness: 0.8 }),
-  wall:      new THREE.MeshStandardMaterial({ color: 0xf2ede4, roughness: 0.9 }),
-  wallDark:  new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.7 }),
-  glass:     new THREE.MeshStandardMaterial({ color: 0x87c8e8, transparent: true, opacity: 0.35, roughness: 0.05 }),
-  glassRail: new THREE.MeshStandardMaterial({ color: 0xaaccdd, transparent: true, opacity: 0.25, roughness: 0.05 }),
-  bath:      new THREE.MeshStandardMaterial({ color: 0xa0b8c8, roughness: 0.4 }),
-  kit:       new THREE.MeshStandardMaterial({ color: 0xc8b890, roughness: 0.6 }),
-  kitCab:    new THREE.MeshStandardMaterial({ color: 0xe8d8b0, roughness: 0.5 }),
-  metal:     new THREE.MeshStandardMaterial({ color: 0x888888, roughness: 0.3, metalness: 0.7 }),
-  bed:       new THREE.MeshStandardMaterial({ color: 0xc8a07a, roughness: 0.7 }),
-  sheet:     new THREE.MeshStandardMaterial({ color: 0xf5f0e8, roughness: 0.9 }),
-  pillow:    new THREE.MeshStandardMaterial({ color: 0xfefefe, roughness: 0.95 }),
-  sofa:      new THREE.MeshStandardMaterial({ color: 0x5e8c6a, roughness: 0.8 }),
-  sofaDark:  new THREE.MeshStandardMaterial({ color: 0x4a7055, roughness: 0.8 }),
-  desk:      new THREE.MeshStandardMaterial({ color: 0x7a5c20, roughness: 0.5 }),
-  deskLeg:   new THREE.MeshStandardMaterial({ color: 0x3a2c10, roughness: 0.4 }),
-  black:     new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.4 }),
-  sink:      new THREE.MeshStandardMaterial({ color: 0x7a9aaa, roughness: 0.3, metalness: 0.5 }),
-  bathFix:   new THREE.MeshStandardMaterial({ color: 0xd0e0e8, roughness: 0.3 }),
-  sleg:      new THREE.MeshStandardMaterial({ color: 0x333322, roughness: 0.4, metalness: 0.2 }),
+  floor:    new THREE.MeshStandardMaterial({ color:0x9e7a4a, roughness:0.6 }),
+  floorBal: new THREE.MeshStandardMaterial({ color:0x888070, roughness:0.8 }),
+  wall:     new THREE.MeshStandardMaterial({ color:0xf2ede4, roughness:0.9 }),
+  wallDark: new THREE.MeshStandardMaterial({ color:0x222222, roughness:0.7 }),
+  glass:    new THREE.MeshStandardMaterial({ color:0x87c8e8, transparent:true, opacity:0.35, roughness:0.05 }),
+  glassRl:  new THREE.MeshStandardMaterial({ color:0xaaccdd, transparent:true, opacity:0.25, roughness:0.05 }),
+  bath:     new THREE.MeshStandardMaterial({ color:0xa0b8c8, roughness:0.4 }),
+  kit:      new THREE.MeshStandardMaterial({ color:0xc8b890, roughness:0.6 }),
+  kitCab:   new THREE.MeshStandardMaterial({ color:0xe8d8b0, roughness:0.5 }),
+  metal:    new THREE.MeshStandardMaterial({ color:0x888888, roughness:0.3, metalness:0.7 }),
+  sink:     new THREE.MeshStandardMaterial({ color:0x7a9aaa, roughness:0.3, metalness:0.5 }),
+  bathFix:  new THREE.MeshStandardMaterial({ color:0xd0e0e8, roughness:0.3 }),
+  bed:      new THREE.MeshStandardMaterial({ color:0xc8a07a, roughness:0.7 }),
+  sheet:    new THREE.MeshStandardMaterial({ color:0xf5f0e8, roughness:0.9 }),
+  pillow:   new THREE.MeshStandardMaterial({ color:0xfefefe, roughness:0.95 }),
+  sofa:     new THREE.MeshStandardMaterial({ color:0x5e8c6a, roughness:0.8 }),
+  sofaDk:   new THREE.MeshStandardMaterial({ color:0x4a7055, roughness:0.8 }),
+  sleg:     new THREE.MeshStandardMaterial({ color:0x333322, roughness:0.4, metalness:0.2 }),
+  desk:     new THREE.MeshStandardMaterial({ color:0x7a5c20, roughness:0.5 }),
+  deskLeg:  new THREE.MeshStandardMaterial({ color:0x3a2c10, roughness:0.4 }),
+  black:    new THREE.MeshStandardMaterial({ color:0x111111, roughness:0.4 }),
 };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-// Add a box to the scene (static geometry)
-function sbox(w, h, d, x, y, z, mat) {
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-  m.position.set(x, y, z);
-  m.castShadow = true; m.receiveShadow = true;
+// ── Box helpers ───────────────────────────────────────────────────────────────
+function sb(w,h,d, x,y,z, mat) {  // static box → scene
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat);
+  m.position.set(x,y,z); m.castShadow=true; m.receiveShadow=true;
   scene.add(m); return m;
 }
-// Add a box to a group (local coords)
-function gbox(grp, w, h, d, x, y, z, mat) {
-  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
-  m.position.set(x, y, z);
-  m.castShadow = true; m.receiveShadow = true;
-  grp.add(m); return m;
+function gb(g, w,h,d, x,y,z, mat) {  // group box → group
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat);
+  m.position.set(x,y,z); m.castShadow=true; m.receiveShadow=true;
+  g.add(m); return m;
 }
 
-// ─── Room Constants ───────────────────────────────────────────────────────────
-const RW=6.1, RD=3.4, RH=2.4;
-const KW=1.5, KD=2.0;
-const BW=2.1, BD=2.0;
-const BAL=1.3;
-const winW = (RW - 1.8 - 0.12) / 3;
+// ── Room constants ────────────────────────────────────────────────────────────
+const RW=6.1, RD=3.4, RH=2.4;  // 실내 폭, 깊이, 높이
+const KW=1.5, KD=2.0;           // 주방 (NW)
+const BW=2.1, BD=2.0;           // 욕실 (NE)
+const BAL=1.3;                   // 발코니 깊이 (남쪽)
+const winW = (RW-1.8-0.12)/3;   // 창문 1짝 폭
 
-// ─── Static Room Geometry ────────────────────────────────────────────────────
+// ── 바닥 ──────────────────────────────────────────────────────────────────────
+sb(RW, 0.05,RD,    RW/2,   0.025, RD/2,     M.floor);
+sb(KW, 0.05,KD,    KW/2,   0.025, RD+KD/2,  M.kit);
+sb(RW, 0.05,BAL,   RW/2,   0.025, -BAL/2,   M.floorBal);
+sb(BW, 0.05,BD,    RW-BW/2,0.028, BD/2,     M.bath);
 
-// Floors
-sbox(RW,  0.05, RD,  RW/2,    0.025, RD/2,       M.floor);
-sbox(KW,  0.05, KD,  KW/2,    0.025, RD+KD/2,    M.kit);
-sbox(RW,  0.05, BAL, RW/2,    0.025, -BAL/2,     M.floorBal);
-sbox(BW,  0.05, BD,  RW-BW/2, 0.028, BD/2,       M.bath);
+// ── 천장 없음 (위에서 내려다 볼 수 있도록) ───────────────────────────────────
 
-// NO CEILING — open top so you can look in
+// ── 벽 ───────────────────────────────────────────────────────────────────────
+sb(0.15,RH,RD+KD,   0,             RH/2, (RD+KD)/2,    M.wall); // 서벽
+sb(KW,  RH,0.15,    KW/2,          RH/2, RD+KD,         M.wall); // 북벽(주방)
+sb(RW-KW,RH,0.15,   KW+(RW-KW)/2, RH/2, RD,            M.wall); // 북벽(거실)
+sb(0.15,RH,RD-BD,   RW,            RH/2, BD+(RD-BD)/2, M.wall); // 동벽(상)
+sb(0.15,RH,BD,      RW,            RH/2, BD/2,          M.bath); // 동벽(욕실)
+sb(BW,  RH,0.15,    RW-BW/2,       RH/2, BD,            M.wall); // 욕실 북벽
+sb(0.15,RH,BD*0.65, RW-BW,         RH/2, BD-BD*0.65/2, M.wall); // 욕실 서벽
+// 남벽 (창문 사이 기둥)
+sb(0.9, RH,0.15,    0.45,          RH/2, 0,  M.wall);
+sb(0.9, RH,0.15,    RW-0.45,       RH/2, 0,  M.wall);
+sb(RW-1.8,0.45,0.15,RW/2,          RH-0.225,0, M.wall); // 창문 상단
+sb(RW-1.8,0.35,0.15,RW/2,          0.175,   0, M.wall); // 창문 하단 턱
 
-// Walls
-sbox(0.15, RH, RD+KD, 0,            RH/2, (RD+KD)/2,    M.wall); // west
-sbox(KW,   RH, 0.15,  KW/2,         RH/2, RD+KD,         M.wall); // north-kitchen
-sbox(RW-KW,RH, 0.15,  KW+(RW-KW)/2, RH/2, RD,            M.wall); // north-main
-sbox(0.15, RH, RD-BD, RW,           RH/2, BD+(RD-BD)/2,  M.wall); // east-upper
-sbox(0.15, RH, BD,    RW,           RH/2, BD/2,           M.bath); // east-bath
-sbox(BW,   RH, 0.15,  RW-BW/2,      RH/2, BD,             M.wall); // bath-north
-sbox(0.15, RH, BD*0.65, RW-BW,      RH/2, BD-BD*0.65/2,  M.wall); // bath-west
-// South wall piers
-sbox(0.9,  RH, 0.15,  0.45,    RH/2, 0, M.wall);
-sbox(0.9,  RH, 0.15,  RW-0.45, RH/2, 0, M.wall);
-sbox(RW-1.8, 0.45, 0.15, RW/2, RH-0.225, 0, M.wall); // window header
-sbox(RW-1.8, 0.35, 0.15, RW/2, 0.175,    0, M.wall); // window sill
-
-// Windows
-for (let i = 0; i < 3; i++) {
+// ── 창문 (3짝) ────────────────────────────────────────────────────────────────
+for (let i=0; i<3; i++) {
   const wx = 0.9 + winW/2 + i*(winW+0.04);
-  sbox(winW, 1.6, 0.06, wx, 0.35+0.8, 0.03, M.wall);
-  const g = new THREE.Mesh(new THREE.BoxGeometry(winW-0.1, 1.4, 0.03), M.glass);
-  g.position.set(wx, 0.4+0.7, 0.02); g.receiveShadow = true; scene.add(g);
+  sb(winW,1.6,0.06, wx, 0.35+0.8, 0.03, M.wall); // 프레임
+  const gls = new THREE.Mesh(new THREE.BoxGeometry(winW-0.1,1.4,0.03), M.glass);
+  gls.position.set(wx, 0.4+0.7, 0.02); gls.receiveShadow=true; scene.add(gls);
 }
 
-// Pillar
-sbox(0.18, RH, 0.18, KW, RH/2, RD, M.wallDark);
+// ── 구조 기둥 (주방/거실 경계) ───────────────────────────────────────────────
+sb(0.18,RH,0.18, KW, RH/2, RD, M.wallDark);
 
-// Balcony railing
-sbox(RW, 0.9, 0.06, RW/2, 0.45, -BAL, M.glassRail);
-sbox(RW, 0.04, 0.06, RW/2, 0.9, -BAL, M.metal);
-for (let i=0; i<=4; i++) sbox(0.04,0.9,0.04, 0.6+i*(RW-1.2)/4, 0.45, -BAL, M.metal);
+// ── 발코니 난간 ───────────────────────────────────────────────────────────────
+sb(RW,0.9,0.06,   RW/2,0.45,-BAL,  M.glassRl);
+sb(RW,0.04,0.06,  RW/2,0.9, -BAL,  M.metal);
+for (let i=0; i<=4; i++)
+  sb(0.04,0.9,0.04, 0.6+i*(RW-1.2)/4, 0.45, -BAL, M.metal);
 
-// Kitchen
-sbox(0.65, 0.9, KD,    0.325,  0.45, RD+KD/2,     M.kit);
-sbox(KW,   0.9, 0.65,  KW/2,   0.45, RD+KD-0.325, M.kit);
-sbox(0.62, 0.04, KD,   0.32,   0.92, RD+KD/2,     M.metal);
-sbox(0.55, 0.65, KD*0.9, 0.28, 2.0,  RD+KD*0.55,  M.kitCab);
-sbox(0.55, 0.03, 0.5,  0.3,    0.935,RD+0.9,      M.metal);
-sbox(0.35, 0.06, 0.35, 0.3,    0.93, RD+1.8,      M.sink);
+// ── 주방 ─────────────────────────────────────────────────────────────────────
+sb(0.65,0.9,KD,    0.325,  0.45, RD+KD/2,     M.kit);
+sb(KW,  0.9,0.65,  KW/2,   0.45, RD+KD-0.325, M.kit);
+sb(0.62,0.04,KD,   0.32,   0.92, RD+KD/2,     M.metal);   // 카운터탑
+sb(0.55,0.65,KD*0.9,0.28,  2.0,  RD+KD*0.55,  M.kitCab);  // 상부장
+sb(0.55,0.03,0.5,  0.3,    0.935,RD+0.9,      M.metal);   // 인덕션
+sb(0.35,0.06,0.35, 0.3,    0.93, RD+1.8,      M.sink);    // 싱크
 
-// Bathroom fixtures (fixed)
-sbox(0.4, 0.75, 0.6, RW-0.25, 0.375, 1.6,     M.bath);
-sbox(0.5, 0.85, 0.4, RW-0.3,  0.425, BD-0.25, M.bathFix);
+// ── 욕실 (고정) ──────────────────────────────────────────────────────────────
+sb(0.4,0.75,0.6,  RW-0.25,0.375,1.6,     M.bath);   // 변기
+sb(0.5,0.85,0.4,  RW-0.3, 0.425,BD-0.25, M.bathFix); // 세면대
 
-// Light rays on floor (subtle)
+// ── 자연광 패턴 (바닥 광 줄기) ───────────────────────────────────────────────
 const rayMat = new THREE.MeshBasicMaterial({
-  color: 0xfff0b0, transparent: true, opacity: 0.055, side: THREE.DoubleSide
+  color:0xfff0b0, transparent:true, opacity:0.05, side:THREE.DoubleSide
 });
 const rays = [];
 for (let i=0; i<3; i++) {
   const rx = 0.9 + winW/2 + i*(winW+0.04);
-  const r = new THREE.Mesh(new THREE.BoxGeometry(winW*0.7, 0.01, 3.8), rayMat);
-  r.position.set(rx, 0.02, RD/2-0.5); scene.add(r); rays.push(r);
+  const r = new THREE.Mesh(new THREE.BoxGeometry(winW*0.7,0.01,3.8), rayMat);
+  r.position.set(rx,0.02,RD/2-0.5); scene.add(r); rays.push(r);
   const pool = new THREE.Mesh(
-    new THREE.PlaneGeometry(winW*0.7, 0.7),
-    new THREE.MeshBasicMaterial({ color:0xfff4aa, transparent:true, opacity:0.07 })
+    new THREE.PlaneGeometry(winW*0.7,0.7),
+    new THREE.MeshBasicMaterial({color:0xfff4aa,transparent:true,opacity:0.07})
   );
-  pool.rotation.x = -Math.PI/2; pool.position.set(rx, 0.03, 1.2); scene.add(pool);
+  pool.rotation.x=-Math.PI/2; pool.position.set(rx,0.03,1.2); scene.add(pool);
 }
 
-// Room dimension lines
-function dimLine(x1,y1,z1, x2,y2,z2, c=0xffdd44) {
-  const l = new THREE.Line(
-    new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x1,y1,z1),new THREE.Vector3(x2,y2,z2)]),
+// ── 치수선 ────────────────────────────────────────────────────────────────────
+function dimLine(x1,y1,z1,x2,y2,z2,c=0xffdd44) {
+  scene.add(new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(x1,y1,z1), new THREE.Vector3(x2,y2,z2)
+    ]),
     new THREE.LineBasicMaterial({color:c})
-  );
-  scene.add(l);
+  ));
 }
-dimLine(0,0.05,RD+0.35, RW,0.05,RD+0.35);
-dimLine(-0.35,0.05,0, -0.35,0.05,RD);
+dimLine(0,0.05,RD+0.4, RW,0.05,RD+0.4);
+dimLine(-0.4,0.05,0,   -0.4,0.05,RD);
 
-function makeSprite(text, color='#ffdd44', bg='rgba(0,0,20,0.75)') {
-  const c = document.createElement('canvas'); c.width=320; c.height=72;
-  const ctx = c.getContext('2d');
-  ctx.fillStyle=bg; ctx.beginPath(); ctx.roundRect(0,0,320,72,10); ctx.fill();
-  ctx.fillStyle=color; ctx.font='bold 24px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
-  ctx.fillText(text,160,36);
-  const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true}));
-  sp.scale.set(1.7,0.38,1); return sp;
+function makeSprite(text, color='#ffdd44', bg='rgba(0,0,20,0.8)') {
+  const c=document.createElement('canvas'); c.width=300; c.height=66;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle=bg;
+  if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(0,0,300,66,8); ctx.fill(); }
+  else { ctx.fillRect(0,0,300,66); }
+  ctx.fillStyle=color; ctx.font='bold 23px Arial';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(text,150,33);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true}));
+  sp.scale.set(1.6,0.35,1); return sp;
 }
-function addSprite(text,x,y,z,color) {
-  const sp=makeSprite(text,color); sp.position.set(x,y,z); scene.add(sp);
-}
-addSprite('← 6,100mm →', RW/2, 0.4, RD+0.65, '#ffdd44');
-addSprite('↕ 3,400mm',   -0.85, 0.4, RD/2,   '#ffdd44');
-addSprite('☀ 남향 창',    RW/2, 1.8, 0.35,   '#fff3a0');
+function addSp(txt,x,y,z,col) { const s=makeSprite(txt,col); s.position.set(x,y,z); scene.add(s); }
+addSp('← 6,100mm →', RW/2,0.4,RD+0.7, '#ffdd44');
+addSp('↕ 3,400mm',   -0.9, 0.4,RD/2,  '#ffdd44');
+addSp('☀ 남향 창',    RW/2,1.8, 0.35,  '#fff3a0');
 
-// ─── Furniture Groups ────────────────────────────────────────────────────────
-const draggableGroups  = [];   // THREE.Group list
-const draggableMeshes  = [];   // flat mesh list for raycasting
+// ═══════════════════════════════════════════════════════════════════
+// 가구 그룹 (드래그 가능)
+// ═══════════════════════════════════════════════════════════════════
+const draggableGroups = [];
+const draggableMeshes = [];
 
-function makeFurnitureGroup(name, px, pz) {
+function makeGroup(name, px, pz) {
   const g = new THREE.Group();
   g.userData.name = name;
   g.position.set(px, 0, pz);
-  scene.add(g);
-  draggableGroups.push(g);
+  scene.add(g); draggableGroups.push(g);
   return g;
 }
 function registerGroup(g) {
   g.traverse(c => {
-    if (c.isMesh) { c.userData.group = g; draggableMeshes.push(c); }
+    if (c.isMesh) { c.userData.group=g; draggableMeshes.push(c); }
   });
 }
-function addGroupSprite(grp, text, lx, ly, lz, color) {
-  const sp = makeSprite(text, color);
-  sp.position.set(lx, ly, lz);
-  grp.add(sp);
+function addGrpSp(grp,txt,lx,ly,lz,col) {
+  const s=makeSprite(txt,col); s.position.set(lx,ly,lz); grp.add(s);
 }
 
-// Default positions (saved for reset)
-const DEFAULTS = {};
+// 초기 위치 저장 (초기화용)
+const INIT = {};
 
-// ── QUEEN BED ────────────────────────────────────────────────────────────────
-// Group origin = floor center of 2m bed length
-const bedX0 = RW - BW - 0.85;
-const bedZ0 = RD - 0.05 - 1.0;  // headboard at RD-0.05
-const bedGrp = makeFurnitureGroup('🛏 퀸침대 (1,600×2,000mm)', bedX0, bedZ0);
-DEFAULTS.bed = { x: bedX0, z: bedZ0, ry: 0 };
+// ── 퀸침대 (1,600×2,000) ──────────────────────────────────────────
+// 그룹 원점 = 침대 바닥 XZ 중심
+const bX0=RW-BW-0.85, bZ0=RD-0.05-1.0;
+const bedG = makeGroup('🛏 퀸침대 (1,600×2,000mm)', bX0, bZ0);
+INIT.bed = {x:bX0, z:bZ0, ry:0};
 
-gbox(bedGrp, 1.6,  0.20, 2.0,  0,     0.10,  0,    M.bed);    // frame
-gbox(bedGrp, 1.5,  0.22, 1.85, 0,     0.31,  0,    M.sheet);  // mattress
-gbox(bedGrp, 1.65, 0.65, 0.10, 0,     0.52,  1.05, M.bed);    // headboard
-gbox(bedGrp, 0.65, 0.10, 0.42, -0.37, 0.44,  0.77, M.pillow); // pillow L
-gbox(bedGrp, 0.65, 0.10, 0.42,  0.37, 0.44,  0.77, M.pillow); // pillow R
-gbox(bedGrp, 1.50, 0.06, 0.80, 0,     0.44, -0.40, M.sheet);  // duvet fold
-gbox(bedGrp, 0.40, 0.60, 0.40, 0.9,   0.30,  0.70, M.deskLeg);// bedside body
-gbox(bedGrp, 0.38, 0.03, 0.38, 0.9,   0.615, 0.70, M.desk);   // bedside top
-addGroupSprite(bedGrp, '🛏 퀸침대', 0, 1.35, 0, '#ffc09f');
-registerGroup(bedGrp);
+gb(bedG,1.6,0.20,2.0,  0,    0.10, 0,    M.bed);    // 프레임
+gb(bedG,1.5,0.22,1.85, 0,    0.31, 0,    M.sheet);  // 매트리스
+gb(bedG,1.65,0.65,0.1, 0,    0.52, 1.05, M.bed);    // 헤드보드
+gb(bedG,0.65,0.1,0.42, -0.37,0.44, 0.77, M.pillow); // 베개 L
+gb(bedG,0.65,0.1,0.42,  0.37,0.44, 0.77, M.pillow); // 베개 R
+gb(bedG,1.5,0.06,0.8,  0,    0.44,-0.40, M.sheet);  // 이불
+gb(bedG,0.40,0.60,0.40, 0.9, 0.30, 0.70, M.deskLeg);// 협탁 몸체
+gb(bedG,0.38,0.03,0.38, 0.9, 0.615,0.70, M.desk);   // 협탁 상판
+addGrpSp(bedG,'🛏 퀸침대',0,1.3,0,'#ffc09f');
+registerGroup(bedG);
 
-// ── SOFA ─────────────────────────────────────────────────────────────────────
-const sfX0 = KW + (RW - BW - KW) / 2;
-const sfZ0 = RD - 0.5;
-const sofaGrp = makeFurnitureGroup('🛋 소파 (2,000mm)', sfX0, sfZ0);
-DEFAULTS.sofa = { x: sfX0, z: sfZ0, ry: 0 };
+// ── 소파 (2,000×900) ─────────────────────────────────────────────
+// 북쪽 벽 기댐, 남향 창 정면으로 앉는 배치
+const sfX0=KW+(RW-BW-KW)/2, sfZ0=RD-0.5;
+const sofaG = makeGroup('🛋 소파 (2,000mm)', sfX0, sfZ0);
+INIT.sofa = {x:sfX0, z:sfZ0, ry:0};
 
-gbox(sofaGrp, 2.0,  0.45, 0.88, 0,      0.25, 0,    M.sofa);
-gbox(sofaGrp, 2.0,  0.45, 0.14, 0,      0.65, 0.42, M.sofa);
-gbox(sofaGrp, 0.14, 0.42, 0.88, -1.0,   0.46, 0,    M.sofa);
-gbox(sofaGrp, 0.14, 0.42, 0.88,  1.0,   0.46, 0,    M.sofa);
+gb(sofaG,2.0,0.45,0.88,  0,     0.25,0,    M.sofa);
+gb(sofaG,2.0,0.45,0.14,  0,     0.65,0.42, M.sofa);   // 등받이
+gb(sofaG,0.14,0.42,0.88,-1.0,   0.46,0,    M.sofa);   // 팔걸이 L
+gb(sofaG,0.14,0.42,0.88, 1.0,   0.46,0,    M.sofa);   // 팔걸이 R
 [-0.63,0,0.63].forEach(dx => {
-  gbox(sofaGrp, 0.60, 0.12, 0.52, dx, 0.52, -0.13, M.sofaDark);
-  gbox(sofaGrp, 0.58, 0.38, 0.10, dx, 0.63,  0.35, M.sofaDark);
+  gb(sofaG,0.60,0.12,0.52,dx,0.52,-0.13,M.sofaDk); // 좌석쿠션
+  gb(sofaG,0.58,0.38,0.10,dx,0.63, 0.35,M.sofaDk); // 등쿠션
 });
-[[-0.9,-0.38],[-0.9,0.38],[0.9,-0.38],[0.9,0.38]].forEach(([dx,dz]) =>
-  gbox(sofaGrp, 0.06,0.10,0.06, dx, 0.05, dz, M.sleg)
+[[-0.9,-0.38],[-0.9,0.38],[0.9,-0.38],[0.9,0.38]].forEach(([dx,dz])=>
+  gb(sofaG,0.06,0.10,0.06,dx,0.05,dz,M.sleg)
 );
-addGroupSprite(sofaGrp, '🛋 소파 2,000mm', 0, 1.2, 0, '#9fdfb0');
-registerGroup(sofaGrp);
+addGrpSp(sofaG,'🛋 소파 2,000mm',0,1.15,0,'#9fdfb0');
+registerGroup(sofaG);
 
-// ── COFFEE TABLE ─────────────────────────────────────────────────────────────
-const ctX0 = sfX0;
-const ctZ0 = sfZ0 - 1.0;
-const ctGrp = makeFurnitureGroup('☕ 커피테이블', ctX0, ctZ0);
-DEFAULTS.ct = { x: ctX0, z: ctZ0, ry: 0 };
+// ── 커피테이블 ────────────────────────────────────────────────────
+const ctX0=sfX0, ctZ0=sfZ0-1.05;
+const ctG = makeGroup('☕ 커피테이블', ctX0, ctZ0);
+INIT.ct = {x:ctX0, z:ctZ0, ry:0};
 
-gbox(ctGrp, 1.1, 0.04, 0.55, 0, 0.38, 0, M.desk);
-[[0.48,-0.22],[0.48,0.22],[-0.48,-0.22],[-0.48,0.22]].forEach(([dx,dz]) =>
-  gbox(ctGrp, 0.05,0.38,0.05, dx, 0.19, dz, M.deskLeg)
+gb(ctG,1.1,0.04,0.55, 0,0.38,0, M.desk);
+[[0.48,-0.22],[0.48,0.22],[-0.48,-0.22],[-0.48,0.22]].forEach(([dx,dz])=>
+  gb(ctG,0.05,0.38,0.05,dx,0.19,dz,M.deskLeg)
 );
-registerGroup(ctGrp);
+registerGroup(ctG);
 
-// ── DESK ─────────────────────────────────────────────────────────────────────
-const dkX0 = 0.65;
-const dkZ0 = 1.1;
-const deskGrp = makeFurnitureGroup('💻 책상 (1,200×600mm)', dkX0, dkZ0);
-DEFAULTS.desk = { x: dkX0, z: dkZ0, ry: 0 };
+// ── 책상 (1,200×600) ─────────────────────────────────────────────
+// 서쪽 벽, 남향 창 측면 자연광
+const dkX0=0.65, dkZ0=1.1;
+const deskG = makeGroup('💻 책상 (1,200×600mm)', dkX0, dkZ0);
+INIT.desk = {x:dkX0, z:dkZ0, ry:0};
 
-gbox(deskGrp, 0.60, 0.04, 1.20, 0,     0.76, 0,    M.desk);
-[[0.24,-0.52],[0.24,0.52],[-0.24,-0.52],[-0.24,0.52]].forEach(([dx,dz]) =>
-  gbox(deskGrp, 0.05,0.76,0.05, dx, 0.38, dz, M.deskLeg)
+gb(deskG,0.60,0.04,1.20,  0,    0.76, 0,    M.desk);
+[[0.24,-0.52],[0.24,0.52],[-0.24,-0.52],[-0.24,0.52]].forEach(([dx,dz])=>
+  gb(deskG,0.05,0.76,0.05,dx,0.38,dz,M.deskLeg)
 );
-gbox(deskGrp, 0.02, 0.34, 0.54, 0.32, 0.97, 0,    M.black); // monitor
-gbox(deskGrp, 0.02, 0.06, 0.18, 0.32, 0.81, 0,    M.black); // monitor stand
-gbox(deskGrp, 0.02, 0.02, 0.35, 0.20, 0.79, 0,    M.metal); // keyboard
-// Chair
-gbox(deskGrp, 0.48, 0.04, 0.48, 0,    0.46, 0.70, M.sofaDark);
-gbox(deskGrp, 0.48, 0.48, 0.04, 0,    0.72, 0.48, M.sofaDark);
-[[0.2,-0.2],[-0.2,-0.2],[0.2,0.2],[-0.2,0.2]].forEach(([dx,dz]) =>
-  gbox(deskGrp, 0.04,0.46,0.04, dx, 0.23, 0.70+dz, M.black)
+gb(deskG,0.02,0.34,0.54,  0.32,0.97, 0,    M.black); // 모니터
+gb(deskG,0.02,0.06,0.18,  0.32,0.81, 0,    M.black); // 모니터 받침
+gb(deskG,0.02,0.02,0.35,  0.20,0.79, 0,    M.metal); // 키보드
+// 의자
+gb(deskG,0.48,0.04,0.48,  0,   0.46, 0.70, M.sofaDk);
+gb(deskG,0.48,0.48,0.04,  0,   0.72, 0.48, M.sofaDk);
+[[0.2,-0.2],[-0.2,-0.2],[0.2,0.2],[-0.2,0.2]].forEach(([dx,dz])=>
+  gb(deskG,0.04,0.46,0.04,dx,0.23,0.70+dz,M.black)
 );
-addGroupSprite(deskGrp, '💻 책상', 0, 1.2, 0, '#9fcfff');
-registerGroup(deskGrp);
+addGrpSp(deskG,'💻 책상',0,1.15,0,'#9fcfff');
+registerGroup(deskG);
 
-// ─── Selection / Highlight ───────────────────────────────────────────────────
-// Glowing plane under hovered/dragged furniture
+// ═══════════════════════════════════════════════════════════════════
+// 선택/하이라이트
+// ═══════════════════════════════════════════════════════════════════
 const hlMat = new THREE.MeshBasicMaterial({
-  color: 0x00e5ff, transparent: true, opacity: 0.18, side: THREE.DoubleSide
+  color:0x00e5ff, transparent:true, opacity:0.17, side:THREE.DoubleSide
 });
 const hlMesh = new THREE.Mesh(new THREE.PlaneGeometry(1,1), hlMat);
 hlMesh.rotation.x = -Math.PI/2;
-hlMesh.position.y = 0.062;
+hlMesh.position.y = 0.06;
 hlMesh.visible = false;
 scene.add(hlMesh);
 
-// Edge outline helper (thin lines around selected furniture)
-const edgeMat = new THREE.LineBasicMaterial({ color: 0x00e5ff });
+const edgeMat = new THREE.LineBasicMaterial({color:0x00e5ff});
 let edgeLines = null;
 
-function showHighlight(grp) {
-  if (!grp) { hlMesh.visible = false; if(edgeLines){edgeLines.visible=false;} return; }
-  const bbox = new THREE.Box3().setFromObject(grp);
-  const sz = new THREE.Vector3(); bbox.getSize(sz);
-  const ct = new THREE.Vector3(); bbox.getCenter(ct);
-  hlMesh.position.set(ct.x, 0.061, ct.z);
-  hlMesh.scale.set(sz.x + 0.12, sz.z + 0.12, 1);
+function showHL(grp) {
+  if (!grp) {
+    hlMesh.visible = false;
+    if (edgeLines) edgeLines.visible = false;
+    return;
+  }
+  const box = new THREE.Box3().setFromObject(grp);
+  const sz = new THREE.Vector3(); box.getSize(sz);
+  const ct = new THREE.Vector3(); box.getCenter(ct);
+  hlMesh.position.set(ct.x, 0.06, ct.z);
+  hlMesh.scale.set(sz.x+0.15, sz.z+0.15, 1);
   hlMesh.visible = true;
-  // Update edge outline
-  if (edgeLines) { scene.remove(edgeLines); edgeLines = null; }
-  const eg = new THREE.EdgesGeometry(new THREE.BoxGeometry(sz.x+0.08, sz.y+0.05, sz.z+0.08));
-  edgeLines = new THREE.LineSegments(eg, edgeMat);
-  edgeLines.position.copy(ct);
-  edgeLines.position.y = sz.y/2 + 0.025;
+  if (edgeLines) { scene.remove(edgeLines); edgeLines=null; }
+  edgeLines = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(sz.x+0.1, sz.y+0.06, sz.z+0.1)),
+    edgeMat
+  );
+  edgeLines.position.set(ct.x, sz.y/2+0.03, ct.z);
   scene.add(edgeLines);
 }
 
-// ─── Drag Interaction ────────────────────────────────────────────────────────
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-const dragPlane = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
-const dragOffset = new THREE.Vector3();
-const hitPt = new THREE.Vector3();
+// ═══════════════════════════════════════════════════════════════════
+// 드래그 인터랙션
+// ═══════════════════════════════════════════════════════════════════
+const rc      = new THREE.Raycaster();
+const mouse   = new THREE.Vector2();
+const floorPl = new THREE.Plane(new THREE.Vector3(0,1,0), 0);
+const dragOff = new THREE.Vector3();
+const hitPt   = new THREE.Vector3();
 
-let hoveredGrp = null;
-let dragGrp    = null;
-let selectedGrp = null;
+let hovGrp  = null;
+let dragGrp = null;
+let selGrp  = null;
 
-const selBar = document.getElementById('selected-bar');
+const selBar = document.getElementById('sel-bar');
 
-function updateMouse(e) {
+function toNDC(e) {
   mouse.set(
-    (e.clientX / window.innerWidth)  * 2 - 1,
-    -(e.clientY / window.innerHeight) * 2 + 1
+    (e.clientX/innerWidth)*2-1,
+    -(e.clientY/innerHeight)*2+1
   );
 }
-
-function pickGroup(e) {
-  updateMouse(e);
-  raycaster.setFromCamera(mouse, camera);
-  const hits = raycaster.intersectObjects(draggableMeshes, false);
-  return hits.length > 0 ? hits[0].object.userData.group : null;
+function pickGrp(e) {
+  toNDC(e);
+  rc.setFromCamera(mouse, camera);
+  const hits = rc.intersectObjects(draggableMeshes, false);
+  return hits.length ? hits[0].object.userData.group : null;
 }
 
-renderer.domElement.addEventListener('mousemove', e => {
+const cv = renderer.domElement;
+
+cv.addEventListener('mousemove', e => {
   if (dragGrp) {
-    updateMouse(e);
-    raycaster.setFromCamera(mouse, camera);
-    if (raycaster.ray.intersectPlane(dragPlane, hitPt)) {
-      dragGrp.position.x = hitPt.x + dragOffset.x;
-      dragGrp.position.z = hitPt.z + dragOffset.z;
+    toNDC(e);
+    rc.setFromCamera(mouse, camera);
+    if (rc.ray.intersectPlane(floorPl, hitPt)) {
+      dragGrp.position.x = hitPt.x + dragOff.x;
+      dragGrp.position.z = hitPt.z + dragOff.z;
     }
-    showHighlight(dragGrp);
+    showHL(dragGrp);
   } else {
-    const g = pickGroup(e);
-    hoveredGrp = g;
-    renderer.domElement.style.cursor = g ? 'grab' : 'default';
-    showHighlight(g || selectedGrp);
+    hovGrp = pickGrp(e);
+    cv.style.cursor = hovGrp ? 'grab' : 'default';
+    showHL(hovGrp || selGrp);
   }
 });
 
-renderer.domElement.addEventListener('mousedown', e => {
+cv.addEventListener('mousedown', e => {
   if (e.button !== 0) return;
-  const g = pickGroup(e);
+  const g = pickGrp(e);
   if (g) {
-    dragGrp = g;
-    selectedGrp = g;
+    dragGrp = g; selGrp = g;
     controls.enabled = false;
-    renderer.domElement.style.cursor = 'grabbing';
-    selBar.textContent = g.userData.name + ' — R키로 회전';
+    cv.style.cursor = 'grabbing';
+    selBar.textContent = g.userData.name + '  —  R 키로 90° 회전';
     selBar.style.display = 'block';
-    updateMouse(e);
-    raycaster.setFromCamera(mouse, camera);
-    raycaster.ray.intersectPlane(dragPlane, hitPt);
-    dragOffset.set(g.position.x - hitPt.x, 0, g.position.z - hitPt.z);
+    toNDC(e);
+    rc.setFromCamera(mouse, camera);
+    rc.ray.intersectPlane(floorPl, hitPt);
+    dragOff.set(g.position.x-hitPt.x, 0, g.position.z-hitPt.z);
     e.stopPropagation();
   } else {
-    selectedGrp = null;
+    selGrp = null;
     selBar.style.display = 'none';
-    showHighlight(null);
+    showHL(null);
   }
 });
 
-renderer.domElement.addEventListener('mouseup', () => {
-  if (dragGrp) {
-    dragGrp = null;
-    controls.enabled = true;
-    renderer.domElement.style.cursor = hoveredGrp ? 'grab' : 'default';
-  }
+cv.addEventListener('mouseup', () => {
+  if (dragGrp) { dragGrp=null; controls.enabled=true; cv.style.cursor=hovGrp?'grab':'default'; }
 });
 
-// R key → rotate selected furniture 90°
+// R 키 회전
 document.addEventListener('keydown', e => {
-  if ((e.key === 'r' || e.key === 'R') && selectedGrp) {
-    selectedGrp.rotation.y += Math.PI / 2;
-    showHighlight(selectedGrp);
+  if ((e.key==='r'||e.key==='R') && selGrp) {
+    selGrp.rotation.y += Math.PI/2;
+    showHL(selGrp);
   }
 });
 
-// Reset function
-function resetFurniture() {
-  const reset = (grp, d) => {
-    grp.position.x = d.x; grp.position.z = d.z;
-    grp.rotation.y  = d.ry;
-  };
-  reset(bedGrp,  DEFAULTS.bed);
-  reset(sofaGrp, DEFAULTS.sofa);
-  reset(ctGrp,   DEFAULTS.ct);
-  reset(deskGrp, DEFAULTS.desk);
-  selectedGrp = null;
-  selBar.style.display = 'none';
-  showHighlight(null);
-}
+// 초기화
+window._resetFurniture = () => {
+  const r=(g,d)=>{ g.position.x=d.x; g.position.z=d.z; g.rotation.y=d.ry; };
+  r(bedG, INIT.bed); r(sofaG,INIT.sofa); r(ctG,INIT.ct); r(deskG,INIT.desk);
+  selGrp=null; selBar.style.display='none'; showHL(null);
+};
 
-// ─── Touch support ────────────────────────────────────────────────────────────
-renderer.domElement.addEventListener('touchstart', e => {
-  if (e.touches.length === 1) {
-    const t = e.touches[0];
-    const g = pickGroup(t);
-    if (g) {
-      dragGrp = g; selectedGrp = g; controls.enabled = false;
-      selBar.textContent = g.userData.name; selBar.style.display = 'block';
-      updateMouse(t);
-      raycaster.setFromCamera(mouse, camera);
-      raycaster.ray.intersectPlane(dragPlane, hitPt);
-      dragOffset.set(g.position.x-hitPt.x, 0, g.position.z-hitPt.z);
-      e.preventDefault();
-    }
-  }
-}, { passive: false });
-
-renderer.domElement.addEventListener('touchmove', e => {
-  if (dragGrp && e.touches.length === 1) {
-    updateMouse(e.touches[0]);
-    raycaster.setFromCamera(mouse, camera);
-    if (raycaster.ray.intersectPlane(dragPlane, hitPt)) {
-      dragGrp.position.x = hitPt.x + dragOffset.x;
-      dragGrp.position.z = hitPt.z + dragOffset.z;
-    }
-    showHighlight(dragGrp);
+// 터치 지원
+cv.addEventListener('touchstart', e=>{
+  if(e.touches.length!==1) return;
+  const g=pickGrp(e.touches[0]);
+  if(g){
+    dragGrp=g; selGrp=g; controls.enabled=false;
+    selBar.textContent=g.userData.name; selBar.style.display='block';
+    toNDC(e.touches[0]);
+    rc.setFromCamera(mouse,camera); rc.ray.intersectPlane(floorPl,hitPt);
+    dragOff.set(g.position.x-hitPt.x,0,g.position.z-hitPt.z);
     e.preventDefault();
   }
-}, { passive: false });
+},{passive:false});
+cv.addEventListener('touchmove',e=>{
+  if(dragGrp&&e.touches.length===1){
+    toNDC(e.touches[0]); rc.setFromCamera(mouse,camera);
+    if(rc.ray.intersectPlane(floorPl,hitPt)){
+      dragGrp.position.x=hitPt.x+dragOff.x;
+      dragGrp.position.z=hitPt.z+dragOff.z;
+    }
+    showHL(dragGrp); e.preventDefault();
+  }
+},{passive:false});
+cv.addEventListener('touchend',()=>{ if(dragGrp){dragGrp=null;controls.enabled=true;} });
 
-renderer.domElement.addEventListener('touchend', () => {
-  if (dragGrp) { dragGrp = null; controls.enabled = true; }
-});
-
-// ─── Animate ─────────────────────────────────────────────────────────────────
-let t = 0;
-function animate() {
+// ── 애니메이션 루프 ───────────────────────────────────────────────────────────
+let t=0;
+(function animate() {
   requestAnimationFrame(animate);
-  t += 0.005;
-  rayMat.opacity = 0.04 + Math.sin(t) * 0.015;
-  if (edgeLines && (dragGrp || selectedGrp)) {
-    const grp = dragGrp || selectedGrp;
-    const bbox = new THREE.Box3().setFromObject(grp);
-    const ct = new THREE.Vector3(); bbox.getCenter(ct);
-    edgeLines.position.copy(ct);
+  t+=0.005;
+  rayMat.opacity = 0.035 + Math.sin(t)*0.015;
+  if (edgeLines && (dragGrp||selGrp)) {
+    const g=dragGrp||selGrp;
+    const box=new THREE.Box3().setFromObject(g);
+    const ct=new THREE.Vector3(); box.getCenter(ct);
+    edgeLines.position.set(ct.x, edgeLines.position.y, ct.z);
   }
   controls.update();
   renderer.render(scene, camera);
-}
+})();
 
-window.addEventListener('resize', () => {
-  const w=window.innerWidth, h=window.innerHeight;
+window.addEventListener('resize',()=>{
+  const w=innerWidth,h=innerHeight;
   camera.aspect=w/h; camera.updateProjectionMatrix();
   renderer.setSize(w,h);
 });
 
-animate();
 </script>
 </body>
 </html>
