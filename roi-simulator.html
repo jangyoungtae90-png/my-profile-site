@@ -283,6 +283,12 @@
                         </div>
                     </details>
                 </div>
+
+                <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2" data-i18n="logic"></p>
+                    <p id="archLogic"></p>
+                </div>
             </div>
         </div>
     </section>
@@ -395,7 +401,7 @@
                 <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
                     <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
                     <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2" data-i18n="logic"></p>
-                    <p data-i18n-html="intelLogic"></p>
+                    <p id="intelLogic"></p>
                 </div>
             </div>
         </div>
@@ -494,10 +500,32 @@
                     </div>
                 </div>
 
+                <div class="widget card p-5" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-3" data-i18n="extraTitle"></p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div class="mini-card mc-green">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="cmsTitle"></p>
+                            <p class="text-xl font-bold mt-1 v-green">+$18,000</p>
+                            <p class="text-[10px] text-gray-400" data-i18n="cmsNote"></p>
+                        </div>
+                        <div class="mini-card mc-pri">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="greyTitle"></p>
+                            <p class="text-xl font-bold mt-1 v-pri">+$2,000</p>
+                            <p class="text-[10px] text-gray-400" data-i18n="greyNote"></p>
+                        </div>
+                        <div class="mini-card mc-deep">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="resizeTitle"></p>
+                            <p class="text-xl font-bold mt-1 v-deep">$10K~$80K</p>
+                            <p class="text-[10px] text-gray-400" data-i18n="resizeNote"></p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
                     <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
                     <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2" data-i18n="logic"></p>
-                    <p data-i18n-html="revLogic"></p>
+                    <p id="revLogic"></p>
                 </div>
             </div>
         </div>
@@ -539,17 +567,19 @@ const I18N = {
     aCapex: 'A. 카메라 CAPEX', bCapex: 'B. 센서 결합형 CAPEX', bAdv: 'B안 우위',
     aShort: 'A. 카메라 단독', bShort: 'B. 센서 결합형',
     logic: '로직 요약',
-    intelLogic: 'A안(카메라 단독)은 결품을 감지하기까지의 지연과 보충 작업 시간만큼 재고 공백이 생깁니다.<br>B안(UWB + 엣지 카메라 + 로드셀)은 무게 변화로 결품을 먼저 감지하고 보충 동선을 줄여 공백을 단축합니다.<br>5년 TCO = CAPEX + 5 × (결품 손실 + 보충 인력 비용), 매대 수에 비례해 확장.',
     popDensity: '전자종이 POP 밀도 (대/10,000㎡)', adRate: '광고 구좌 단가 ($/일)', opDays: '연간 영업일',
     slotsPerPop: 'POP당 광고 구좌 수', hiPop: '고효율 POP', stdPop: '일반 POP',
     capexUnit: 'CAPEX 단가 ($, 예시)', popUnit: '전자종이 POP/대', apInfra: 'AP 인프라 합계',
     apInfraNote: '예시: HaLow AP 2대 × ($450 + $300)',
     hiSlots: '고효율 POP 광고 구좌', slotsDay: '구좌 / 일', hiAnnual: '고효율 POP 연 매출', stdAnnual: '일반 POP 연 매출',
     netDiff: '5년 Net Value 차이', netChart: '5년 Net Value (누적 광고 매출 − CAPEX)', net5: '5년 Net Value',
-    revLogic: '배터리 효율이 높은 POP는 콘텐츠를 더 자주 바꿀 수 있어 POP당 광고 구좌가 늘어납니다.<br>연 매출 = POP 수 × 구좌 수 × 구좌 단가 × 영업일. 5년 Net Value = 5 × 연 매출 − CAPEX(AP 인프라 + POP).',
     labelYear: '연 매출', label5y: '5년 누적', labelNet: 'Net Value',
     cum: '누적', oos5: '결품 손실 (5년)', labor5: '보충 인력 (5년)', opex5: 'OPEX (5년)',
     footer: '포트폴리오 데모 · 장영태(Terry) · Claude Code로 개발 · 모든 수치는 예시 가정값',
+    extraTitle: '추가 고려 가치 (예시)',
+    cmsTitle: '통합 CMS 절감 (연)', cmsNote: '3개 CMS 분리 운영 대비 (예시)',
+    greyTitle: '음영 구역 CAPEX 회피', greyNote: 'HaLow 채택 시 음영 구역 추가 장비 불필요 (예시)',
+    resizeTitle: '규격 OPEX 회피', resizeNote: '비표준 규격 콘텐츠 리사이징 비용 (예시)',
     dragHint: '드래그하여 이동', custom: '직접 입력'
   },
   en: {
@@ -576,17 +606,19 @@ const I18N = {
     aCapex: 'A. Camera CAPEX', bCapex: 'B. Sensor fusion CAPEX', bAdv: 'Option B advantage',
     aShort: 'A. Camera only', bShort: 'B. Sensor fusion',
     logic: 'Logic',
-    intelLogic: 'Option A (camera only) leaves a stock gap for as long as detection delay plus replenishment time.<br>Option B (UWB + edge camera + load cell) detects out-of-stock early from weight changes and shortens the replenishment route.<br>5-yr TCO = CAPEX + 5 × (OOS loss + replenishment labor), scaled by shelf count.',
     popDensity: 'E-paper POP density (units / 10,000㎡)', adRate: 'Ad slot rate ($/day)', opDays: 'Operating days / yr',
     slotsPerPop: 'Ad slots per POP', hiPop: 'High-efficiency POP', stdPop: 'Standard POP',
     capexUnit: 'CAPEX unit cost ($, illustrative)', popUnit: 'E-paper POP / unit', apInfra: 'AP infrastructure total',
     apInfraNote: 'Example: 2 HaLow APs × ($450 + $300)',
     hiSlots: 'High-efficiency ad slots', slotsDay: 'slots / day', hiAnnual: 'High-efficiency annual revenue', stdAnnual: 'Standard annual revenue',
     netDiff: '5-yr Net Value gap', netChart: '5-yr Net Value (cumulative ad revenue − CAPEX)', net5: '5-yr Net Value',
-    revLogic: 'A more battery-efficient POP can refresh content more often, so each POP carries more ad slots.<br>Annual revenue = POPs × slots × slot rate × operating days. 5-yr Net Value = 5 × annual revenue − CAPEX (AP infrastructure + POPs).',
     labelYear: 'Annual', label5y: '5-yr total', labelNet: 'Net Value',
     cum: 'cumulative', oos5: 'OOS loss (5 yr)', labor5: 'Replenishment labor (5 yr)', opex5: 'OPEX (5 yr)',
     footer: 'Portfolio demo · Youngtae (Terry) Jang · Built with Claude Code · All figures are illustrative',
+    extraTitle: 'Additional value (illustrative)',
+    cmsTitle: 'Unified CMS savings / yr', cmsNote: 'vs. running 3 separate CMSs (illustrative)',
+    greyTitle: 'Dead-zone CAPEX avoided', greyNote: 'No extra devices for coverage gaps with HaLow (illustrative)',
+    resizeTitle: 'Format OPEX avoided', resizeNote: 'Resizing content for non-standard sizes (illustrative)',
     dragHint: 'Drag to reorder', custom: 'Custom'
   }
 };
@@ -768,7 +800,42 @@ function renderRev() {
         {label:t('stdPop'),data:[r.normAnnual,r.normAnnual*5,r.normNet5],backgroundColor:[C.p1,'#cfe9f0',C.p2],borderRadius:4,maxBarThickness:60}
     ]},options:revBarOpts});
 }
-function render() { renderArch(); renderIntel(); renderRev(); }
+/* ── Logic summaries (live values) ─────────────── */
+const b_ = x => `<span class="v-pri font-semibold">${x}</span>`;
+const LOGIC = {
+  ko: {
+    arch: v => `BLE AP 수 = 면적 ${b_(v.area)}㎡ ÷ 1,000 × 밀도 ${b_(v.bd)}대 (올림) → ${b_(v.bleAps+'대')}<br>
+      HaLow AP 수 = 10,000㎡당 ${b_(v.hb)}대 × 면적 비례 (올림) → ${b_(v.halowAps+'대')}<br>
+      5년 TCO = AP 대수 × (HW + 설치) + 5 × AP 대수 × 연 유지보수. 커버리지가 넓을수록 장비 대수가 줄고, 대수에 비례하던 설치·유지보수 인건비도 함께 줄어듭니다.`,
+    intel: v => `A안(카메라 단독): 결품 감지 지연 약 30분 + 보충 약 20분 = 약 ${b_('50분')} 재고 공백 (예시)<br>
+      B안(UWB + 엣지 카메라 + 로드셀): 로드셀 약 10분 주기 선제 감지 + UWB 동선 최적화 = 약 ${b_('10분')} 공백 (예시)<br>
+      공백 시간의 차이가 매대당 연 결품 손실 ${b_(v.aOOS)} vs ${b_(v.bOOS)}, 보충 인력 비용 ${b_(v.aL)} vs ${b_(v.bL)}의 차이로 이어지고, 매대 ${b_(v.shelves+'개')}에 비례해 커집니다.<br>
+      5년 TCO = CAPEX + 5 × (결품 손실 + 보충 인력 비용).`,
+    rev: v => `배터리 수명이 경쟁 제품보다 약 30% 길면(예시) 같은 기간에 콘텐츠를 더 자주 갱신할 수 있어 POP당 광고 구좌가 늘어납니다 (${b_(v.ss)} vs ${b_(v.ns)}).<br>
+      연 매출 = POP ${b_(v.pops+'대')} × 구좌 수 × ${b_(v.rate)}/일 × ${b_(v.days+'일')}<br>
+      5년 Net Value = 5 × 연 매출 − CAPEX(AP 인프라 + POP). 추가 고려 가치는 계산에 포함하지 않은 별도 예시값입니다.`
+  },
+  en: {
+    arch: v => `BLE APs = area ${b_(v.area)}㎡ ÷ 1,000 × density ${b_(v.bd)} (rounded up) → ${b_(v.bleAps)}<br>
+      HaLow APs = ${b_(v.hb)} per 10,000㎡, scaled by area (rounded up) → ${b_(v.halowAps)}<br>
+      5-yr TCO = APs × (HW + install) + 5 × APs × annual maintenance. Wider coverage means fewer devices, so install and maintenance labor that scales with device count falls too.`,
+    intel: v => `Option A (camera only): detection delay ~30 min + replenishment ~20 min = ~${b_('50 min')} stock gap (illustrative)<br>
+      Option B (UWB + edge camera + load cell): load-cell check every ~10 min + UWB route optimization = ~${b_('10 min')} gap (illustrative)<br>
+      The gap difference drives per-shelf annual OOS loss ${b_(v.aOOS)} vs ${b_(v.bOOS)} and replenishment labor ${b_(v.aL)} vs ${b_(v.bL)}, scaled by ${b_(v.shelves)} shelves.<br>
+      5-yr TCO = CAPEX + 5 × (OOS loss + replenishment labor).`,
+    rev: v => `If battery life is ~30% longer than a competing product (illustrative), content can be refreshed more often, so each POP carries more ad slots (${b_(v.ss)} vs ${b_(v.ns)}).<br>
+      Annual revenue = ${b_(v.pops)} POPs × slots × ${b_(v.rate)}/day × ${b_(v.days)} days<br>
+      5-yr Net Value = 5 × annual revenue − CAPEX (AP infrastructure + POPs). Additional value cards are separate illustrative figures, not part of this calculation.`
+  }
+};
+function renderLogic() {
+  const L = LOGIC[lang] || LOGIC.ko;
+  const a = calcArch(state.area), i = calcIntel(state.area), r = calcRev(state.area);
+  document.getElementById('archLogic').innerHTML = L.arch({area: state.area.toLocaleString(), bd: num('bleDensity').toFixed(1), hb: num('halowAps'), bleAps: a.bleAps, halowAps: a.halowAps});
+  document.getElementById('intelLogic').innerHTML = L.intel({aOOS: fmt(num('camOOS')), bOOS: fmt(num('solOOS')), aL: fmt(num('camLabor')), bL: fmt(num('solLabor')), shelves: i.shelves});
+  document.getElementById('revLogic').innerHTML = L.rev({ss: num('solSlots'), ns: num('normSlots'), pops: r.pops, rate: '$'+num('adRate').toFixed(2), days: num('opDays')});
+}
+function render() { renderArch(); renderIntel(); renderRev(); renderLogic(); }
 
 function syncLabels() {
     document.getElementById('bleDensityVal').textContent  = num('bleDensity').toFixed(1);
