@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retail Tech ROI Simulator — Portfolio Demo</title>
+    <meta name="description" content="Store-size based 5-year TCO and revenue simulator (portfolio demo with illustrative assumptions).">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep:    #0f2a3d;
+            --primary: #0e7490;
+            --mid:     #0891b2;
+            --light:   #e0f2f7;
+            --bg:      #f4f7f9;
+        }
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background: var(--bg); color: #14202b; }
+
+        .brand { font-weight: 800; font-size: 1.15rem; letter-spacing: 0.02em; color: var(--deep); }
+
+        .hero-card {
+            background: linear-gradient(135deg, var(--deep) 0%, #134e64 60%, var(--primary) 100%);
+            border-radius: 24px; color: white; position: relative; overflow: hidden;
+        }
+        .hero-card::before {
+            content: ''; position: absolute; top: -60px; right: -60px;
+            width: 220px; height: 220px; background: rgba(255,255,255,0.06); border-radius: 50%;
+        }
+
+        .card { background: #ffffff; border-radius: 20px; box-shadow: 0 2px 20px rgba(15, 42, 61, 0.07); }
+
+        .tab-btn { border-radius: 12px; transition: all 0.2s ease; color: #64748b; font-weight: 500; white-space: nowrap; }
+        .tab-btn.active { background: var(--deep); color: white; }
+
+        input[type=range] {
+            -webkit-appearance: none; width: 100%; height: 5px;
+            background: #dbe7ec; border-radius: 4px; outline: none;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 18px; height: 18px;
+            background: var(--primary); border-radius: 50%; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(14, 116, 144, 0.35);
+        }
+        input[type=range]::-moz-range-thumb {
+            width: 18px; height: 18px; background: var(--primary); border-radius: 50%; cursor: pointer; border: 0;
+        }
+        input[type=number] {
+            background: #f6fafb; border: 1.5px solid #dbe7ec; color: #14202b;
+            border-radius: 10px; padding: 6px 10px; width: 100%; font-size: 13px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input[type=number]:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(14,116,144,0.12); }
+
+        .v-pri   { color: var(--primary); }
+        .v-deep  { color: var(--deep); }
+        .v-green { color: #059669; }
+        .v-red   { color: #dc2626; }
+
+        .mini-card { border-radius: 16px; padding: 16px; }
+        .mc-pri   { background: #e6f4f8; }
+        .mc-green { background: #ecfdf5; }
+        .mc-red   { background: #fef2f2; }
+        .mc-deep  { background: #e8eef2; }
+        .mc-gray  { background: #f8fafc; }
+
+        .widget { position: relative; }
+        .drag-handle {
+            position: absolute; top: 14px; right: 14px; width: 28px; height: 28px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: grab; color: #a9c3cd; font-size: 18px; opacity: 0; transition: opacity 0.2s;
+            user-select: none; z-index: 10; border-radius: 8px;
+        }
+        .drag-handle:hover { background: #e6f4f8; color: var(--primary); }
+        .widget:hover .drag-handle { opacity: 1; }
+        .widget.dragging { opacity: 0.35; }
+        .widget.drag-over { outline: 2px dashed var(--primary); outline-offset: 3px; border-radius: 20px; }
+
+        details > summary { list-style: none; cursor: pointer; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] .chevron { transform: rotate(90deg); }
+        .chevron { transition: transform 0.2s ease; display: inline-block; }
+
+        .hero-right-panel { background: rgba(230, 244, 248, 0.94); border-radius: 16px; padding: 20px 22px; }
+        .hero-slider-light {
+            -webkit-appearance: none; width: 100%; height: 6px; border-radius: 99px; outline: none; cursor: pointer;
+            background: linear-gradient(to right, var(--mid) 0%, var(--mid) var(--pct, 50%), #c5e4ec var(--pct, 50%), #c5e4ec 100%);
+        }
+        .hero-slider-light::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 20px; height: 20px; background: var(--deep);
+            border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 5px rgba(14, 116, 144, 0.22);
+        }
+        .hero-slider-light::-moz-range-thumb {
+            width: 20px; height: 20px; background: var(--deep); border-radius: 50%; border: 0; cursor: pointer;
+        }
+        .hero-select-light {
+            background: rgba(255,255,255,0.9); border: 1.5px solid #9fd0dc; color: var(--deep);
+            border-radius: 12px; padding: 8px 36px 8px 14px; font-size: 13px; font-weight: 500;
+            width: 100%; cursor: pointer; outline: none; appearance: none; -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%230e7490' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center; background-size: 14px;
+        }
+
+        .lang-toggle { display: inline-flex; background: #e8eef2; border-radius: 999px; padding: 3px; }
+        .lang-toggle button {
+            border-radius: 999px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: #557080;
+            transition: all 0.2s;
+        }
+        .lang-toggle button.active { background: var(--deep); color: white; }
+
+        .disclaimer {
+            background: #fff8e6; border: 1px solid #f5dfa0; color: #7a5a00;
+            border-radius: 14px; padding: 10px 14px; font-size: 12px; line-height: 1.5;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+<header class="bg-white sticky top-0 z-40" style="border-bottom: 1px solid #e3ecf0;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+        <div>
+            <div class="brand">Retail Tech ROI Simulator</div>
+            <div class="text-[10px] text-gray-400 uppercase tracking-widest mt-0.5" data-i18n="headerSub">Portfolio Demo</div>
+        </div>
+        <div class="lang-toggle" role="group" aria-label="Language">
+            <button type="button" data-lang="ko" class="active">한국어</button>
+            <button type="button" data-lang="en">EN</button>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+
+    <p class="disclaimer mb-5" data-i18n="disclaimer"></p>
+
+    <section class="hero-card p-6 sm:p-8 mb-6 grid grid-cols-1 md:grid-cols-2 gap-6 relative z-0">
+        <div class="relative">
+            <span class="inline-block bg-white text-gray-800 rounded-full px-4 py-1 text-xs font-semibold mb-4">ESL &amp; IoT · Retail Tech</span>
+            <h1 class="text-2xl sm:text-3xl font-bold leading-tight mb-2">Retail Tech<br>ROI Simulator</h1>
+            <p class="text-sm text-white/70" data-i18n="heroDesc"></p>
+            <p class="text-xs text-white/50 mt-2">Architecture · Intelligence · Revenue</p>
+        </div>
+        <div class="hero-right-panel grid grid-cols-1 sm:grid-cols-2 gap-5 relative">
+            <div>
+                <label for="areaSlider" class="text-xs font-semibold uppercase tracking-widest" style="color:var(--primary)" data-i18n="storeArea"></label>
+                <div class="mt-3">
+                    <input type="range" id="areaSlider" class="hero-slider-light" min="300" max="25000" step="100" value="10000">
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                    <input type="number" id="areaInput" min="100" max="50000" step="100" value="10000"
+                        style="background:rgba(255,255,255,0.9);border:1.5px solid #9fd0dc;color:var(--deep);border-radius:10px;padding:6px 12px;width:110px;font-size:14px;font-weight:600;">
+                    <span class="text-xs font-medium" style="color:var(--primary)">㎡</span>
+                </div>
+            </div>
+            <div class="flex flex-col justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-widest mb-2" style="color:var(--primary)" data-i18n="storePreset"></p>
+                    <select id="presetSelect" class="hero-select-light" aria-label="Store preset"></select>
+                    <p class="text-[10px] mt-2" style="color:var(--primary)" data-i18n="presetNote"></p>
+                </div>
+                <p class="text-[10px] mt-4" style="color:var(--primary)" data-i18n="heroAnalysis"></p>
+            </div>
+        </div>
+    </section>
+
+    <nav class="flex gap-1 mb-6 bg-white p-1.5 rounded-2xl shadow-sm w-full sm:w-fit overflow-x-auto" style="border:1px solid #e3ecf0;">
+        <button data-tab="arch"  class="tab-btn active px-5 py-2 text-sm">01 / Architecture</button>
+        <button data-tab="intel" class="tab-btn px-5 py-2 text-sm">02 / Intelligence</button>
+        <button data-tab="rev"   class="tab-btn px-5 py-2 text-sm">03 / Revenue</button>
+    </nav>
+
+    <!-- ═══════════ ARCHITECTURE ═══════════ -->
+    <section id="tab-arch" class="tab-panel">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="card p-5 lg:col-span-1">
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1" data-i18n="params"></h3>
+                <p class="text-[11px] text-gray-400 mb-4" data-i18n="archIntro"></p>
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-500" data-i18n="bleDensity"></span>
+                            <span id="bleDensityVal" class="v-pri font-semibold">2.5</span>
+                        </div>
+                        <input type="range" id="bleDensity" min="1" max="5" step="0.1" value="2.5">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-500" data-i18n="halowAps"></span>
+                            <span id="halowApsVal" class="v-pri font-semibold">2</span>
+                        </div>
+                        <input type="range" id="halowAps" min="1" max="6" step="1" value="2">
+                    </div>
+                    <div class="border-t border-gray-100 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-400" data-i18n="bleCost"></h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block"><span class="text-[10px] text-gray-400">HW</span><input type="number" id="bleHw" value="250" step="10"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="install"></span><input type="number" id="bleInstall" value="300" step="10"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="maintYr"></span><input type="number" id="bleMaint" value="300" step="10"></label>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-100 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-400" data-i18n="halowCost"></h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block"><span class="text-[10px] text-gray-400">HW</span><input type="number" id="halowHw" value="450" step="10"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="install"></span><input type="number" id="halowInstall" value="300" step="10"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="maintYr"></span><input type="number" id="halowMaint" value="300" step="10"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="arch-widgets" class="lg:col-span-2 space-y-5">
+                <div class="widget card p-5" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="mini-card mc-deep">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">HaLow AP</p>
+                            <p class="text-2xl font-bold mt-1 v-deep" id="archHalowAps">—</p>
+                            <p class="text-[10px] text-gray-400" data-i18n="units"></p>
+                        </div>
+                        <div class="mini-card mc-red">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">BLE AP</p>
+                            <p class="text-2xl font-bold mt-1 v-red" id="archBleAps">—</p>
+                            <p class="text-[10px] text-gray-400" data-i18n="units"></p>
+                        </div>
+                        <div class="mini-card mc-green">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="saving5"></p>
+                            <p class="text-2xl font-bold mt-1 v-green" id="archSaving">—</p>
+                            <p class="text-[10px] text-gray-400" data-i18n="halowAdv"></p>
+                        </div>
+                        <div class="mini-card mc-pri">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="savingPct"></p>
+                            <p class="text-2xl font-bold mt-1 v-pri" id="archSavingPct">—</p>
+                            <p class="text-[10px] text-gray-400">vs BLE</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3">HaLow</h3>
+                        <div class="h-48 flex-1"><canvas id="halowBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold v-deep" id="halowTcoDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400" data-i18n="tco5"></p>
+                    </div>
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3">BLE</h3>
+                        <div class="h-48 flex-1"><canvas id="bleBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold v-deep" id="bleTcoDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400" data-i18n="tco5"></p>
+                    </div>
+                </div>
+
+                <div class="widget card p-5" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4" data-i18n="cumTco"></h3>
+                    <div class="h-64"><canvas id="archLineChart"></canvas></div>
+                </div>
+
+                <div class="widget card p-5" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <details open>
+                        <summary class="flex items-center justify-between">
+                            <h3 class="text-sm font-semibold text-gray-700" data-i18n="matrix"></h3>
+                            <span class="chevron text-gray-300 text-xs">▶</span>
+                        </summary>
+                        <div class="overflow-x-auto mt-4">
+                            <table class="w-full text-sm">
+                                <thead><tr class="text-left text-[11px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                    <th class="py-2 pr-3" data-i18n="thStore"></th>
+                                    <th class="py-2 px-3 text-right" data-i18n="thArea"></th>
+                                    <th class="py-2 px-3 text-right">BLE AP</th>
+                                    <th class="py-2 px-3 text-right">HaLow AP</th>
+                                    <th class="py-2 px-3 text-right">BLE TCO</th>
+                                    <th class="py-2 px-3 text-right">HaLow TCO</th>
+                                    <th class="py-2 pl-3 text-right" data-i18n="thSaving"></th>
+                                </tr></thead>
+                                <tbody id="archStoreTable"></tbody>
+                            </table>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ INTELLIGENCE ═══════════ -->
+    <section id="tab-intel" class="tab-panel hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="card p-5 lg:col-span-1">
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1" data-i18n="params"></h3>
+                <p class="text-[11px] text-gray-400 mb-4" data-i18n="intelIntro"></p>
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-500" data-i18n="shelfDensity"></span>
+                            <span id="shelfDensityVal" class="v-pri font-semibold">100</span>
+                        </div>
+                        <input type="range" id="shelfDensity" min="50" max="300" step="10" value="100">
+                    </div>
+                    <div class="border-t border-gray-100 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-400" data-i18n="optA"></h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="camHw"></span><input type="number" id="camHw" value="1500" step="50"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="oosYr"></span><input type="number" id="camOOS" value="1000" step="50"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="laborYr"></span><input type="number" id="camLabor" value="200" step="10"></label>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-100 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-400" data-i18n="optB"></h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="uwb"></span><input type="number" id="solUwb" value="120" step="10"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="edgeCam"></span><input type="number" id="solEye" value="80" step="5"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="loadCell"></span><input type="number" id="solLoad" value="15" step="1"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="oosYr"></span><input type="number" id="solOOS" value="350" step="10"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="laborYr"></span><input type="number" id="solLabor" value="60" step="5"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="intel-widgets" class="lg:col-span-2 space-y-5">
+                <div class="widget card p-5" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="mini-card mc-red">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="aCapex"></p>
+                            <p class="text-2xl font-bold mt-1 v-red" id="intelACapex">—</p>
+                        </div>
+                        <div class="mini-card mc-pri">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="bCapex"></p>
+                            <p class="text-2xl font-bold mt-1 v-pri" id="intelBCapex">—</p>
+                        </div>
+                        <div class="mini-card mc-green">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="saving5"></p>
+                            <p class="text-2xl font-bold mt-1 v-green" id="intelSaving">—</p>
+                            <p class="text-[10px] text-gray-400" data-i18n="bAdv"></p>
+                        </div>
+                        <div class="mini-card mc-deep">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="savingPct"></p>
+                            <p class="text-2xl font-bold mt-1 v-deep" id="intelSavingPct">—</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3" data-i18n="aShort"></h3>
+                        <div class="h-52 flex-1"><canvas id="cameraBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold v-deep" id="cameraTcoDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400" data-i18n="tco5"></p>
+                    </div>
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3" data-i18n="bShort"></h3>
+                        <div class="h-52 flex-1"><canvas id="solumBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold v-deep" id="solumTcoDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400" data-i18n="tco5"></p>
+                    </div>
+                </div>
+
+                <div class="widget card p-5" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4" data-i18n="cumTco"></h3>
+                    <div class="h-64"><canvas id="intelLineChart"></canvas></div>
+                </div>
+
+                <div class="widget card p-5" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <details open>
+                        <summary class="flex items-center justify-between">
+                            <h3 class="text-sm font-semibold text-gray-700" data-i18n="matrix"></h3>
+                            <span class="chevron text-gray-300 text-xs">▶</span>
+                        </summary>
+                        <div class="overflow-x-auto mt-4">
+                            <table class="w-full text-sm">
+                                <thead><tr class="text-left text-[11px] uppercase tracking-widest text-gray-400 border-b border-gray-100">
+                                    <th class="py-2 pr-3" data-i18n="thStore"></th>
+                                    <th class="py-2 px-3 text-right" data-i18n="thArea"></th>
+                                    <th class="py-2 px-3 text-right" data-i18n="thShelves"></th>
+                                    <th class="py-2 px-3 text-right" data-i18n="aShort"></th>
+                                    <th class="py-2 px-3 text-right" data-i18n="bShort"></th>
+                                    <th class="py-2 pl-3 text-right" data-i18n="thSaving"></th>
+                                </tr></thead>
+                                <tbody id="intelStoreTable"></tbody>
+                            </table>
+                        </div>
+                    </details>
+                </div>
+
+                <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2" data-i18n="logic"></p>
+                    <p data-i18n-html="intelLogic"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══════════ REVENUE ═══════════ -->
+    <section id="tab-rev" class="tab-panel hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="card p-5 lg:col-span-1">
+                <h3 class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1" data-i18n="params"></h3>
+                <p class="text-[11px] text-gray-400 mb-4" data-i18n="revIntro"></p>
+                <div class="space-y-5">
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-500" data-i18n="popDensity"></span>
+                            <span id="popDensityVal" class="v-pri font-semibold">30</span>
+                        </div>
+                        <input type="range" id="popDensity" min="10" max="200" step="10" value="30">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-500" data-i18n="adRate"></span>
+                            <span id="adRateVal" class="v-pri font-semibold">$1.00</span>
+                        </div>
+                        <input type="range" id="adRate" min="0.5" max="2" step="0.05" value="1">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs mb-1">
+                            <span class="text-gray-500" data-i18n="opDays"></span>
+                            <span id="opDaysVal" class="v-pri font-semibold">300</span>
+                        </div>
+                        <input type="range" id="opDays" min="240" max="365" step="5" value="300">
+                    </div>
+                    <div class="border-t border-gray-100 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-400" data-i18n="slotsPerPop"></h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="hiPop"></span><input type="number" id="solSlots" value="4" step="1"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="stdPop"></span><input type="number" id="normSlots" value="3" step="1"></label>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-100 pt-4 space-y-3">
+                        <h4 class="text-[11px] uppercase tracking-widest text-gray-400" data-i18n="capexUnit"></h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="popUnit"></span><input type="number" id="popPrice" value="650" step="50"></label>
+                            <label class="block"><span class="text-[10px] text-gray-400" data-i18n="apInfra"></span><input type="number" id="apInfra" value="1500" step="100"></label>
+                        </div>
+                        <p class="text-[10px] text-gray-400" data-i18n="apInfraNote"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="rev-widgets" class="lg:col-span-2 space-y-5">
+                <div class="widget card p-5" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="mini-card mc-pri">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="hiSlots"></p>
+                            <p class="text-2xl font-bold mt-1 v-pri" id="revSolSlots">—</p>
+                            <p class="text-[10px] text-gray-400" data-i18n="slotsDay"></p>
+                        </div>
+                        <div class="mini-card mc-green">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="hiAnnual"></p>
+                            <p class="text-2xl font-bold mt-1 v-green" id="revSolAnnual">—</p>
+                        </div>
+                        <div class="mini-card mc-gray">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="stdAnnual"></p>
+                            <p class="text-2xl font-bold mt-1 text-gray-500" id="revNormAnnual">—</p>
+                        </div>
+                        <div class="mini-card mc-deep">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest" data-i18n="netDiff"></p>
+                            <p class="text-2xl font-bold mt-1 v-deep" id="revNetDiff">—</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget card p-5" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4" data-i18n="netChart"></h3>
+                    <div class="h-64"><canvas id="revLineChart"></canvas></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3" data-i18n="hiPop"></h3>
+                        <div class="h-48 flex-1"><canvas id="solumRevBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold v-deep" id="solumNetDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400" data-i18n="net5"></p>
+                    </div>
+                    <div class="widget card p-5 flex flex-col" draggable="true">
+                        <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                        <h3 class="text-sm font-semibold text-center text-gray-700 mb-3" data-i18n="stdPop"></h3>
+                        <div class="h-48 flex-1"><canvas id="normRevBarChart"></canvas></div>
+                        <p class="text-center mt-3 text-xl font-bold v-deep" id="normNetDisplay">—</p>
+                        <p class="text-center text-xs text-gray-400" data-i18n="net5"></p>
+                    </div>
+                </div>
+
+                <div class="widget card p-5 text-xs text-gray-500 leading-relaxed" draggable="true">
+                    <div class="drag-handle" data-i18n-title="dragHint">⠿</div>
+                    <p class="text-[11px] uppercase tracking-widest text-gray-400 mb-2" data-i18n="logic"></p>
+                    <p data-i18n-html="revLogic"></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer style="border-top:1px solid #e3ecf0;" class="mt-12 py-6 bg-white">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <div class="brand text-base">Retail Tech ROI Simulator</div>
+        <p class="text-xs text-gray-400" data-i18n="footer"></p>
+    </div>
+</footer>
+
+<script>
+/* ── i18n ───────────────────────────────────────── */
+const I18N = {
+  ko: {
+    headerSub: '포트폴리오 데모',
+    disclaimer: '본 페이지의 모든 단가·수치는 공개용 예시 가정값입니다. 실제 판매 가격이나 특정 기업·고객의 데이터가 아니며, 계산 구조를 보여주기 위한 데모입니다.',
+    heroDesc: '매장 면적 기반 5년 TCO · 수익 비교',
+    storeArea: '매장 면적 (㎡)', storePreset: '매장 유형 프리셋',
+    presetNote: '프리셋 면적은 일반적인 매장 유형 기준 예시값',
+    heroAnalysis: '5년 누적 TCO / Net Value 분석',
+    params: '파라미터',
+    archIntro: '무선 인프라 방식에 따라 필요한 장비 대수와 설치·유지보수 비용이 어떻게 달라지는지 비교합니다.',
+    intelIntro: '결품(OOS) 감지 방식에 따라 장비 비용, 결품 손실, 보충 인력 비용이 어떻게 달라지는지 비교합니다.',
+    revIntro: '전자종이 POP의 광고 구좌 수에 따라 5년간 쌓이는 광고 수익과 투자 회수를 비교합니다.',
+    bleDensity: 'BLE AP 밀도 (대/1,000㎡)', halowAps: 'HaLow AP 수 (10,000㎡ 기준)',
+    bleCost: 'BLE 단가 ($, 예시)', halowCost: 'HaLow 단가 ($, 예시)',
+    install: '설치', maintYr: '유지보수/년',
+    units: '대', saving5: '5년 절감액', halowAdv: 'HaLow 우위', savingPct: '절감률',
+    tco5: '5년 TCO', cumTco: '연차별 누적 TCO', matrix: '매장 유형별 5년 TCO 매트릭스',
+    thStore: '매장 유형', thArea: '면적(㎡)', thSaving: '절감액', thShelves: '매대 수',
+    shelfDensity: '매대 밀도 (개/10,000㎡)',
+    optA: 'A. 카메라 단독 ($/매대, 예시)', optB: 'B. 센서 결합형 ($/매대, 예시)',
+    camHw: '카메라 HW', oosYr: '결품 손실/년', laborYr: '보충 인력/년',
+    uwb: 'UWB 레일', edgeCam: '엣지 카메라', loadCell: '로드셀',
+    aCapex: 'A. 카메라 CAPEX', bCapex: 'B. 센서 결합형 CAPEX', bAdv: 'B안 우위',
+    aShort: 'A. 카메라 단독', bShort: 'B. 센서 결합형',
+    logic: '로직 요약',
+    intelLogic: 'A안(카메라 단독)은 결품을 감지하기까지의 지연과 보충 작업 시간만큼 재고 공백이 생깁니다.<br>B안(UWB + 엣지 카메라 + 로드셀)은 무게 변화로 결품을 먼저 감지하고 보충 동선을 줄여 공백을 단축합니다.<br>5년 TCO = CAPEX + 5 × (결품 손실 + 보충 인력 비용), 매대 수에 비례해 확장.',
+    popDensity: '전자종이 POP 밀도 (대/10,000㎡)', adRate: '광고 구좌 단가 ($/일)', opDays: '연간 영업일',
+    slotsPerPop: 'POP당 광고 구좌 수', hiPop: '고효율 POP', stdPop: '일반 POP',
+    capexUnit: 'CAPEX 단가 ($, 예시)', popUnit: '전자종이 POP/대', apInfra: 'AP 인프라 합계',
+    apInfraNote: '예시: HaLow AP 2대 × ($450 + $300)',
+    hiSlots: '고효율 POP 광고 구좌', slotsDay: '구좌 / 일', hiAnnual: '고효율 POP 연 매출', stdAnnual: '일반 POP 연 매출',
+    netDiff: '5년 Net Value 차이', netChart: '5년 Net Value (누적 광고 매출 − CAPEX)', net5: '5년 Net Value',
+    revLogic: '배터리 효율이 높은 POP는 콘텐츠를 더 자주 바꿀 수 있어 POP당 광고 구좌가 늘어납니다.<br>연 매출 = POP 수 × 구좌 수 × 구좌 단가 × 영업일. 5년 Net Value = 5 × 연 매출 − CAPEX(AP 인프라 + POP).',
+    labelYear: '연 매출', label5y: '5년 누적', labelNet: 'Net Value',
+    cum: '누적', oos5: '결품 손실 (5년)', labor5: '보충 인력 (5년)', opex5: 'OPEX (5년)',
+    footer: '포트폴리오 데모 · 장영태(Terry) · Claude Code로 개발 · 모든 수치는 예시 가정값',
+    dragHint: '드래그하여 이동', custom: '직접 입력'
+  },
+  en: {
+    headerSub: 'Portfolio Demo',
+    disclaimer: 'All prices and figures on this page are illustrative assumptions for a public demo. They are not actual pricing or data from any company or customer; the page shows the calculation structure only.',
+    heroDesc: 'Store-size based 5-year TCO & revenue comparison',
+    storeArea: 'Store area (㎡)', storePreset: 'Store format preset',
+    presetNote: 'Preset areas are typical examples per store format',
+    heroAnalysis: '5-year cumulative TCO / Net Value',
+    params: 'Parameters',
+    archIntro: 'Compares how the wireless infrastructure choice changes the number of devices and the install and maintenance cost.',
+    intelIntro: 'Compares equipment cost, out-of-stock loss and replenishment labor across two out-of-stock detection setups.',
+    revIntro: 'Compares 5-year ad revenue and payback by the number of ad slots per e-paper POP.',
+    bleDensity: 'BLE AP density (units / 1,000㎡)', halowAps: 'HaLow APs (per 10,000㎡)',
+    bleCost: 'BLE unit cost ($, illustrative)', halowCost: 'HaLow unit cost ($, illustrative)',
+    install: 'Install', maintYr: 'Maintenance / yr',
+    units: 'units', saving5: '5-yr savings', halowAdv: 'HaLow advantage', savingPct: 'Savings rate',
+    tco5: '5-yr TCO', cumTco: 'Cumulative TCO by year', matrix: '5-yr TCO by store format',
+    thStore: 'Store format', thArea: 'Area (㎡)', thSaving: 'Savings', thShelves: 'Shelves',
+    shelfDensity: 'Shelf density (per 10,000㎡)',
+    optA: 'A. Camera only ($/shelf, illustrative)', optB: 'B. Sensor fusion ($/shelf, illustrative)',
+    camHw: 'Camera HW', oosYr: 'OOS loss / yr', laborYr: 'Replenishment labor / yr',
+    uwb: 'UWB rail', edgeCam: 'Edge camera', loadCell: 'Load cell',
+    aCapex: 'A. Camera CAPEX', bCapex: 'B. Sensor fusion CAPEX', bAdv: 'Option B advantage',
+    aShort: 'A. Camera only', bShort: 'B. Sensor fusion',
+    logic: 'Logic',
+    intelLogic: 'Option A (camera only) leaves a stock gap for as long as detection delay plus replenishment time.<br>Option B (UWB + edge camera + load cell) detects out-of-stock early from weight changes and shortens the replenishment route.<br>5-yr TCO = CAPEX + 5 × (OOS loss + replenishment labor), scaled by shelf count.',
+    popDensity: 'E-paper POP density (units / 10,000㎡)', adRate: 'Ad slot rate ($/day)', opDays: 'Operating days / yr',
+    slotsPerPop: 'Ad slots per POP', hiPop: 'High-efficiency POP', stdPop: 'Standard POP',
+    capexUnit: 'CAPEX unit cost ($, illustrative)', popUnit: 'E-paper POP / unit', apInfra: 'AP infrastructure total',
+    apInfraNote: 'Example: 2 HaLow APs × ($450 + $300)',
+    hiSlots: 'High-efficiency ad slots', slotsDay: 'slots / day', hiAnnual: 'High-efficiency annual revenue', stdAnnual: 'Standard annual revenue',
+    netDiff: '5-yr Net Value gap', netChart: '5-yr Net Value (cumulative ad revenue − CAPEX)', net5: '5-yr Net Value',
+    revLogic: 'A more battery-efficient POP can refresh content more often, so each POP carries more ad slots.<br>Annual revenue = POPs × slots × slot rate × operating days. 5-yr Net Value = 5 × annual revenue − CAPEX (AP infrastructure + POPs).',
+    labelYear: 'Annual', label5y: '5-yr total', labelNet: 'Net Value',
+    cum: 'cumulative', oos5: 'OOS loss (5 yr)', labor5: 'Replenishment labor (5 yr)', opex5: 'OPEX (5 yr)',
+    footer: 'Portfolio demo · Youngtae (Terry) Jang · Built with Claude Code · All figures are illustrative',
+    dragHint: 'Drag to reorder', custom: 'Custom'
+  }
+};
+const STORE_FORMATS = [
+  { key:'hyper',    area:20000, ko:'하이퍼마켓',     en:'Hypermarket' },
+  { key:'large',    area:10000, ko:'대형 슈퍼마켓',  en:'Large supermarket' },
+  { key:'super',    area:5000,  ko:'슈퍼마켓',       en:'Supermarket' },
+  { key:'discount', area:1500,  ko:'할인점',         en:'Discount store' },
+  { key:'compact',  area:500,   ko:'소형 매장',      en:'Compact store' }
+];
+
+let lang = 'ko';
+try {
+  const q = new URLSearchParams(location.search).get('lang');
+  const saved = localStorage.getItem('roiSimLang');
+  if (q === 'en' || q === 'ko') lang = q; else if (saved === 'en' || saved === 'ko') lang = saved;
+} catch (e) {}
+const t = k => (I18N[lang] && I18N[lang][k]) || I18N.ko[k] || k;
+
+function buildPresetOptions() {
+  const sel = document.getElementById('presetSelect');
+  const cur = sel.value || 'large';
+  sel.innerHTML = STORE_FORMATS.map(f => `<option value="${f.key}">${f[lang]} — ${f.area.toLocaleString()}㎡</option>`).join('')
+    + `<option value="custom">${t('custom')}</option>`;
+  sel.value = cur;
+}
+
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => { el.innerHTML = t(el.dataset.i18nHtml); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
+  document.querySelectorAll('.lang-toggle button').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  buildPresetOptions();
+}
+
+/* ── Calculations ───────────────────────────────── */
+const fmt  = n => '$' + Math.round(n).toLocaleString();
+const fmtK = n => { const v=Math.round(n); if(Math.abs(v)>=1e6) return '$'+(v/1e6).toFixed(2)+'M'; if(Math.abs(v)>=1e3) return '$'+(v/1e3).toFixed(1)+'K'; return '$'+v.toLocaleString(); };
+const num  = id => +document.getElementById(id).value;
+const state = { area: 10000 };
+
+function calcArch(area) {
+    const bd=num('bleDensity'), hb=num('halowAps');
+    const bh=num('bleHw'), bi=num('bleInstall'), bm=num('bleMaint');
+    const hh=num('halowHw'), hi=num('halowInstall'), hm=num('halowMaint');
+    const bleAps=Math.ceil((area/1000)*bd), halowAps=Math.max(1,Math.ceil(hb*(area/10000)));
+    const bleCapex=bleAps*(bh+bi), bleOpex=bleAps*bm, bleTCO=bleCapex+5*bleOpex;
+    const halowCapex=halowAps*(hh+hi), halowOpex=halowAps*hm, halowTCO=halowCapex+5*halowOpex;
+    return {bleAps,halowAps,bleCapex,bleOpex,bleTCO,halowCapex,halowOpex,halowTCO};
+}
+function calcIntel(area) {
+    const sd=num('shelfDensity'), shelves=Math.round((area/10000)*sd);
+    const ch=num('camHw'), co=num('camOOS'), cl=num('camLabor');
+    const su=num('solUwb'), se=num('solEye'), sl=num('solLoad'), so=num('solOOS'), sb=num('solLabor');
+    const aCapex=shelves*ch, aOOS=shelves*co, aLabor=shelves*cl, aOpex=aOOS+aLabor, aTCO=aCapex+5*aOpex;
+    const bCapex=shelves*(su+se+sl), bOOS=shelves*so, bLabor=shelves*sb, bOpex=bOOS+bLabor, bTCO=bCapex+5*bOpex;
+    return {shelves,aCapex,aOOS,aLabor,aOpex,aTCO,bCapex,bOOS,bLabor,bOpex,bTCO};
+}
+function calcRev(area) {
+    const pd=num('popDensity'), ar=num('adRate'), od=num('opDays'), ss=num('solSlots'), ns=num('normSlots');
+    const pp=num('popPrice'), ai=num('apInfra');
+    const pops=Math.round((area/10000)*pd);
+    const solAnnual=pops*ss*ar*od, normAnnual=pops*ns*ar*od, capex=ai+pops*pp;
+    return {pops, solTotalSlots:pops*ss, solAnnual, normAnnual, capex, solNet5:5*solAnnual-capex, normNet5:5*normAnnual-capex};
+}
+
+/* ── Charts ─────────────────────────────────────── */
+const charts = {};
+function makeChart(id, cfg) {
+    if (charts[id]) charts[id].destroy();
+    charts[id] = new Chart(document.getElementById(id).getContext('2d'), cfg);
+}
+const C = {
+    p1:'#a5d8e6', p2:'#4fb3cc', p3:'#0891b2', p4:'#0e7490', p5:'#0f2a3d',
+    p2L:'#4fb3cc33', p5L:'#0f2a3d26', grid:'#edf3f6', text:'#94a3b8'
+};
+const baseOpts = () => ({
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+        legend:{labels:{color:C.text,font:{size:11},boxWidth:12}},
+        tooltip:{callbacks:{label:(c)=>`${c.dataset.label}: ${fmt(c.parsed.y??c.parsed)}`}}
+    },
+    scales:{
+        x:{ticks:{color:C.text,font:{size:11}},grid:{color:C.grid}},
+        y:{ticks:{color:C.text,callback:(v)=>fmtK(v),font:{size:11}},grid:{color:C.grid}}
+    }
+});
+const stackOpts = () => { const b=baseOpts(); return {...b, scales:{...b.scales, y:{...b.scales.y,stacked:true}, x:{...b.scales.x,stacked:true,ticks:{display:false},grid:{display:false}}}}; };
+const yrs=[0,1,2,3,4,5];
+
+function renderArch() {
+    const r=calcArch(state.area), diff=r.bleTCO-r.halowTCO;
+    document.getElementById('archHalowAps').textContent = r.halowAps;
+    document.getElementById('archBleAps').textContent   = r.bleAps;
+    document.getElementById('archSaving').textContent    = fmtK(diff);
+    document.getElementById('archSavingPct').textContent = r.bleTCO>0?Math.round(diff/r.bleTCO*100)+'%':'—';
+    document.getElementById('halowTcoDisplay').textContent = fmt(r.halowTCO);
+    document.getElementById('bleTcoDisplay').textContent   = fmt(r.bleTCO);
+    makeChart('halowBarChart',{type:'bar',data:{labels:['HaLow'],datasets:[
+        {label:'CAPEX',data:[r.halowCapex],backgroundColor:C.p4,stack:'s',borderRadius:4,maxBarThickness:72},
+        {label:t('opex5'),data:[r.halowOpex*5],backgroundColor:C.p5,stack:'s',maxBarThickness:72}
+    ]},options:stackOpts()});
+    makeChart('bleBarChart',{type:'bar',data:{labels:['BLE'],datasets:[
+        {label:'CAPEX',data:[r.bleCapex],backgroundColor:C.p1,stack:'s',borderRadius:4,maxBarThickness:72},
+        {label:t('opex5'),data:[r.bleOpex*5],backgroundColor:C.p2,stack:'s',maxBarThickness:72}
+    ]},options:stackOpts()});
+    makeChart('archLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
+        {label:'HaLow '+t('cum'),data:yrs.map(y=>r.halowCapex+r.halowOpex*y),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5},
+        {label:'BLE '+t('cum'),data:yrs.map(y=>r.bleCapex+r.bleOpex*y),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2}
+    ]},options:baseOpts()});
+    document.getElementById('archStoreTable').innerHTML = STORE_FORMATS.map(s=>{
+        const sr=calcArch(s.area), sd=sr.bleTCO-sr.halowTCO;
+        return `<tr class="border-b border-gray-50">
+            <td class="py-2 pr-3 font-medium text-gray-700">${s[lang]}</td>
+            <td class="py-2 px-3 text-right text-gray-500">${s.area.toLocaleString()}</td>
+            <td class="py-2 px-3 text-right v-red">${sr.bleAps}</td>
+            <td class="py-2 px-3 text-right v-pri">${sr.halowAps}</td>
+            <td class="py-2 px-3 text-right text-gray-500">${fmt(sr.bleTCO)}</td>
+            <td class="py-2 px-3 text-right v-pri font-medium">${fmt(sr.halowTCO)}</td>
+            <td class="py-2 pl-3 text-right v-green font-semibold">${fmtK(sd)}</td>
+        </tr>`;
+    }).join('');
+}
+function renderIntel() {
+    const r=calcIntel(state.area), diff=r.aTCO-r.bTCO;
+    document.getElementById('intelACapex').textContent    = fmtK(r.aCapex);
+    document.getElementById('intelBCapex').textContent    = fmtK(r.bCapex);
+    document.getElementById('intelSaving').textContent    = fmtK(diff);
+    document.getElementById('intelSavingPct').textContent = r.aTCO>0?Math.round(diff/r.aTCO*100)+'%':'—';
+    document.getElementById('cameraTcoDisplay').textContent = fmt(r.aTCO);
+    document.getElementById('solumTcoDisplay').textContent  = fmt(r.bTCO);
+    makeChart('cameraBarChart',{type:'bar',data:{labels:['A'],datasets:[
+        {label:'CAPEX',data:[r.aCapex],backgroundColor:'#cfe9f0',stack:'s',borderRadius:4,maxBarThickness:72},
+        {label:t('oos5'),data:[r.aOOS*5],backgroundColor:C.p1,stack:'s',maxBarThickness:72},
+        {label:t('labor5'),data:[r.aLabor*5],backgroundColor:C.p2,stack:'s',maxBarThickness:72}
+    ]},options:stackOpts()});
+    makeChart('solumBarChart',{type:'bar',data:{labels:['B'],datasets:[
+        {label:'CAPEX',data:[r.bCapex],backgroundColor:C.p3,stack:'s',borderRadius:4,maxBarThickness:72},
+        {label:t('oos5'),data:[r.bOOS*5],backgroundColor:C.p4,stack:'s',maxBarThickness:72},
+        {label:t('labor5'),data:[r.bLabor*5],backgroundColor:C.p5,stack:'s',maxBarThickness:72}
+    ]},options:stackOpts()});
+    makeChart('intelLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
+        {label:t('aShort')+' '+t('cum'),data:yrs.map(y=>r.aCapex+r.aOpex*y),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2},
+        {label:t('bShort')+' '+t('cum'),data:yrs.map(y=>r.bCapex+r.bOpex*y),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5}
+    ]},options:baseOpts()});
+    document.getElementById('intelStoreTable').innerHTML = STORE_FORMATS.map(s=>{
+        const sr=calcIntel(s.area), sd=sr.aTCO-sr.bTCO;
+        return `<tr class="border-b border-gray-50">
+            <td class="py-2 pr-3 font-medium text-gray-700">${s[lang]}</td>
+            <td class="py-2 px-3 text-right text-gray-500">${s.area.toLocaleString()}</td>
+            <td class="py-2 px-3 text-right text-gray-500">${sr.shelves}</td>
+            <td class="py-2 px-3 text-right v-red">${fmt(sr.aTCO)}</td>
+            <td class="py-2 px-3 text-right v-pri font-medium">${fmt(sr.bTCO)}</td>
+            <td class="py-2 pl-3 text-right v-green font-semibold">${fmtK(sd)}</td>
+        </tr>`;
+    }).join('');
+}
+function renderRev() {
+    const r=calcRev(state.area);
+    document.getElementById('revSolSlots').textContent  = r.solTotalSlots;
+    document.getElementById('revSolAnnual').textContent = fmtK(r.solAnnual);
+    document.getElementById('revNormAnnual').textContent= fmtK(r.normAnnual);
+    const nd=r.solNet5-r.normNet5;
+    document.getElementById('revNetDiff').textContent   = (nd>=0?'+':'')+fmtK(nd);
+    makeChart('revLineChart',{type:'line',data:{labels:yrs.map(y=>'Y'+y),datasets:[
+        {label:t('hiPop'),data:yrs.map(y=>r.solAnnual*y-r.capex),borderColor:C.p5,backgroundColor:C.p5L,tension:0.3,fill:true,pointBackgroundColor:C.p5},
+        {label:t('stdPop'),data:yrs.map(y=>r.normAnnual*y-r.capex),borderColor:C.p2,backgroundColor:C.p2L,tension:0.3,fill:true,pointBackgroundColor:C.p2}
+    ]},options:baseOpts()});
+    document.getElementById('solumNetDisplay').textContent = fmt(r.solNet5);
+    document.getElementById('normNetDisplay').textContent  = fmt(r.normNet5);
+    const b=baseOpts();
+    const revBarOpts = {...b, plugins:{...b.plugins,legend:{display:false}}, scales:{...b.scales,x:{...b.scales.x,ticks:{color:C.text,font:{size:10}}}}};
+    const labels=[t('labelYear'),t('label5y'),t('labelNet')];
+    makeChart('solumRevBarChart',{type:'bar',data:{labels,datasets:[
+        {label:t('hiPop'),data:[r.solAnnual,r.solAnnual*5,r.solNet5],backgroundColor:[C.p3,C.p4,C.p5],borderRadius:4,maxBarThickness:60}
+    ]},options:revBarOpts});
+    makeChart('normRevBarChart',{type:'bar',data:{labels,datasets:[
+        {label:t('stdPop'),data:[r.normAnnual,r.normAnnual*5,r.normNet5],backgroundColor:[C.p1,'#cfe9f0',C.p2],borderRadius:4,maxBarThickness:60}
+    ]},options:revBarOpts});
+}
+function render() { renderArch(); renderIntel(); renderRev(); }
+
+function syncLabels() {
+    document.getElementById('bleDensityVal').textContent  = num('bleDensity').toFixed(1);
+    document.getElementById('halowApsVal').textContent    = num('halowAps');
+    document.getElementById('shelfDensityVal').textContent= num('shelfDensity');
+    document.getElementById('popDensityVal').textContent  = num('popDensity');
+    document.getElementById('adRateVal').textContent      = '$'+num('adRate').toFixed(2);
+    document.getElementById('opDaysVal').textContent      = num('opDays');
+}
+
+/* ── Events ─────────────────────────────────────── */
+const areaSlider = document.getElementById('areaSlider');
+const areaInput  = document.getElementById('areaInput');
+const presetSel  = document.getElementById('presetSelect');
+function updateSliderFill(slider) {
+    const pct = ((+slider.value - +slider.min) / (+slider.max - +slider.min) * 100).toFixed(1) + '%';
+    slider.style.setProperty('--pct', pct);
+}
+document.querySelectorAll('.tab-panel input').forEach(el => el.addEventListener('input',()=>{syncLabels();render();}));
+areaSlider.addEventListener('input', e => {
+    state.area = +e.target.value; areaInput.value = state.area;
+    updateSliderFill(areaSlider); presetSel.value = 'custom'; render();
+});
+areaInput.addEventListener('input', e => {
+    state.area = Math.max(100, Math.min(50000, +e.target.value || 0));
+    areaSlider.value = Math.min(25000, state.area);
+    updateSliderFill(areaSlider); presetSel.value = 'custom'; render();
+});
+presetSel.addEventListener('change', e => {
+    const f = STORE_FORMATS.find(x => x.key === e.target.value);
+    if (!f) return;
+    state.area = f.area; areaInput.value = f.area; areaSlider.value = Math.min(25000, f.area);
+    updateSliderFill(areaSlider); render();
+});
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));
+        document.getElementById('tab-'+btn.dataset.tab).classList.remove('hidden');
+        render();
+    });
+});
+document.querySelectorAll('.lang-toggle button').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        lang = btn.dataset.lang;
+        try { localStorage.setItem('roiSimLang', lang); } catch (e) {}
+        applyLang(); render();
+    });
+});
+
+function initDragDrop(id) {
+    const container=document.getElementById(id); if(!container) return;
+    let src=null;
+    const ws=()=>[...container.querySelectorAll(':scope>.widget')];
+    container.addEventListener('dragstart',e=>{
+        const w=e.target.closest('.widget'); if(!w) return;
+        src=w; e.dataTransfer.effectAllowed='move'; setTimeout(()=>w.classList.add('dragging'),0);
+    });
+    container.addEventListener('dragend',()=>{ ws().forEach(w=>w.classList.remove('dragging','drag-over')); src=null; setTimeout(render,50); });
+    container.addEventListener('dragover',e=>{
+        e.preventDefault();
+        const w=e.target.closest('.widget');
+        if(w&&w!==src){ ws().forEach(x=>x.classList.remove('drag-over')); w.classList.add('drag-over'); }
+    });
+    container.addEventListener('drop',e=>{
+        e.preventDefault();
+        const tgt=e.target.closest('.widget');
+        if(!tgt||tgt===src||!src) return;
+        const all=ws(), si=all.indexOf(src), ti=all.indexOf(tgt);
+        if(si<ti) container.insertBefore(src,tgt.nextSibling); else container.insertBefore(src,tgt);
+        tgt.classList.remove('drag-over');
+    });
+}
+['arch-widgets','intel-widgets','rev-widgets'].forEach(initDragDrop);
+
+presetSel.value = 'large';
+applyLang();
+presetSel.value = 'large';
+updateSliderFill(areaSlider);
+syncLabels();
+render();
+</script>
+</body>
+</html>
